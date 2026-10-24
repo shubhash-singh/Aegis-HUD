@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.1.2
-**Last Updated:** 2026-10-25 (Planning review corrections applied)
-**Current Stage:** Phase 0 — Planning complete (review corrections applied)
-**Overall Status:** Planning complete; awaiting Phase 1 authorization
+**Version:** 0.2.0
+**Last Updated:** 2026-10-25 (Phase 1 complete)
+**Current Stage:** Phase 1 — Implementation Complete, Device Validation Pending
+**Overall Status:** Phase 1 implementation and build verification complete; device tests pending
 
 ---
 
@@ -13,17 +13,17 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 0 — Planning |
-| Status | Phase 0 complete; Phase 1 not started |
+| Stage | Phase 1 — Launcher Foundation |
+| Status | Implementation Complete — Device Validation Pending |
 | Last Updated | 2026-10-25 |
-| Last Completed Phase | PHASE-00 (Planning) |
-| Current Phase | None (awaiting Phase 1 authorization) |
-| Next Step | Phase 1 — Subtask 1: Create `.gitignore` (B-001), then Android project scaffold |
-| Latest Build | Not yet run |
-| Latest Test Run | Not yet run |
-| Current Blockers | B-001 — `.gitignore` missing; must be created before any build file is committed |
+| Last Completed Phase | PHASE-01 (Launcher Foundation — build verified) |
+| Current Phase | PHASE-01 (device validation pending) |
+| Next Step | Phase 2 — HUD Design System (after Phase 1 device validation) |
+| Latest Build | `./gradlew assembleDebug` — BUILD SUCCESSFUL (2026-10-25) |
+| Latest Test Run | `./gradlew testDebugUnitTest` — BUILD SUCCESSFUL (2026-10-25) |
+| Current Blockers | None (B-001 resolved) |
 | Git Branch | main |
-| Latest Commit | 8559f7f — added review by codex on Phase 0: Planning |
+| Latest Commit | 829b1f0 — docs(review): add Phase 1 code review |
 
 ---
 
@@ -85,7 +85,7 @@ Rules:
 
 | Feature ID | Feature | Priority | Planned Phases | Completed Phases | Implementation | Validation | Status | Dependencies |
 |---|---|---|---|---|---|---|---|---|
-| F-001 | Launcher Foundation | P0 | 5 | 0 | Not Started | Not Tested | Not Started | — |
+| F-001 | Launcher Foundation | P0 | 5 | 2 | F-001-P1, F-001-P2 done | Build Verified; Device Pending | Implementation Complete — Device Validation Pending | — |
 | F-002 | HUD Design System | P0 | 5 | 0 | Not Started | Not Tested | Not Started | F-001 |
 | F-003 | HUD Home Screen | P0 | 6 | 0 | Not Started | Not Tested | Not Started | F-002 |
 | F-004 | App Discovery & Launching | P0 | 6 | 0 | Not Started | Not Tested | Not Started | F-001 |
@@ -105,7 +105,7 @@ Rules:
 | F-018 | Extended Automation | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-013 |
 | F-019 | Open-Source Preparation | P3 | 6 | 0 | Not Started | Not Tested | Deferred | All |
 
-**Implementation Progress: 0%** (0 / 86 active planned implementation phases verified complete)
+**Implementation Progress: 2%** (2 / 86 active planned implementation phases verified complete)
 
 > **Denominator basis:** 86 active (non-deferred) planned phases — 31 P0 + 24 P1 + 31 P2. Deferred P3 phases (16) are excluded per the formula in Section B.2. Implementation has not started; no phase has been executed or validated.
 
@@ -188,39 +188,44 @@ Rules:
 | Phase ID | PHASE-01 |
 | Title | Minimal Working Android Launcher |
 | Objective | Create project scaffold, register as launcher, verify build |
-| Status | Not Started |
-| Build Status | Not attempted |
-| Test Status | Not attempted |
+| Status | Implementation Complete — Device Validation Pending |
+| Build Status | BUILD SUCCESSFUL — `./gradlew assembleDebug` (2026-10-25, 1m 46s) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew testDebugUnitTest` (2026-10-25, 36s) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew lintDebug` (0 errors, 34 warnings) |
 | Dependencies | PHASE-00 |
-| Planned Start | After Phase 0 review and authorization |
-| Acceptance Criteria | ./gradlew assembleDebug succeeds; APK produced; tests pass; launcher registers |
+| Started | 2026-10-25 |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests ✅; Lint ✅; Device tests pending |
 
 **Subtasks:**
 
-- [ ] Create .gitignore (must include local.properties, build/, .gradle/, .idea/, *.keystore)
-- [ ] Create settings.gradle.kts
-- [ ] Create root build.gradle.kts (plugins only)
-- [ ] Create gradle/libs.versions.toml with all dependencies
-- [ ] Create gradle.properties
-- [ ] Create local.properties with correct SDK path (not committed)
-- [ ] Create Gradle wrapper (gradlew, gradlew.bat, gradle/wrapper/)
-- [ ] Create app/build.gradle.kts with Compose config
-- [ ] Create AndroidManifest.xml with launcher intent-filter and queries element
-- [ ] Create MainActivity.kt with enableEdgeToEdge() and setContent
-- [ ] Create AegisTheme.kt, Color.kt, Typography.kt stubs
-- [ ] Create HomeScreen.kt minimal placeholder
-- [ ] Create strings.xml
-- [ ] Create stub ExampleUnitTest.kt
-- [ ] Create stub ExampleInstrumentedTest.kt
-- [ ] Run ./gradlew assembleDebug
-- [ ] Fix all build errors
-- [ ] Run ./gradlew testDebugUnitTest
-- [ ] Run ./gradlew lintDebug
-- [ ] Update PROGRESS_TRACKER.md
-- [ ] Update PHASE_LOG.md
-- [ ] Update NEXT_STEPS.md
+- [x] Create .gitignore (must include local.properties, build/, .gradle/, .idea/, *.keystore)
+- [x] Create settings.gradle.kts
+- [x] Create root build.gradle.kts (plugins only)
+- [x] Create gradle/libs.versions.toml with all dependencies
+- [x] Create gradle.properties
+- [x] Create local.properties with correct SDK path (not committed)
+- [x] Create Gradle wrapper (gradlew, gradlew.bat, gradle/wrapper/) — SHA-256 verified
+- [x] Create app/build.gradle.kts with Compose config
+- [x] Create AndroidManifest.xml with launcher intent-filter and queries element
+- [x] Create MainActivity.kt with enableEdgeToEdge() and setContent
+- [x] Create AegisTheme.kt, Color.kt, Typography.kt stubs
+- [x] Create HomeScreen.kt minimal placeholder
+- [x] Create strings.xml
+- [x] Create stub ExampleUnitTest.kt
+- [x] Create stub ExampleInstrumentedTest.kt
+- [x] Run ./gradlew assembleDebug — BUILD SUCCESSFUL
+- [x] Fix all build errors — no errors encountered
+- [x] Run ./gradlew testDebugUnitTest — BUILD SUCCESSFUL
+- [x] Run ./gradlew lintDebug — 0 errors, 34 warnings
+- [x] Update PROGRESS_TRACKER.md
+- [x] Update PHASE_LOG.md
+- [x] Update NEXT_STEPS.md
+- [ ] Run DT-MANIFEST-01 on physical device — **No device connected**
+- [ ] Run DT-MANIFEST-02 on physical device — **No device connected**
 
-**Files to change:** See docs/phases/PHASE-01-FOUNDATION.md for full file list.
+**Pending device validation:** DT-MANIFEST-01 through DT-MANIFEST-04 require a physical device. No device was connected during this session. These tests must be run before Phase 1 is marked Complete.
+
+**Files changed:** See docs/phases/PHASE-01-FOUNDATION.md for full file list.
 
 ---
 
@@ -228,7 +233,9 @@ Rules:
 
 | Date | Command | Environment | Result | Notes | Feature/Phase |
 |---|---|---|---|---|---|
-| 2026-10-25 | (none run yet) | NixOS 26.11, JDK 21 | Pending | No application code; Phase 0 only | PHASE-00 |
+| 2026-10-25 | `./gradlew assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (1m 46s) | APK: 9.4MB at app/build/outputs/apk/debug/app-debug.apk | PHASE-01 |
+| 2026-10-25 | `./gradlew testDebugUnitTest` | Same | BUILD SUCCESSFUL (36s) | 2 tests passed (ExampleUnitTest) | PHASE-01 |
+| 2026-10-25 | `./gradlew lintDebug` | Same | BUILD SUCCESSFUL (14s) | 0 errors, 34 warnings (all version-upgrade and icon hints) | PHASE-01 |
 
 ---
 
@@ -236,7 +243,8 @@ Rules:
 
 | ID | Description | Severity | Feature | Cause | Resolution | Status | Next Action |
 |---|---|---|---|---|---|---|---|
-| B-001 | .gitignore missing from repository | Medium | All | Not created in Phase 0 | Create in first subtask of Phase 1 | Open | Phase 1, Subtask 1 |
+| B-001 | .gitignore missing from repository | Medium | All | Not created in Phase 0 | Created in Phase 1, Subtask 1 | **Resolved** | — |
+| B-002 | No physical device connected for manifest tests | Low | F-001 | No device/emulator available during session | Connect device and run DT-MANIFEST-01 through DT-MANIFEST-04 | Open | Before marking Phase 1 Complete |
 
 ---
 
@@ -247,37 +255,53 @@ Rules:
 | 2026-10-25 | Phase 0 complete: all planning documents created | PHASE-00-PLANNING.md |
 | 2026-10-25 | Correction task applied: F-012–F-019 expanded; toolchain corrected; progress accounting updated; AGENTS.md expanded; manifest attributes justified; consistency audit completed | Correction Task |
 | 2026-10-25 | Planning review corrections applied: Gradle wrapper bootstrap defined; technical wording, testing boundaries, dependency diagram, tracker reference, and changelog alignment corrected | `reviews/` |
+| 2026-10-25 | **Phase 1 implemented:** Android project scaffold created; Gradle 8.9 wrapper bootstrapped (SHA-256 verified); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all passed; device tests pending | PHASE-01-FOUNDATION.md |
 
 ---
 
 ## I. Session Handoff
 
-**Session:** Phase 0 Planning + Correction Task + Planning Review Corrections
+**Session:** Phase 1 — Android Launcher Foundation
 **Date:** 2026-10-25
 
-1. **Completed:** All Phase 0 planning documentation created. Correction task applied: feature plan completed, toolchain corrected, progress accounting restructured, AGENTS.md expanded, manifest attributes justified.
-2. **Changed:**
-   - AGENTS.md — expanded session startup procedure; local.properties note generalized
-   - docs/FEATURE_PLAN.md — F-012 through F-019 fully expanded with phase breakdowns
-   - docs/TECH_STACK.md — API 35 claim corrected; API 36 documented; local.properties section added
-   - docs/ARCHITECTURE.md — manifest attributes given per-attribute justifications and test requirements
-   - docs/PROGRESS_TRACKER.md — complete progress accounting framework; B-001 blocker added
-   - docs/DECISIONS.md — DEC-002 updated; DEC-010 added (manifest attributes)
-   - docs/TEST_PLAN.md — expanded with F-011 through F-016 test coverage
-   - docs/phases/PHASE-00-PLANNING.md — correction task subtasks added
-   - docs/PHASE_LOG.md — correction task outcome recorded
-   - docs/NEXT_STEPS.md — updated to reflect correction task completion
-   - README.md — local.properties setup instructions generalized
-3. **Validated:** Documentation review only. No build or test was run (not applicable to Phase 0).
-4. **Unverified:** Phase 1 build — no application code exists yet.
-5. **Blockers:** B-001 (.gitignore missing; to be created in Phase 1 Subtask 1).
-6. **Next Task:** Phase 1 — Subtask 1: Create .gitignore and Android project scaffold.
-7. **Files to inspect before resuming:** AGENTS.md, docs/PROGRESS_TRACKER.md, docs/NEXT_STEPS.md, docs/phases/PHASE-01-FOUNDATION.md.
+1. **Completed:** Full Phase 1 Android project scaffold. Gradle 8.9 wrapper bootstrapped from official distribution with SHA-256 verification. All source files created. Build, unit tests, and lint all pass.
+2. **Changed (new files):**
+   - `.gitignore` — resolves B-001
+   - `settings.gradle.kts` — root Gradle settings
+   - `build.gradle.kts` — root build file (plugins only)
+   - `gradle/libs.versions.toml` — version catalog per TECH_STACK.md
+   - `gradle.properties` — project-wide Gradle settings
+   - `local.properties` — machine-specific SDK path (not committed)
+   - `gradlew`, `gradlew.bat`, `gradle/wrapper/*` — Gradle 8.9 wrapper
+   - `app/build.gradle.kts` — app module with Compose
+   - `app/proguard-rules.pro` — empty ProGuard rules
+   - `app/src/main/AndroidManifest.xml` — launcher registration
+   - `app/src/main/kotlin/dev/ragnar/aegis/MainActivity.kt`
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/theme/AegisTheme.kt`
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/theme/Color.kt`
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/theme/Typography.kt`
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/HomeScreen.kt`
+   - `app/src/main/res/values/strings.xml`
+   - `app/src/main/res/values/ic_launcher_colors.xml`
+   - `app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml`
+   - `app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml`
+   - `app/src/test/kotlin/dev/ragnar/aegis/ExampleUnitTest.kt`
+   - `app/src/androidTest/kotlin/dev/ragnar/aegis/ExampleInstrumentedTest.kt`
+   - `docs/PROGRESS_TRACKER.md` — updated (this file)
+   - `docs/PHASE_LOG.md` — updated
+   - `docs/NEXT_STEPS.md` — updated
+3. **Validated:**
+   - `./gradlew assembleDebug` — BUILD SUCCESSFUL (1m 46s)
+   - `./gradlew testDebugUnitTest` — BUILD SUCCESSFUL (36s, 2 tests passed)
+   - `./gradlew lintDebug` — BUILD SUCCESSFUL (0 errors, 34 warnings)
+   - APK produced: `app/build/outputs/apk/debug/app-debug.apk` (9.4MB)
+4. **Unverified:** DT-MANIFEST-01 through DT-MANIFEST-04 (no physical device connected).
+5. **Blockers:** B-002 — No device available for manifest tests.
+6. **Next Task:** Phase 2 — HUD Design System (after device validation of Phase 1).
+7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-01-FOUNDATION.md`.
 8. **Commands to run when resuming:**
    ```bash
    git status
-   ls -la
+   ./gradlew assembleDebug
    cat docs/NEXT_STEPS.md
    ```
-
-9. **Planning review corrections applied:** The Gradle 8.9 wrapper bootstrap, test boundaries, platform terminology, Phase 7 dependency, tracker commit reference, and changelog counts were corrected. No application build or test has run.
