@@ -12,7 +12,7 @@
 | RISK-002 | Package visibility restrictions (Android 11+ API 30) | Platform | Medium | High | Apps not discoverable | Use `<queries>` element in manifest; test on API 30+ device | Open |
 | RISK-003 | Launcher not selected as default by Android | Platform/UX | Low | Medium | Core functionality blocked | Implement clear first-run prompt using `RoleManager` or `ACTION_HOME_SETTINGS` | Open |
 | RISK-004 | System toggle APIs deprecated (Wi-Fi, Bluetooth) | Platform | Medium | High (already happened) | Quick-action feature limited | Use intent-based flows only; document limitation clearly in UI | Open |
-| RISK-005 | Gradle wrapper download failure on NixOS | Build Environment | Medium | Low | Build cannot proceed without wrapper | Pin specific Gradle version; ensure network access; use local cache if needed | Open |
+| RISK-005 | Initial Gradle bootstrap or wrapper distribution download fails on NixOS | Build Environment | High | Medium | Phase 1 cannot create or run the wrapper | Download the official Gradle 8.9 binary distribution, verify its SHA-256, generate the wrapper, and retain `distributionSha256Sum`; use a verified local cache only when available | Open |
 | RISK-006 | Compose animation performance on target device | Performance | Medium | Medium | Janky HUD; battery drain | Profile early (Phase 6); provide animation disable setting; use Canvas-only rendering | Open |
 | RISK-007 | Memory leak from registered BroadcastReceiver | Reliability | High | Medium | App crashes or system instability | Always unregister receivers in `onStop`/`onDestroy`; use lifecycle-aware registration | Open |
 | RISK-008 | NetworkCallback not unregistered on activity destroy | Reliability | High | Medium | App crashes or network stack issues | Always unregister in `onStop`; use `lifecycleScope.launch` with proper cancellation | Open |
@@ -37,6 +37,10 @@
 ### RISK-001: AGP / Kotlin Compatibility
 
 The reference project (`GlassMorphismTest`) uses AGP 9.2.1 which is very new. AEGIS will use AGP 8.7.3 for stability. If 8.7.x cannot be resolved (e.g., incompatibility with Compose BOM 2024.11.00), escalate to 9.0.x stable and update `docs/DECISIONS.md`.
+
+### RISK-005: Initial Gradle Bootstrap and Wrapper Download
+
+The repository intentionally has no Gradle wrapper and the development machine has no system Gradle. Before the wrapper can exist, download `gradle-8.9-bin.zip` from `services.gradle.org`, verify SHA-256 `d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab` against `gradle.org/release-checksums`, then use its `:wrapper` task. The generated wrapper must retain the same distribution checksum. See DEC-012 and PHASE-01-FOUNDATION.md.
 
 ### RISK-004: Wi-Fi / Bluetooth Toggle
 

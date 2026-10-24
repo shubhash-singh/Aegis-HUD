@@ -22,6 +22,7 @@ This directory contains all project documentation for AEGIS HUD Launcher.
 | [RISK_REGISTER.md](RISK_REGISTER.md) | Technical and platform risks |
 | [NEXT_STEPS.md](NEXT_STEPS.md) | Current next implementation step and session handoff |
 | [CHANGELOG.md](CHANGELOG.md) | Milestone changelog |
+| [../reviews/README.md](../reviews/README.md) | Planning review and Phase 1 readiness reports |
 
 ## Phase Documents
 

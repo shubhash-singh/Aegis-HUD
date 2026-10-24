@@ -4,6 +4,15 @@
 
 ## [Unreleased] — Development
 
+### [0.1.1-planning] — Planning Review Corrections — 2026-10-25
+
+**Changed:**
+- Added a verified Gradle 8.9 wrapper-bootstrap procedure and associated decision/risk handling.
+- Corrected battery, widget-binding, animation, ViewModel-factory, test-boundary, and Phase 7 dependency documentation.
+- Corrected the tracker commit reference and updated the planning review handoff.
+- Updated the feature-plan total to 102 phases and the decision-log count to 12.
+- Added the `reviews/` planning-audit and Phase 1 readiness reports.
+
 ### [0.1.0-dev] — Phase 0 Complete — 2026-10-25
 
 **Added:**
@@ -11,7 +20,7 @@
   - `AGENTS.md` — Agent session instructions and workflow rules
   - `README.md` — Project overview and setup guide
   - `docs/PROJECT_PLAN.md` — Full roadmap and milestones
-  - `docs/FEATURE_PLAN.md` — 19 features across P0-P3 with 55+ phases
+  - `docs/FEATURE_PLAN.md` — 19 features across P0-P3 with 102 phases
   - `docs/ARCHITECTURE.md` — Layered architecture and package structure
   - `docs/TECH_STACK.md` — Technology choices and version catalog TOML
   - `docs/UI_UX_SPECIFICATION.md` — HUD visual design system specification
@@ -19,7 +28,7 @@
   - `docs/TEST_PLAN.md` — Testing strategy and acceptance criteria
   - `docs/PROGRESS_TRACKER.md` — Authoritative project tracker
   - `docs/PHASE_LOG.md` — Chronological phase log
-  - `docs/DECISIONS.md` — 9 architectural decisions recorded
+  - `docs/DECISIONS.md` — 12 architectural decisions recorded
   - `docs/BUG_TRACKER.md` — Bug tracking log (initially empty)
   - `docs/RISK_REGISTER.md` — 13 technical and platform risks documented
   - `docs/NEXT_STEPS.md` — Session handoff and Phase 1 task definition

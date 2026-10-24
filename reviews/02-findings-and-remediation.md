@@ -1,5 +1,7 @@
 # Findings and Remediation
 
+**Disposition (2026-10-25):** All documentation corrections described below were applied. The findings remain as the audit record; application build, test, lint, and device validation remain pending.
+
 ## FINDING-001 — Tracker does not name the current commit
 
 **Severity:** Medium  

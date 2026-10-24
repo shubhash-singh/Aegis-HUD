@@ -111,7 +111,7 @@
 |---|---|---|
 | (none) | App discovery via queries manifest | Declared in manifest; no runtime request |
 | `ACCESS_NETWORK_STATE` | Network connectivity telemetry | Declared in manifest; no runtime request |
-| `RECEIVE_BOOT_COMPLETED` | Optional: re-register as launcher on boot | Declared in manifest if needed |
+| `RECEIVE_BOOT_COMPLETED` | Not used in initial phases; only for a separately justified future boot receiver | Do not declare it merely to retain the default-home role; a launcher cannot re-register itself as default at boot |
 | `CAMERA` | Flashlight control (Phase 8+) | At runtime when flashlight feature is first used |
 | `VIBRATE` | Optional haptic feedback | Declared in manifest; no runtime request |
 

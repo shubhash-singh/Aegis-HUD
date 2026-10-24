@@ -1,8 +1,8 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.1.1
-**Last Updated:** 2026-10-25 (Correction Task)
-**Current Stage:** Phase 0 — Planning complete (correction task applied)
+**Version:** 0.1.2
+**Last Updated:** 2026-10-25 (Planning review corrections applied)
+**Current Stage:** Phase 0 — Planning complete (review corrections applied)
 **Overall Status:** Planning complete; awaiting Phase 1 authorization
 
 ---
@@ -23,7 +23,7 @@
 | Latest Test Run | Not yet run |
 | Current Blockers | B-001 — `.gitignore` missing; must be created before any build file is committed |
 | Git Branch | main |
-| Latest Commit | 68175a4 — docs(phase-0): final tracker consistency check |
+| Latest Commit | 8559f7f — added review by codex on Phase 0: Planning |
 
 ---
 
@@ -246,12 +246,13 @@ Rules:
 |---|---|---|
 | 2026-10-25 | Phase 0 complete: all planning documents created | PHASE-00-PLANNING.md |
 | 2026-10-25 | Correction task applied: F-012–F-019 expanded; toolchain corrected; progress accounting updated; AGENTS.md expanded; manifest attributes justified; consistency audit completed | Correction Task |
+| 2026-10-25 | Planning review corrections applied: Gradle wrapper bootstrap defined; technical wording, testing boundaries, dependency diagram, tracker reference, and changelog alignment corrected | `reviews/` |
 
 ---
 
 ## I. Session Handoff
 
-**Session:** Phase 0 Planning + Correction Task
+**Session:** Phase 0 Planning + Correction Task + Planning Review Corrections
 **Date:** 2026-10-25
 
 1. **Completed:** All Phase 0 planning documentation created. Correction task applied: feature plan completed, toolchain corrected, progress accounting restructured, AGENTS.md expanded, manifest attributes justified.
@@ -278,3 +279,5 @@ Rules:
    ls -la
    cat docs/NEXT_STEPS.md
    ```
+
+9. **Planning review corrections applied:** The Gradle 8.9 wrapper bootstrap, test boundaries, platform terminology, Phase 7 dependency, tracker commit reference, and changelog counts were corrected. No application build or test has run.

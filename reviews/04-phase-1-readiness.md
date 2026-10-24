@@ -9,21 +9,21 @@
 | Source and build state | Expectedly absent | No Gradle project, Android source, wrapper, or APK exists. |
 | Development environment | Partially ready | JDK 21, SDK 35/36, and `adb` are present. |
 | SDK local configuration | Pending | `local.properties` is absent and must be created locally after `.gitignore`. |
-| Gradle bootstrap | Blocked | No `gradlew` and no system `gradle`; no documented acquisition method. |
+| Gradle bootstrap | Defined, pending execution | DEC-012 defines the verified official Gradle 8.9 bootstrap method. |
 | Git hygiene | Pending | `.gitignore` is absent; two pre-existing root artifacts are untracked. |
 | Authorization | Pending | The governing documents state that Phase 1 awaits explicit authorization. |
 
-## Do Not Start Yet
+## Start Conditions
 
-Do not create Gradle or Android files until the team chooses the Gradle-bootstrap source and decides what to do with `AR_HUD_Luncher.tar.gz` and `diff.txt`. That keeps the first implementation commit reproducible and avoids accidentally staging local or generated files.
+Do not create Gradle or Android files until Phase 1 is explicitly authorized. The first execution steps must create `.gitignore`, decide what to do with the untracked `diff.txt` artifact, then perform the verified Gradle bootstrap. That keeps the first implementation commit reproducible and avoids accidentally staging local or generated files.
 
-## Required Plan Updates
+## Applied Plan Updates
 
-1. Add a wrapper-bootstrap subtask before the current Phase 1 wrapper-creation subtask, with a pinned official source and checksum.
-2. Add the initial-wrapper problem to the risk register; RISK-005 only covers the later distribution download.
-3. Reclassify each test as JVM unit, instrumentation/Compose, integration with fakes, or manual device test.
-4. State that missing device validation results in `Implementation Complete — Validation Pending`, not Phase 1 `Complete`.
-5. Fix the tracker hash, technical wording, dependency diagram, and changelog totals described in the findings report.
+1. Added a wrapper-bootstrap subtask with an official Gradle 8.9 source and SHA-256 checksum.
+2. Expanded RISK-005 to cover initial wrapper bootstrap and distribution download.
+3. Reclassified Android framework and Compose checks as instrumentation or device tests; pure logic remains JVM testable.
+4. Defined `Implementation Complete — Validation Pending` for missing physical-device validation.
+5. Corrected the tracker hash, technical wording, dependency diagram, and changelog totals.
 
 ## Safe Start Sequence After Updates and Authorization
 

@@ -100,6 +100,7 @@ AEGIS displays live system telemetry, provides a fully functional application dr
 | [docs/UI_UX_SPECIFICATION.md](docs/UI_UX_SPECIFICATION.md) | HUD design specification |
 | [docs/PROGRESS_TRACKER.md](docs/PROGRESS_TRACKER.md) | **Authoritative progress tracker** |
 | [docs/NEXT_STEPS.md](docs/NEXT_STEPS.md) | Current next implementation step |
+| [reviews/README.md](reviews/README.md) | Planning review and Phase 1 readiness reports |
 
 ---
 

@@ -87,6 +87,7 @@ Establish the complete project planning and tracking system for AEGIS HUD Launch
 | DEC-007 | DataStore Preferences over SharedPreferences |
 | DEC-008 | No external image loading library initially |
 | DEC-009 | No fake telemetry — permanent rule |
+| DEC-012 | Verified Gradle 8.9 bootstrap for initial wrapper generation |
 
 ---
 
@@ -133,6 +134,20 @@ None.
 **Outstanding item from correction task:**
 - B-001: `.gitignore` does not exist. Must be created in Phase 1, Subtask 1 (before any other file is committed).
   - Must include: `local.properties`, `build/`, `.gradle/`, `.idea/`, `*.keystore`, `*.jks`.
+
+---
+
+## Planning Review Corrections (2026-10-25)
+
+The planning review recorded in `reviews/` was applied before Phase 1 authorization.
+
+- Added DEC-012 and RISK-005 coverage for bootstrapping the initial Gradle 8.9 wrapper from a SHA-256 verified official distribution.
+- Corrected the tracker commit reference to the active `main` `HEAD` (`8559f7f`).
+- Corrected Android platform terminology for battery broadcasts, widget binding, and motion reduction.
+- Aligned lifecycle state collection, manual ViewModel factories, Phase 7 dependencies, test types, and changelog counts.
+- Defined physical-device validation handling so missing device tests produce `Implementation Complete — Validation Pending` rather than a false complete state.
+
+No Android application code, build, or test was created or run by this correction task.
 
 ---
 

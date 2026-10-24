@@ -12,34 +12,35 @@
 | Level | Description | Location | Tool | Phase Required |
 |---|---|---|---|---|
 | Unit Tests | Test pure Kotlin logic: filtering, sorting, data mapping | `app/src/test/` | JUnit 4, kotlinx-coroutines-test | Phase 1+ |
-| ViewModel Tests | Test ViewModel state changes using TestCoroutineDispatcher | `app/src/test/` | JUnit 4, turbine (optional) | Phase 2+ |
+| ViewModel Tests | Test ViewModel state changes with `runTest` and a `StandardTestDispatcher` or `UnconfinedTestDispatcher` | `app/src/test/` | JUnit 4, kotlinx-coroutines-test | Phase 2+ |
 | Compose UI Tests | Test composables in isolation | `app/src/androidTest/` | ComposeTestRule | Phase 3+ |
+| Instrumentation Tests | Test Activity, manifest, and Android framework adapters | `app/src/androidTest/` | AndroidX Test | Phase 1+ |
 | Integration Tests | Test repository + ViewModel together with fake platform | `app/src/test/` | JUnit 4 | Phase 4+ |
 | Device Tests | Full end-to-end on physical device | Manual + adb | Manual | Phase 14 |
 | Regression Tests | Re-run all tests after major changes | Both | All tools | Phase 13+ |
 
 ---
 
-## 2. Unit Test Requirements by Feature
+## 2. Test Requirements by Feature
 
 ### F-001: Launcher Foundation
-- [ ] `UT-001-01`: Activity starts without crash (Compose test).
-- [ ] `UT-001-02`: Back press on home screen does not finish Activity (Compose test).
-- [ ] `UT-001-03`: Process recreation does not lose critical state.
+- [ ] `IT-001-01`: Activity starts without crash (instrumentation test).
+- [ ] `IT-001-02`: Back press on home screen does not finish Activity (instrumentation test).
+- [ ] `IT-001-03`: Activity recreation does not lose critical launcher state (instrumentation test).
 
 ### F-002: HUD Design System
-- [ ] `UT-002-01`: `AegisTheme` composable renders without crash (preview test).
+- [ ] `CT-002-01`: `AegisTheme` composable renders without crash (Compose instrumentation test).
 - [ ] `UT-002-02`: Color tokens are not null.
-- [ ] `UT-002-03`: `HudPanel` composable renders with and without content.
+- [ ] `CT-002-03`: `HudPanel` composable renders with and without content (Compose instrumentation test).
 
 ### F-003: HUD Home Screen
 - [ ] `UT-003-01`: Clock displays correct time format (unit test on formatting function).
-- [ ] `UT-003-02`: Clock updates after one second (ViewModel test with test dispatcher).
+- [ ] `VT-003-02`: Clock updates after one second (ViewModel test with `runTest` and a test dispatcher).
 - [ ] `UT-003-03`: Date label displays correct date string (unit test).
-- [ ] `UT-003-04`: Home screen renders without crash (Compose test).
+- [ ] `CT-003-04`: Home screen renders without crash (Compose instrumentation test).
 
 ### F-004: Application Discovery
-- [ ] `UT-004-01`: `AppInfo` data class correctly maps from `ResolveInfo` (unit test).
+- [ ] `IT-004-01`: PackageManager adapter maps `ResolveInfo` into a platform-neutral `AppInfo` (instrumentation test).
 - [ ] `UT-004-02`: App list sorts alphabetically (unit test).
 - [ ] `UT-004-03`: Duplicate entries are removed (unit test).
 - [ ] `UT-004-04`: Empty package list produces empty `AppInfo` list (unit test).
@@ -52,22 +53,22 @@
 - [ ] `UT-005-04`: Query with no matches returns empty list (unit test).
 
 ### F-006: Battery Telemetry
-- [ ] `UT-006-01`: `BatteryState` maps from `Intent` extras correctly (unit test).
-- [ ] `UT-006-02`: Charging state correctly identified (unit test).
+- [ ] `IT-006-01`: Battery adapter extracts values from `Intent.ACTION_BATTERY_CHANGED` extras (instrumentation test).
+- [ ] `UT-006-02`: Platform-neutral battery values map to charging state correctly (unit test).
 - [ ] `UT-006-03`: Temperature converts from tenths of degrees to degrees (unit test).
-- [ ] `UT-006-04`: Missing extras produce safe default `BatteryState` (unit test).
+- [ ] `UT-006-04`: Missing platform-neutral values produce safe defaults (unit test).
 
 ### F-007: Animated Radar
-- [ ] `UT-007-01`: Radar composable renders without crash (Compose test).
-- [ ] `UT-007-02`: Animation does not throw exceptions (Compose test).
+- [ ] `CT-007-01`: Radar composable renders without crash (Compose instrumentation test).
+- [ ] `CT-007-02`: Animation does not throw exceptions (Compose instrumentation test).
 
 ### F-008: System Telemetry
-- [ ] `UT-008-01`: `NetworkState` maps from `NetworkCapabilities` correctly (unit test, if testable).
-- [ ] `UT-008-02`: Offline state produces correct `NetworkState` (unit test with fake).
+- [ ] `IT-008-01`: Network adapter maps `NetworkCapabilities` correctly (instrumentation test).
+- [ ] `UT-008-02`: Fake network source produces the correct offline `NetworkState` (unit test).
 
 ### F-009: Quick Actions
-- [ ] `UT-009-01`: Flashlight toggle calls `setTorchMode` (unit test with mock CameraManager).
-- [ ] `UT-009-02`: Settings intent resolves on device (device test).
+- [ ] `UT-009-01`: Flashlight action calls a fake `TorchController` (unit test).
+- [ ] `DT-009-02`: Settings intent resolves on device (device test).
 
 ### F-010: Customization / DataStore
 - [ ] `UT-010-01`: Default preferences produce expected values (unit test with in-memory DataStore).
@@ -174,6 +175,7 @@ The following tests verify the manifest attributes accepted in DEC-010:
 ## 6. Known Testing Limitations
 
 - Unit tests for `PackageManager` and `BroadcastReceiver` require instrumented tests or fakes; JVM unit tests cannot test real Android APIs.
+- Android framework types such as `Intent`, `ResolveInfo`, `NetworkCapabilities`, and `CameraManager` must be tested through instrumentation or isolated behind platform-neutral adapters.
 - Compose UI tests require an Android emulator or device.
 - Network callback behavior cannot be fully tested in unit tests.
 - Radar animation performance must be assessed on a real device.

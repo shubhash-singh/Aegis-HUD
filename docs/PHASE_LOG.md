@@ -112,6 +112,30 @@ A systematic correction pass was applied to all Phase 0 planning documents:
 
 ---
 
+### PHASE-00 — Planning Review Corrections (2026-10-25)
+
+| Field | Value |
+|---|---|
+| Session | Documentation review correction session |
+| Date | 2026-10-25 |
+| Status | Complete |
+| Build Result | N/A (no application code) |
+| Test Result | N/A (no application code) |
+
+**Summary:**
+
+The planning review findings were applied before Phase 1 authorization:
+
+1. Defined a reproducible, SHA-256 verified Gradle 8.9 bootstrap procedure for creating the first wrapper (DEC-012, RISK-005).
+2. Corrected the progress tracker’s latest-commit reference to active `main` `HEAD` (`8559f7f`).
+3. Corrected battery broadcast, widget-binding, animation, lifecycle-state, ViewModel-factory, and test-boundary guidance.
+4. Reconciled Phase 7 dependencies, changelog counts, Phase 1 device-validation criteria, and session handoff instructions.
+5. Added the root `reviews/` audit pack. The remaining untracked `diff.txt` artifact was left untouched pending an ownership decision.
+
+**Next phase:** PHASE-01 — Android Launcher Foundation, awaiting explicit authorization.
+
+---
+
 ### PHASE-01 — Android Launcher Foundation
 
 | Field | Value |

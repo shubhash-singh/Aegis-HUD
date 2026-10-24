@@ -206,7 +206,7 @@ Panels use 1dp borders, 2dp corner radius, with corner tick decorations (6dp lin
 **Rules:**
 - Never animate more than 2 major elements simultaneously.
 - All animations must be interruptible.
-- Respect `WindowManager.LayoutParams.FLAG_DIM_BEHIND` and `PowerManager` battery-saver state.
+- Pause or reduce nonessential animation when `PowerManager.isPowerSaveMode` is true.
 - Provide a global "reduce motion" or "disable animations" setting.
 
 ---

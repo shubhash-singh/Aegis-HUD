@@ -196,7 +196,7 @@ Display live battery level, charge state, and temperature. No polling; use stick
 
 | Phase | ID | Title | Status |
 |---|---|---|---|
-| 1 | F-006-P1 | BatteryManager sticky broadcast integration | Not Started |
+| 1 | F-006-P1 | `Intent.ACTION_BATTERY_CHANGED` sticky broadcast integration | Not Started |
 | 2 | F-006-P2 | Battery percentage display composable | Not Started |
 | 3 | F-006-P3 | Charging state indicator (charging / full / discharging) | Not Started |
 | 4 | F-006-P4 | Battery temperature display | Not Started |
@@ -295,7 +295,8 @@ Display live battery level, charge state, and temperature. No polling; use stick
 - No attempt to use restricted or deprecated system APIs.
 
 **Testing Requirements:**
-- Unit: Flashlight toggle calls setTorchMode (mock CameraManager).
+- Unit: Flashlight action calls a fake `TorchController` facade.
+- Integration / device: `CameraManager` adapter invokes `setTorchMode` and handles unsupported hardware.
 - Device: Settings intent resolves correctly.
 
 ---
@@ -383,7 +384,7 @@ Investigate the feasibility of hosting Android app widgets on the AEGIS home scr
 - F-012-P2 through F-012-P6: Widget hosts, binds, updates, and removes correctly without lifecycle leaks; widgets from at least 3 third-party apps load and display; placement persists across launcher restarts.
 
 **Risks:**
-- AppWidgetHost API is complex; BIND_APPWIDGET permission may require system-level elevation on some devices.
+- The custom widget-host binding flow declares `BIND_APPWIDGET`; if binding is not already allowed, it must request explicit user approval through the system binding flow.
 - Widget configuration activities require careful lifecycle management.
 - If F-012-P1 investigation reveals insurmountable restrictions, F-012 will be moved to Deferred and documented in DECISIONS.md.
 

@@ -19,7 +19,7 @@ Module boundaries will be introduced when complexity justifies it. Do not pre-cr
 ┌─────────────────────────────────────────────┐
 │   UI Layer (Jetpack Compose Composables)    │
 │   - Screens, components, animations        │
-│   - Observes StateFlow via collectAsState   │
+│   - Observes StateFlow via collectAsStateWithLifecycle │
 └────────────────────┬────────────────────────┘
                      │ state down / events up
 ┌────────────────────▼────────────────────────┐
@@ -138,7 +138,7 @@ No nested navigation graphs until Phase 5+.
 ### Battery State Example Flow
 
 ```
-BatteryManager sticky broadcast (platform)
+Intent.ACTION_BATTERY_CHANGED sticky broadcast (platform)
     → BatteryRepository (produces Flow<BatteryState>)
     → HomeViewModel (collects, maps to UI state)
     → HomeScreen (observes via collectAsStateWithLifecycle)
@@ -213,7 +213,7 @@ val LocalAegisSpacing = compositionLocalOf { AegisSpacing.default() }
 
 **Phase 1-5:** Manual dependency wiring. No DI framework.
 
-ViewModels are created via `viewModel { MyViewModel(repository) }` with `ViewModelProvider.Factory`.
+ViewModels with constructor dependencies are created through a `ViewModelProvider.Factory`, passed to Compose as `viewModel<MyViewModel>(factory = myViewModelFactory)`. The factory owns the manual repository wiring.
 
 **Phase 6+:** Evaluate Hilt if the number of dependencies justifies it. Decision to be recorded in `DECISIONS.md`.
 

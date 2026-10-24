@@ -1,6 +1,6 @@
 # NEXT_STEPS.md — AEGIS HUD Launcher
 
-**Last Updated:** 2026-10-25
+**Last Updated:** 2026-10-25 (Planning review corrections applied)
 **Current Phase:** PHASE-00 complete
 **Next Phase:** PHASE-01 — Android Launcher Foundation
 
@@ -25,7 +25,23 @@ Before starting Phase 1:
 - [x] Android SDK API 35 available at `~/Android/Sdk/`
 - [x] JDK 21 available
 - [x] adb available
+- [x] Planning review corrections applied; see `reviews/README.md`
+- [x] Gradle 8.9 wrapper bootstrap method defined in DEC-012
 - [ ] .gitignore does not yet exist — **must be created first** (B-001)
+
+---
+
+## Gradle Wrapper Bootstrap
+
+The repository has no `gradlew` and the machine has no system `gradle`. After creating the root Gradle settings and build files, bootstrap the wrapper from the official Gradle 8.9 binary distribution:
+
+1. Download `https://services.gradle.org/distributions/gradle-8.9-bin.zip` outside the repository.
+2. Verify SHA-256 `d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab` against `https://gradle.org/release-checksums/`.
+3. Unpack the verified archive outside the repository.
+4. From the repository root, run the unpacked `bin/gradle :wrapper --gradle-version 8.9 --distribution-type bin`.
+5. Confirm `gradle/wrapper/gradle-wrapper.properties` pins the same distribution URL and `distributionSha256Sum`.
+
+Do not commit the downloaded archive or unpacked bootstrap distribution. See DEC-012, RISK-005, and PHASE-01-FOUNDATION.md.
 
 ---
 
@@ -80,6 +96,7 @@ AR_HUD_Luncher/
 - [ ] APK is produced at `app/build/outputs/apk/debug/app-debug.apk`.
 - [ ] `./gradlew testDebugUnitTest` passes.
 - [ ] `./gradlew lintDebug` produces no errors.
+- [ ] The generated wrapper pins Gradle 8.9 and `distributionSha256Sum=d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab`.
 - [ ] `AndroidManifest.xml` contains `HOME` and `DEFAULT` intent categories.
 - [ ] `AndroidManifest.xml` contains `<queries>` element for app discovery.
 - [ ] `MainActivity.kt` uses `setContent` and renders `HomeScreen`.
@@ -172,6 +189,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 3. `docs/NEXT_STEPS.md` — this file
 4. `docs/phases/PHASE-01-FOUNDATION.md` — detailed Phase 1 plan
 5. `docs/TECH_STACK.md` — dependency versions
+6. `reviews/04-phase-1-readiness.md` — review disposition and readiness gates
 
 ---
 
@@ -195,6 +213,9 @@ Required entries: `local.properties`, `build/`, `.gradle/`, `.idea/`, `*.keystor
 
 **Next action after authorization:**
 1. Create `.gitignore` (B-001) — before any other file is committed.
-2. Create the Android project scaffold (Gradle, manifest, MainActivity, stubs).
-3. Run `./gradlew assembleDebug` from the repository root and resolve any build errors.
-4. Update `PROGRESS_TRACKER.md` with results.
+2. Decide whether to track, relocate, or remove the existing untracked `diff.txt` artifact.
+3. Bootstrap the verified Gradle 8.9 wrapper according to DEC-012.
+4. Create the Android project scaffold (Gradle, manifest, MainActivity, stubs).
+5. Run `./gradlew assembleDebug` from the repository root and resolve any build errors.
+6. Run the required physical-device manifest tests when a device is available; otherwise record `Implementation Complete — Validation Pending`.
+7. Update `PROGRESS_TRACKER.md` with observed results.

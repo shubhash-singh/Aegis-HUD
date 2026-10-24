@@ -41,6 +41,7 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 ## Dependencies
 
 - PHASE-00: All planning documents must exist.
+- Planning review corrections must be applied (DEC-012; `reviews/README.md`).
 - Android SDK API 35 available.
 - JDK 17+ (JDK 21 available on this machine).
 
@@ -56,23 +57,26 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 | 4 | Create `gradle/libs.versions.toml` | Not started |
 | 5 | Create `gradle.properties` | Not started |
 | 6 | Create `local.properties` (sdk.dir=<your Android SDK path> — not committed) | Not started |
-| 7 | Create Gradle wrapper (`gradlew`, `gradlew.bat`, `gradle/wrapper/`) | Not started |
-| 8 | Create `app/build.gradle.kts` with Compose config | Not started |
-| 9 | Create `AndroidManifest.xml` with launcher + queries | Not started |
-| 10 | Create `MainActivity.kt` | Not started |
-| 11 | Create `AegisTheme.kt`, `Color.kt`, `Typography.kt` stubs | Not started |
-| 12 | Create `HomeScreen.kt` minimal placeholder | Not started |
-| 13 | Create `strings.xml` | Not started |
-| 14 | Create stub `ExampleUnitTest.kt` | Not started |
-| 15 | Create stub `ExampleInstrumentedTest.kt` | Not started |
-| 16 | Run `./gradlew assembleDebug` | Not started |
-| 17 | Fix build errors | Not started |
-| 18 | Run `./gradlew testDebugUnitTest` | Not started |
-| 19 | Run `./gradlew lintDebug` | Not started |
-| 20 | Verify .gitignore excludes local.properties before any commit | Not started |
-| 21 | Update PROGRESS_TRACKER.md | Not started |
-| 22 | Update PHASE_LOG.md | Not started |
-| 23 | Update NEXT_STEPS.md | Not started |
+| 7 | Download and SHA-256 verify the official Gradle 8.9 bootstrap distribution outside the repository | Not started |
+| 8 | Generate Gradle wrapper (`gradlew`, `gradlew.bat`, `gradle/wrapper/`) from the verified distribution | Not started |
+| 9 | Create `app/build.gradle.kts` with Compose config | Not started |
+| 10 | Create `AndroidManifest.xml` with launcher + queries | Not started |
+| 11 | Create `MainActivity.kt` | Not started |
+| 12 | Create `AegisTheme.kt`, `Color.kt`, `Typography.kt` stubs | Not started |
+| 13 | Create `HomeScreen.kt` minimal placeholder | Not started |
+| 14 | Create `strings.xml` | Not started |
+| 15 | Create stub `ExampleUnitTest.kt` | Not started |
+| 16 | Create stub `ExampleInstrumentedTest.kt` | Not started |
+| 17 | Run `./gradlew assembleDebug` | Not started |
+| 18 | Fix build errors | Not started |
+| 19 | Run `./gradlew testDebugUnitTest` | Not started |
+| 20 | Run `./gradlew lintDebug` | Not started |
+| 21 | Verify .gitignore excludes local.properties before any commit | Not started |
+| 22 | Run DT-MANIFEST-01 on a physical device | Not started |
+| 23 | Run DT-MANIFEST-02 on a physical device | Not started |
+| 24 | Update PROGRESS_TRACKER.md | Not started |
+| 25 | Update PHASE_LOG.md | Not started |
+| 26 | Update NEXT_STEPS.md | Not started |
 
 ---
 
@@ -110,6 +114,8 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 ## Acceptance Criteria
 
 - [ ] `.gitignore` excludes `local.properties`, `build/`, `.gradle/`, `.idea/`, `*.keystore`, `*.jks`.
+- [ ] Gradle 8.9 bootstrap ZIP is SHA-256 verified before generating the wrapper.
+- [ ] Generated `gradle-wrapper.properties` pins Gradle 8.9 and its verified `distributionSha256Sum`.
 - [ ] `./gradlew assembleDebug` exits with code 0.
 - [ ] APK exists at `app/build/outputs/apk/debug/app-debug.apk`.
 - [ ] `./gradlew testDebugUnitTest` exits with code 0.
@@ -130,7 +136,8 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 ## Test Strategy
 
 - Unit test: Confirm basic Kotlin test runs (placeholder only in this phase).
-- Instrumentation test: Placeholder only; actual Compose tests in Phase 2+.
+- Instrumentation test: Verify launcher Activity and back-press behaviour when the harness is available; broader Compose component coverage begins in Phase 2.
+- Device test: Run DT-MANIFEST-01 and DT-MANIFEST-02 on a physical device. If no device is available, record the phase as `Implementation Complete — Validation Pending`; do not mark it complete.
 - Build verification is the primary validation for this phase.
 
 ---
@@ -146,7 +153,7 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 ## Completion Criteria
 
 This phase is complete when:
-- All 23 subtasks are marked done.
+- All 26 subtasks are marked done.
 - `./gradlew assembleDebug` succeeds.
 - `./gradlew testDebugUnitTest` succeeds.
 - `./gradlew lintDebug` produces no errors.

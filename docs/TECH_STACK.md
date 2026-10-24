@@ -163,6 +163,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 | System Gradle | Not available | Always use ./gradlew wrapper |
 | ANDROID_HOME env var | Not set | Configure via local.properties (see Section 8) |
 | AGP 8.7.3 build | Not yet verified | No project scaffold exists yet; to be verified in Phase 1 |
+| Initial Gradle wrapper bootstrap | Defined, not yet executed | Download and verify the official Gradle 8.9 binary distribution, then run its `:wrapper` task; see DEC-012 and Phase 1 plan |
 
 ---
 
@@ -182,3 +183,15 @@ sdk.dir=/home/ragnar/Android/Sdk
 ```
 
 This path is specific to this machine. On a different computer, use the correct path for that system. Android Studio can set this file automatically when you open the project. See the README for setup instructions.
+
+---
+
+## 9. Initial Gradle Wrapper Bootstrap
+
+The repository intentionally has no wrapper yet and this machine has no system `gradle` executable. Phase 1 must bootstrap the wrapper from the official Gradle 8.9 binary distribution before any `./gradlew` command can run.
+
+- Distribution: `https://services.gradle.org/distributions/gradle-8.9-bin.zip`
+- SHA-256: `d725d707bfabd4dfdc958c624003b3c80accc03f7037b5122c4b1d0ef15cecab`
+- Verification source: `https://gradle.org/release-checksums/`
+
+Download and unpack the distribution outside the repository, verify its SHA-256 before use, then run its `bin/gradle :wrapper --gradle-version 8.9 --distribution-type bin` task from the repository root. The generated wrapper configuration must set the same distribution URL and `distributionSha256Sum`. Do not commit the downloaded archive or unpacked bootstrap distribution.
