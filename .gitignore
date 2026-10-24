@@ -1,0 +1,29 @@
+# Built outputs
+build/
+*.apk
+*.aab
+
+# Gradle
+.gradle/
+gradle-app.setting
+
+# Local configuration (machine-specific SDK path)
+local.properties
+
+# IDE
+.idea/
+*.iml
+*.iws
+.DS_Store
+.externalNativeBuild
+.cxx
+
+# Signing keys
+*.keystore
+*.jks
+
+# Misc
+*.log
+captures/
+.navigation/
+output-metadata.json
