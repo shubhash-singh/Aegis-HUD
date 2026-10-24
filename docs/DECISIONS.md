@@ -16,7 +16,7 @@ Significant architectural and implementation decisions are recorded here with al
 **Phase:** PHASE-00
 **Status:** Accepted
 
-**Decision:** Set `minSdk = 30`. `Accepted: 2026-10-25 01:09`
+**Decision:** Set `minSdk = 26`. `Accepted: 2026-10-25 01:09`
 
 **Alternatives Considered:**
 - API 21 (Android 5.0): Broadest coverage but excludes several modern APIs and requires additional compatibility shims.
@@ -165,23 +165,26 @@ Significant architectural and implementation decisions are recorded here with al
 
 ---
 
-### DEC-010: Launcher Activity Manifest Attributes Accepted
+### DEC-010: Launcher Activity Manifest Attributes
 
 **Date:** 2026-10-25
 **Phase:** PHASE-00 (Correction Task)
 **Status:** Accepted
 
-**Decision:** Use `launchMode="singleTask"`, `stateNotNeeded="true"`, and `excludeFromRecents="true"` on MainActivity.
+**Decision:** Use `launchMode="singleTask"`, `stateNotNeeded="true"`, and `excludeFromRecents="true"` on `MainActivity`. Each attribute is justified independently below.
 
-**Justifications:**
+**`launchMode="singleTask"` — Accepted**
+Without this, pressing Home while the launcher is already displayed could push a second `MainActivity` instance onto the back stack, causing nested launcher screens and broken navigation. A single guaranteed instance is required for correct home-screen behavior. Standard practice for Android launcher activities.
 
-- `singleTask`: Prevents multiple launcher instances stacking on the back stack when the user presses Home repeatedly. Standard for all production Android launchers.
-- `stateNotNeeded`: The launcher's display state is built from live sources (platform APIs, DataStore), not from a saved bundle. Android is permitted to kill the launcher without saving state, as is normal. The launcher must always reconstruct from scratch in `onCreate()`.
-- `excludeFromRecents`: The home screen should not appear as a card in the Android Recents screen. Appearing in Recents would allow accidental dismissal of the launcher task.
+**`stateNotNeeded="true"` — Accepted**
+The launcher home screen is always reconstructed from live data sources (PackageManager, BatteryManager, DataStore); it does not depend on a saved UI bundle. Declaring `stateNotNeeded="true"` makes this design contract explicit to the OS and avoids unnecessary `onSaveInstanceState()` serialization. This is a deliberate design choice suited to AEGIS's stateless-reconstruction model, not a universal launcher requirement.
 
-**Alternatives considered:** Using Android defaults (standard launch mode, stateNotNeeded=false, no excludeFromRecents). This would allow stacked launcher instances, stale bundle state, and launcher appearance in Recents — all undesirable.
+**`excludeFromRecents="true"` — Accepted**
+The home screen should not appear as a card in the Android Overview (Recents) screen. Appearing in Recents would allow the user to accidentally swipe away the launcher task, which is unexpected behavior for a home screen application.
 
-**Test requirements defined:** See ARCHITECTURE.md Section 6.
+**Alternative considered:** Using Android defaults (standard launch mode, stateNotNeeded=false, no excludeFromRecents). Rejected: would allow stacked launcher instances, unnecessary saved-state overhead, and launcher appearance in Recents.
+
+**Test requirements:** See ARCHITECTURE.md Section 6 and TEST_PLAN.md (DT-MANIFEST-01 through DT-MANIFEST-04).
 
 ---
 

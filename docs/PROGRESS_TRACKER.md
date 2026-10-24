@@ -18,12 +18,12 @@
 | Last Updated | 2026-10-25 |
 | Last Completed Phase | PHASE-00 (Planning) |
 | Current Phase | None (awaiting Phase 1 authorization) |
-| Next Step | Phase 1 — Subtask 1: Create Gradle project scaffold |
+| Next Step | Phase 1 — Subtask 1: Create `.gitignore` (B-001), then Android project scaffold |
 | Latest Build | Not yet run |
 | Latest Test Run | Not yet run |
-| Current Blockers | None |
+| Current Blockers | B-001 — `.gitignore` missing; must be created before any build file is committed |
 | Git Branch | main |
-| Latest Commit | 94bd1fa — chore(phase-0): complete planning documentation |
+| Latest Commit | 4fdee92 — docs(phase-0): apply Phase 0 correction task |
 
 ---
 
@@ -105,14 +105,16 @@ Rules:
 | F-018 | Extended Automation | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-013 |
 | F-019 | Open-Source Preparation | P3 | 6 | 0 | Not Started | Not Tested | Deferred | All |
 
-**Implementation Progress: 0%** (0 / 0 implementation subtasks verified complete; no implementation phase has begun)
+**Implementation Progress: 0%** (0 / 86 active planned implementation phases verified complete)
+
+> **Denominator basis:** 86 active (non-deferred) planned phases — 31 P0 + 24 P1 + 31 P2. Deferred P3 phases (16) are excluded per the formula in Section B.2. Implementation has not started; no phase has been executed or validated.
 
 **Planning Coverage: 100%** (19 / 19 features have defined phases)
 
 **P0 phase total:** 31 phases across 6 features
 **P1 phase total:** 24 phases across 5 features
 **P2 phase total:** 31 phases across 5 features
-**P3 phase total (Deferred):** 16 phases across 3 features — not counted in active total
+**P3 phase total (Deferred):** 16 phases across 3 features — excluded from active denominator
 
 **Active (non-deferred) total planned phases:** 86
 
@@ -273,6 +275,6 @@ Rules:
 8. **Commands to run when resuming:**
    ```bash
    git status
-   ls /home/ragnar/AndroidStudioProjects/AR_HUD_Luncher/
+   ls -la
    cat docs/NEXT_STEPS.md
    ```

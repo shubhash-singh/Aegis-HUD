@@ -145,9 +145,9 @@ BackHandler { /* no-op: do not exit the launcher */ }
 
 ## Validation Commands for Phase 1
 
-```bash
-cd /home/ragnar/AndroidStudioProjects/AR_HUD_Luncher
+> Run all commands from the repository root.
 
+```bash
 # Build
 ./gradlew assembleDebug
 
@@ -177,7 +177,11 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## Outstanding Blockers
 
-None at this time.
+**B-001 — `.gitignore` missing**
+
+No `.gitignore` file exists in the repository. `local.properties` (which contains the machine-specific SDK path) and IDE/build directories would be accidentally committed without it. `.gitignore` must be the very first file created in Phase 1, before any other file is staged or committed.
+
+Required entries: `local.properties`, `build/`, `.gradle/`, `.idea/`, `*.keystore`, `*.jks`.
 
 ---
 
@@ -187,9 +191,10 @@ None at this time.
 - All planning and documentation created.
 - Environment inspected and documented.
 - Architecture, feature plan, UI/UX spec, test plan, and risk register established.
+- Correction task applied (see PHASE_LOG.md).
 
-**Next action after reviewing the plan:**
-- Authorize Phase 1 implementation.
-- Create the Android project scaffold.
-- Run `./gradlew assembleDebug` and resolve any build errors.
-- Update `PROGRESS_TRACKER.md` with results.
+**Next action after authorization:**
+1. Create `.gitignore` (B-001) — before any other file is committed.
+2. Create the Android project scaffold (Gradle, manifest, MainActivity, stubs).
+3. Run `./gradlew assembleDebug` from the repository root and resolve any build errors.
+4. Update `PROGRESS_TRACKER.md` with results.

@@ -155,21 +155,21 @@ The launcher's `MainActivity` uses three non-default attributes. Each is documen
 
 #### `android:launchMode="singleTask"` — Accepted
 
-**Behavior:** Android ensures only one instance of the Activity exists at a time. If the launcher is already running and a new launch intent arrives (e.g., the user presses Home), Android routes the intent to `onNewIntent()` rather than creating a second instance.
+**Behavior:** Android ensures only one instance of the Activity exists at a time. If the launcher is already running and a new Home intent arrives, Android routes it to `onNewIntent()` rather than creating a new instance.
 
-**Justification for launchers:** A launcher should never have multiple stacked instances. Without `singleTask`, pressing Home while already on the home screen could create a second Activity on the back stack, leading to unexpected "AEGIS inside AEGIS" navigation bugs. All production launchers (AOSP Launcher3, Pixel Launcher) use this launch mode.
+**Justification:** Without `singleTask`, pressing Home while the launcher is already displayed could push a second instance of `MainActivity` onto the back stack, resulting in nested launcher screens and broken navigation. A launcher whose sole task is to be the home screen benefits from a single guaranteed instance. Standard practice for Android launcher activities.
 
-**Test requirement:** Pressing the Home button repeatedly must not stack multiple Activity instances. Verified by observing that the back stack contains exactly one root entry after multiple Home presses.
+**Test requirement:** Pressing the Home button repeatedly must not stack multiple Activity instances. Verified by confirming the back stack contains exactly one root entry after multiple Home presses.
 
 #### `android:stateNotNeeded="true"` — Accepted
 
 **Behavior:** Informs the Android OS that this Activity can be killed without saving instance state via `onSaveInstanceState()`. The system will not call `onSaveInstanceState()`, and `onCreate()` will always receive a null bundle.
 
-**Justification for launchers:** The launcher is the home screen; its state (app list, clock) must be rebuilt from live sources on every start, not from a stale saved bundle. Accepting that the system may kill the launcher without saving state is correct behavior. AEGIS must be designed to reconstruct its display cleanly from `onCreate()` without relying on a saved bundle.
+**Justification:** A launcher's home screen is always reconstructed from live data sources (PackageManager, BatteryManager, DataStore), not from a previously saved UI bundle. Declaring `stateNotNeeded="true"` makes this design contract explicit to the OS and avoids unnecessary bundle serialization. It is a deliberate choice that fits the stateless-reconstruction model, not a universal requirement for launchers.
 
-**Design consequence:** No critical launcher state may depend on the saved instance state bundle. All persistent data must come from DataStore or live platform APIs.
+**Design consequence:** No critical launcher state may depend on the saved instance state bundle. All persistent data must come from DataStore or live platform APIs. `onCreate()` must handle a null bundle correctly at all times.
 
-**Test requirement:** Kill the launcher process via `adb shell am kill dev.ragnar.aegis`, then press Home. AEGIS must restart and display the home screen correctly without errors.
+**Test requirement:** Kill the launcher process via `adb shell am kill dev.ragnar.aegis`, then press Home. AEGIS must restart and display the home screen correctly with no crash or missing data.
 
 #### `android:excludeFromRecents="true"` — Accepted
 
