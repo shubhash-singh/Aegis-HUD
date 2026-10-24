@@ -57,10 +57,15 @@ AEGIS displays live system telemetry, provides a fully functional application dr
 
 1. Clone the repository.
 2. Open in Android Studio.
-3. Ensure `local.properties` contains:
+3. Create `local.properties` at the repository root (this file is machine-specific and is not committed):
+   ```
+   sdk.dir=<absolute path to your Android SDK>
+   ```
+   Example on this development machine:
    ```
    sdk.dir=/home/ragnar/Android/Sdk
    ```
+   Android Studio can create this file automatically when you open the project and configure the SDK.
 4. Sync Gradle.
 
 ---

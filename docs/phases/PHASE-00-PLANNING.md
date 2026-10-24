@@ -110,9 +110,35 @@ None.
 
 ---
 
+## Phase 0 Correction Task (2026-10-25)
+
+**Performed by:** Agent session following initial Phase 0 creation.
+
+**Corrections applied:**
+
+| Item | File(s) Changed |
+|---|---|
+| F-012–F-019 feature phases expanded; no TBD entries remain | FEATURE_PLAN.md |
+| API 35 "latest stable" claim corrected; API 36 documented | TECH_STACK.md, DECISIONS.md |
+| Toolchain compatibility confirmed via official documentation | TECH_STACK.md, DECISIONS.md (DEC-011) |
+| Progress accounting restructured with formula and status vocabulary | PROGRESS_TRACKER.md |
+| Agent startup procedure expanded to 14 steps | AGENTS.md |
+| Machine-specific SDK path generalized | AGENTS.md, README.md, TECH_STACK.md |
+| Manifest attributes given per-attribute justifications and test requirements | ARCHITECTURE.md, DECISIONS.md (DEC-010) |
+| Cross-document consistency audit completed | All docs |
+| F-011–F-016 test coverage added; manifest tests added | TEST_PLAN.md |
+| Correction task outcome recorded | PHASE_LOG.md, this file |
+| .gitignore missing from repository identified as B-001 blocker | PROGRESS_TRACKER.md |
+
+**Outstanding item from correction task:**
+- B-001: `.gitignore` does not exist. Must be created in Phase 1, Subtask 1 (before any other file is committed).
+  - Must include: `local.properties`, `build/`, `.gradle/`, `.idea/`, `*.keystore`, `*.jks`.
+
+---
+
 ## Next Action
 
 Present planning documents to user for review. Await explicit authorization to proceed to PHASE-01.
 
 **Next Phase:** PHASE-01 — Android Launcher Foundation
-**Next Step:** Create Android project scaffold and verify `./gradlew assembleDebug`.
+**Next Step:** Create .gitignore, then Android project scaffold and verify `./gradlew assembleDebug`.

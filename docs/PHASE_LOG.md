@@ -72,6 +72,46 @@ All planning documents were created:
 
 ---
 
+### PHASE-00 — Correction Task (2026-10-25)
+
+| Field | Value |
+|---|---|
+| Session | Correction review session |
+| Date | 2026-10-25 |
+| Status | Complete |
+| Build Result | N/A (no application code) |
+| Test Result | N/A (no application code) |
+
+**Summary:**
+
+A systematic correction pass was applied to all Phase 0 planning documents:
+
+1. **Feature plan completed:** F-012 through F-019 received full phase breakdowns, acceptance criteria, dependencies, and status values. No TBD entries remain.
+2. **Toolchain corrected:** API 35 "latest stable" claim corrected; API 36 (Android 16, stable March 2025) documented. Toolchain compatibility (AGP 8.7.3 + Kotlin 2.0.21 + Compose BOM 2024.11.00 + Gradle 8.9) confirmed against official documentation.
+3. **Progress accounting restructured:** Separate tracking for roadmap coverage vs. implementation progress; standardized status vocabulary; B-001 blocker (missing .gitignore) added.
+4. **Agent startup procedure expanded:** 14-step procedure now requires all technical, testing, and phase-specific documents before implementation.
+5. **SDK path hardcoding removed:** Portable setup instructions with the machine path as an example only.
+6. **Manifest attributes justified:** Per-attribute documentation with test requirements for singleTask, stateNotNeeded, and excludeFromRecents. DEC-010 added.
+7. **Consistency audit:** All documents reviewed; DEC-002 corrected; DEC-010 and DEC-011 added.
+8. **Test plan expanded:** F-011 through F-016 coverage added; manifest attribute tests added; Phase 0 non-implication of test passage clarified.
+
+**Files changed:**
+- AGENTS.md
+- docs/FEATURE_PLAN.md
+- docs/TECH_STACK.md
+- docs/ARCHITECTURE.md
+- docs/DECISIONS.md
+- docs/PROGRESS_TRACKER.md
+- docs/TEST_PLAN.md
+- docs/PHASE_LOG.md (this file)
+- docs/phases/PHASE-00-PLANNING.md
+- docs/NEXT_STEPS.md
+- README.md
+
+**Outstanding item:** .gitignore does not exist; must be created in Phase 1, Subtask 1.
+
+---
+
 ### PHASE-01 — Android Launcher Foundation
 
 | Field | Value |

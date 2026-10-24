@@ -1,7 +1,7 @@
 # TEST_PLAN.md — AEGIS HUD Launcher
 
-**Version:** 0.1.0-planning
-**Last Updated:** 2026-10-25
+**Version:** 0.1.1-planning
+**Last Updated:** 2026-10-25 (Correction Task)
 
 ---
 
@@ -74,22 +74,72 @@
 - [ ] `UT-010-02`: Saved accent color is read back correctly (unit test).
 - [ ] `UT-010-03`: Animation speed setting persists (unit test).
 
+### F-011: Application Organization
+- [ ] `UT-011-01`: Favorite app list persists via DataStore (unit test with in-memory DataStore).
+- [ ] `UT-011-02`: Sort order logic sorts alphabetically by default (unit test).
+- [ ] `UT-011-03`: Quick-launch slot configuration reads back correctly (unit test).
+- [ ] `UT-011-04`: Removing an app from favorites updates the list (unit test).
+
+### F-012: Widget Hosting (feasibility investigation phase only; implementation tests TBD after F-012-P1)
+- [ ] `UT-012-01`: Feasibility investigation report exists and documents API constraints (manual check).
+
+### F-013: Context-Aware HUD
+- [ ] `UT-013-01`: Rule evaluation returns correct action for time-based trigger with mock time input (unit test).
+- [ ] `UT-013-02`: Rule evaluation returns correct action for battery-level trigger (unit test).
+- [ ] `UT-013-03`: No rule configured produces default HUD state (unit test).
+- [ ] `UT-013-04`: Rule persistence reads back correctly (unit test with in-memory DataStore).
+
+### F-014: Developer Console
+- [ ] `UT-014-01`: Diagnostic data model maps correctly from mock inputs (unit test).
+- [ ] `UT-014-02`: Log buffer ring correctly discards oldest entries when full (unit test).
+- [ ] `DT-014-01`: Developer console screen displays real values on device (device test).
+
+### F-015: Gesture Navigation (investigation phase only; implementation tests TBD after F-015-P1)
+- [ ] `UT-015-01`: Investigation report documents gesture conflict analysis (manual check).
+
+### F-016: Reliability and Performance
+- [ ] `PT-016-01`: Cold start to visible home screen: <= 1 second on target device (device perf test).
+- [ ] `PT-016-02`: Drawer scroll: sustained 60fps on target device (device perf test).
+- [ ] `PT-016-03`: Idle battery drain: <= 1% per hour measured over 1 hour (device battery test).
+- [ ] `PT-016-04`: No memory leak from BroadcastReceiver after 30 minutes idle (device memory test).
+- [ ] `PT-016-05`: Kill-and-restart cycle: launcher restarts cleanly after process kill (device test).
+- [ ] `RT-016-01`: Full unit test regression: ./gradlew testDebugUnitTest passes with no failures.
+- [ ] `RT-016-02`: Lint regression: ./gradlew lintDebug produces no errors.
+
+---
+
+## 2b. Manifest Attribute Tests (F-001 Extension)
+
+The following tests verify the manifest attributes accepted in DEC-010:
+
+| Test ID | Description | Method | Phase |
+|---|---|---|---|
+| `DT-MANIFEST-01` | Pressing Home repeatedly does not stack multiple launcher instances | Manual on device | Phase 1 |  
+| `DT-MANIFEST-02` | AEGIS does not appear in the Recents (Overview) screen | Manual on device | Phase 1 |
+| `DT-MANIFEST-03` | After `adb shell am kill dev.ragnar.aegis`, pressing Home restarts launcher cleanly | adb + manual | Phase 1 |
+| `DT-MANIFEST-04` | On launcher restart, no crash due to null bundle in onCreate | Manual observation | Phase 1 |
+
 ---
 
 ## 3. Acceptance Criteria Checklist (for Initial Release)
 
 ### Must Pass Before Phase 14
 
+> **Note:** Phase 0 completion does not imply any of these tests have passed. All items below are pending until the relevant implementation phase is complete and validated.
+
 - [ ] `AC-LAUNCH-01`: AEGIS appears in "Select Home App" dialog.
 - [ ] `AC-LAUNCH-02`: Home button opens AEGIS after selection as default.
 - [ ] `AC-LAUNCH-03`: Back press on home screen does not close launcher.
+- [ ] `AC-LAUNCH-04`: AEGIS does not appear in the Android Recents screen.
+- [ ] `AC-LAUNCH-05`: Repeated Home presses do not stack multiple launcher instances.
 - [ ] `AC-CLOCK-01`: Clock shows correct time and updates every second.
-- [ ] `AC-BATTERY-01`: Battery percentage matches Android status bar within ±1%.
+- [ ] `AC-BATTERY-01`: Battery percentage matches Android status bar within +/-1%.
 - [ ] `AC-APPS-01`: All user-launchable apps appear in drawer.
 - [ ] `AC-APPS-02`: Tapping an app in the drawer launches it correctly.
 - [ ] `AC-SEARCH-01`: Typing filters the app list in real time.
 - [ ] `AC-LIFECYCLE-01`: Rotating the device does not crash the launcher.
 - [ ] `AC-LIFECYCLE-02`: Pressing home from another app returns to AEGIS home screen.
+- [ ] `AC-LIFECYCLE-03`: Kill and restart via adb produces a clean launcher start.
 - [ ] `AC-BUILD-01`: `./gradlew assembleDebug` succeeds without errors.
 - [ ] `AC-UNIT-01`: `./gradlew testDebugUnitTest` passes with no failures.
 - [ ] `AC-LINT-01`: `./gradlew lintDebug` produces no errors (warnings acceptable).

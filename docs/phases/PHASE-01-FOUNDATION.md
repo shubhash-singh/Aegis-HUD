@@ -41,8 +41,8 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 ## Dependencies
 
 - PHASE-00: All planning documents must exist.
-- Android SDK API 35 available at `~/Android/Sdk/`.
-- JDK 17+ (21 available).
+- Android SDK API 35 available.
+- JDK 17+ (JDK 21 available on this machine).
 
 ---
 
@@ -50,27 +50,29 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 
 | # | Task | Status |
 |---|---|---|
-| 1 | Create `settings.gradle.kts` | Not started |
-| 2 | Create root `build.gradle.kts` | Not started |
-| 3 | Create `gradle/libs.versions.toml` | Not started |
-| 4 | Create `gradle.properties` | Not started |
-| 5 | Create `local.properties` | Not started |
-| 6 | Create Gradle wrapper (`gradlew`, `gradlew.bat`, `gradle/wrapper/`) | Not started |
-| 7 | Create `app/build.gradle.kts` with Compose config | Not started |
-| 8 | Create `AndroidManifest.xml` with launcher + queries | Not started |
-| 9 | Create `MainActivity.kt` | Not started |
-| 10 | Create `AegisTheme.kt`, `Color.kt`, `Typography.kt` stubs | Not started |
-| 11 | Create `HomeScreen.kt` minimal placeholder | Not started |
-| 12 | Create `strings.xml` | Not started |
-| 13 | Create stub `ExampleUnitTest.kt` | Not started |
-| 14 | Create stub `ExampleInstrumentedTest.kt` | Not started |
-| 15 | Run `./gradlew assembleDebug` | Not started |
-| 16 | Fix build errors | Not started |
-| 17 | Run `./gradlew testDebugUnitTest` | Not started |
-| 18 | Run `./gradlew lintDebug` | Not started |
-| 19 | Update PROGRESS_TRACKER.md | Not started |
-| 20 | Update PHASE_LOG.md | Not started |
-| 21 | Update NEXT_STEPS.md | Not started |
+| 1 | Create `.gitignore` (local.properties, build/, .gradle/, .idea/, *.keystore, *.jks) | Not started |
+| 2 | Create `settings.gradle.kts` | Not started |
+| 3 | Create root `build.gradle.kts` | Not started |
+| 4 | Create `gradle/libs.versions.toml` | Not started |
+| 5 | Create `gradle.properties` | Not started |
+| 6 | Create `local.properties` (sdk.dir=<your Android SDK path> — not committed) | Not started |
+| 7 | Create Gradle wrapper (`gradlew`, `gradlew.bat`, `gradle/wrapper/`) | Not started |
+| 8 | Create `app/build.gradle.kts` with Compose config | Not started |
+| 9 | Create `AndroidManifest.xml` with launcher + queries | Not started |
+| 10 | Create `MainActivity.kt` | Not started |
+| 11 | Create `AegisTheme.kt`, `Color.kt`, `Typography.kt` stubs | Not started |
+| 12 | Create `HomeScreen.kt` minimal placeholder | Not started |
+| 13 | Create `strings.xml` | Not started |
+| 14 | Create stub `ExampleUnitTest.kt` | Not started |
+| 15 | Create stub `ExampleInstrumentedTest.kt` | Not started |
+| 16 | Run `./gradlew assembleDebug` | Not started |
+| 17 | Fix build errors | Not started |
+| 18 | Run `./gradlew testDebugUnitTest` | Not started |
+| 19 | Run `./gradlew lintDebug` | Not started |
+| 20 | Verify .gitignore excludes local.properties before any commit | Not started |
+| 21 | Update PROGRESS_TRACKER.md | Not started |
+| 22 | Update PHASE_LOG.md | Not started |
+| 23 | Update NEXT_STEPS.md | Not started |
 
 ---
 
@@ -78,11 +80,12 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 
 | File | Action |
 |---|---|
+| `.gitignore` | Create (before any code; must exclude local.properties) |
 | `settings.gradle.kts` | Create |
 | `build.gradle.kts` | Create |
 | `gradle/libs.versions.toml` | Create |
 | `gradle.properties` | Create |
-| `local.properties` | Create (not committed) |
+| `local.properties` | Create (not committed; machine-specific SDK path) |
 | `gradlew` | Create |
 | `gradlew.bat` | Create |
 | `gradle/wrapper/gradle-wrapper.jar` | Create |
@@ -98,7 +101,6 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 | `app/src/main/res/mipmap-*/ic_launcher*.xml` | Create (adaptive icon stub) |
 | `app/src/test/kotlin/.../ExampleUnitTest.kt` | Create |
 | `app/src/androidTest/kotlin/.../ExampleInstrumentedTest.kt` | Create |
-| `.gitignore` | Create |
 | `docs/PROGRESS_TRACKER.md` | Update |
 | `docs/PHASE_LOG.md` | Update |
 | `docs/NEXT_STEPS.md` | Update |
@@ -107,6 +109,7 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 
 ## Acceptance Criteria
 
+- [ ] `.gitignore` excludes `local.properties`, `build/`, `.gradle/`, `.idea/`, `*.keystore`, `*.jks`.
 - [ ] `./gradlew assembleDebug` exits with code 0.
 - [ ] APK exists at `app/build/outputs/apk/debug/app-debug.apk`.
 - [ ] `./gradlew testDebugUnitTest` exits with code 0.
@@ -116,9 +119,11 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 - [ ] `MainActivity` calls `enableEdgeToEdge()` and `setContent { AegisTheme { HomeScreen() } }`.
 - [ ] `HomeScreen` renders at minimum an "AEGIS" text label on a dark background.
 - [ ] `BackHandler { }` prevents the launcher from finishing on back press.
-- [ ] Activity `launchMode` is `singleTask`.
-- [ ] Activity `stateNotNeeded` is `true`.
-- [ ] Activity `excludeFromRecents` is `true`.
+- [ ] Activity `launchMode` is `singleTask` (justified in DEC-010 and ARCHITECTURE.md).
+- [ ] Activity `stateNotNeeded` is `true` (justified in DEC-010 and ARCHITECTURE.md).
+- [ ] Activity `excludeFromRecents` is `true` (justified in DEC-010 and ARCHITECTURE.md).
+- [ ] DT-MANIFEST-01: Repeated Home presses do not stack multiple Activity instances.
+- [ ] DT-MANIFEST-02: AEGIS does not appear in the Android Recents screen.
 
 ---
 
@@ -141,10 +146,11 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 ## Completion Criteria
 
 This phase is complete when:
-- All 21 subtasks are marked done.
+- All 23 subtasks are marked done.
 - `./gradlew assembleDebug` succeeds.
 - `./gradlew testDebugUnitTest` succeeds.
 - `./gradlew lintDebug` produces no errors.
+- `.gitignore` verified to exclude `local.properties` before any commit.
 - `PROGRESS_TRACKER.md` is updated.
 - `PHASE_LOG.md` records the outcome.
 - `NEXT_STEPS.md` points to PHASE-02.

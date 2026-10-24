@@ -25,6 +25,7 @@ Before starting Phase 1:
 - [x] Android SDK API 35 available at `~/Android/Sdk/`
 - [x] JDK 21 available
 - [x] adb available
+- [ ] .gitignore does not yet exist — **must be created first** (B-001)
 
 ---
 
@@ -32,7 +33,8 @@ Before starting Phase 1:
 
 ```
 AR_HUD_Luncher/
-├── local.properties                           (sdk.dir=/home/ragnar/Android/Sdk)
+├── .gitignore                                (FIRST — must exclude local.properties, build/, .gradle/, .idea/)
+├── local.properties                           (sdk.dir=<your Android SDK path> — NOT committed)
 ├── settings.gradle.kts
 ├── build.gradle.kts                           (root, plugins only)
 ├── gradle.properties
@@ -73,6 +75,7 @@ AR_HUD_Luncher/
 
 ## Acceptance Criteria for Phase 1
 
+- [ ] `.gitignore` exists and excludes: `local.properties`, `build/`, `.gradle/`, `.idea/`, `*.keystore`, `*.jks`.
 - [ ] `./gradlew assembleDebug` succeeds with no errors.
 - [ ] APK is produced at `app/build/outputs/apk/debug/app-debug.apk`.
 - [ ] `./gradlew testDebugUnitTest` passes.
@@ -82,6 +85,8 @@ AR_HUD_Luncher/
 - [ ] `MainActivity.kt` uses `setContent` and renders `HomeScreen`.
 - [ ] `HomeScreen.kt` displays a minimal placeholder with "AEGIS" text.
 - [ ] Back press on the home screen does not finish the Activity (via `BackHandler`).
+- [ ] AEGIS does not appear in the Recents screen (DT-MANIFEST-02).
+- [ ] Repeated Home presses do not stack multiple instances (DT-MANIFEST-01).
 
 ---
 

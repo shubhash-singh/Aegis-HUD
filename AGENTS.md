@@ -11,17 +11,25 @@ This file is the primary instruction document for any coding agent working on th
 At the beginning of every session, perform the following steps in order:
 
 1. Read this file (`AGENTS.md`).
-2. Read `docs/README.md`.
+2. Read `README.md` and `docs/README.md`.
 3. Read `docs/PROJECT_PLAN.md`.
 4. Read `docs/FEATURE_PLAN.md`.
-5. Read `docs/ARCHITECTURE.md`.
-6. Read `docs/PROGRESS_TRACKER.md`.
-7. Read `docs/DECISIONS.md`.
-8. Read `docs/NEXT_STEPS.md`.
-9. Run `git status` and `git log --oneline -10` to inspect the working tree.
-10. Identify the last completed phase and the next unfinished step from `PROGRESS_TRACKER.md`.
+5. Read `docs/ARCHITECTURE.md` and `docs/TECH_STACK.md`.
+6. Read `docs/REQUIREMENTS.md` and `docs/UI_UX_SPECIFICATION.md`.
+7. Read `docs/TEST_PLAN.md`.
+8. Read `docs/PROGRESS_TRACKER.md`.
+9. Read `docs/PHASE_LOG.md`, `docs/DECISIONS.md`, and `docs/NEXT_STEPS.md`.
+10. Read the specific phase document in `docs/phases/` associated with the next authorized task.
+11. Review `docs/BUG_TRACKER.md` for open defects relevant to the current phase.
+12. Review `docs/RISK_REGISTER.md` for risks relevant to the current phase.
+13. Run `git status` and `git log --oneline -10` to inspect the working tree and confirm no uncommitted changes are pending.
+14. Compare the documented state in `PROGRESS_TRACKER.md` with the actual repository (source files and build output). If they disagree, investigate and reconcile the difference before continuing.
 
-Do **not** rely on conversation history to determine project state. Use repository files as the single source of truth.
+**Additional rules:**
+- Do **not** rely on conversation history to determine project state. Use repository files as the single source of truth.
+- Do **not** assume that a previous agent's claimed work was completed or validated. Re-check actual files and build outputs.
+- If the tracker and repository disagree, document the discrepancy and resolve it before continuing implementation.
+- Resume only the next authorized, unfinished task identified in `NEXT_STEPS.md` and `PROGRESS_TRACKER.md`.
 
 ---
 
@@ -97,9 +105,18 @@ After every phase, update:
 
 ### Required local.properties
 
+`local.properties` is machine-specific and must **not** be committed to version control. It must exist at the repository root before building. Contents:
+
+```
+sdk.dir=<absolute path to your Android SDK>
+```
+
+Example for the primary development machine:
 ```
 sdk.dir=/home/ragnar/Android/Sdk
 ```
+
+On a different machine, set the path to the actual Android SDK location. Android Studio sets this file automatically when you open the project.
 
 ---
 
@@ -153,6 +170,7 @@ A phase is complete when ALL of the following are true:
 |---|---|
 | AGENTS.md | Agent session instructions (this file) |
 | README.md | Project overview and setup guide |
+| docs/README.md | Documentation index |
 | docs/PROJECT_PLAN.md | Roadmap, milestones, risks |
 | docs/FEATURE_PLAN.md | Feature inventory and phase breakdown |
 | docs/ARCHITECTURE.md | Architecture, packages, data flow |
@@ -160,7 +178,7 @@ A phase is complete when ALL of the following are true:
 | docs/UI_UX_SPECIFICATION.md | HUD visual design specification |
 | docs/REQUIREMENTS.md | Functional and non-functional requirements |
 | docs/TEST_PLAN.md | Testing strategy and acceptance criteria |
-| docs/PROGRESS_TRACKER.md | Authoritative overall progress tracker |
+| docs/PROGRESS_TRACKER.md | **Authoritative overall progress tracker** |
 | docs/PHASE_LOG.md | Chronological log of phases |
 | docs/DECISIONS.md | Architecture and implementation decisions |
 | docs/BUG_TRACKER.md | Defect log |
@@ -169,4 +187,4 @@ A phase is complete when ALL of the following are true:
 | docs/CHANGELOG.md | Milestone changelog |
 | docs/phases/PHASE-00-PLANNING.md | Phase 0 detail document |
 | docs/phases/PHASE-01-FOUNDATION.md | Phase 1 detail document |
-| local.properties | Local SDK path (not committed) |
+| local.properties | Local SDK path (not committed; machine-specific) |

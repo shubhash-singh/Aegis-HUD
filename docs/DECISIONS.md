@@ -16,7 +16,7 @@ Significant architectural and implementation decisions are recorded here with al
 **Phase:** PHASE-00
 **Status:** Accepted
 
-**Decision:** Set `minSdk = 26`.
+**Decision:** Set `minSdk = 30`. `Accepted: 2026-10-25 01:09`
 
 **Alternatives Considered:**
 - API 21 (Android 5.0): Broadest coverage but excludes several modern APIs and requires additional compatibility shims.
@@ -38,13 +38,19 @@ Significant architectural and implementation decisions are recorded here with al
 
 **Date:** 2026-10-25
 **Phase:** PHASE-00
-**Status:** Accepted
+**Status:** Accepted (rationale clarified 2026-10-25)
 
 **Decision:** Set `targetSdk = 35`.
 
-**Reasoning:** API 35 is the latest stable release. Targeting it ensures the app uses the latest Android behavior contract and avoids compatibility modes.
+**Reasoning:**
+- API 35 (Android 15) is the stable release used in the development environment's primary SDK platform.
+- API 36 (Android 16) is also stable as of March 2025, but AEGIS begins development with API 35 to remain on a well-tested platform.
+- Google Play requires API 36 targeting for new and updated apps from August 31, 2026. This project is for personal use; Play Store submission is not planned before Phase 15.
+- Upgrading to targetSdk 36 can be evaluated before Phase 15 with minimal code changes.
 
-**Consequences:** All behavior changes from API 27 through API 35 apply. Key changes to verify: predictive back gesture (API 33), photo picker (API 33), exact alarms (API 33), health connect (not used), overlay permissions, and foreground service type requirements.
+**Consequence:** All behavior changes from API 27 through API 35 apply. Key changes to verify during implementation: predictive back gesture (API 33), overlay permissions, foreground service type requirements (API 34).
+
+**Correction note (2026-10-25):** The previous statement "API 35 is the latest stable release" was inaccurate. API 36 is also stable. The decision to target API 35 is deliberate, not based on API 35 being the only option.
 
 ---
 
@@ -156,3 +162,41 @@ Significant architectural and implementation decisions are recorded here with al
 **Reasoning:** User trust; design integrity; the prompt specification explicitly requires this.
 
 **Consequences:** If a telemetry value is unavailable, it must be displayed as "N/A", "—", or equivalent — never as a fabricated number.
+
+---
+
+### DEC-010: Launcher Activity Manifest Attributes Accepted
+
+**Date:** 2026-10-25
+**Phase:** PHASE-00 (Correction Task)
+**Status:** Accepted
+
+**Decision:** Use `launchMode="singleTask"`, `stateNotNeeded="true"`, and `excludeFromRecents="true"` on MainActivity.
+
+**Justifications:**
+
+- `singleTask`: Prevents multiple launcher instances stacking on the back stack when the user presses Home repeatedly. Standard for all production Android launchers.
+- `stateNotNeeded`: The launcher's display state is built from live sources (platform APIs, DataStore), not from a saved bundle. Android is permitted to kill the launcher without saving state, as is normal. The launcher must always reconstruct from scratch in `onCreate()`.
+- `excludeFromRecents`: The home screen should not appear as a card in the Android Recents screen. Appearing in Recents would allow accidental dismissal of the launcher task.
+
+**Alternatives considered:** Using Android defaults (standard launch mode, stateNotNeeded=false, no excludeFromRecents). This would allow stacked launcher instances, stale bundle state, and launcher appearance in Recents — all undesirable.
+
+**Test requirements defined:** See ARCHITECTURE.md Section 6.
+
+---
+
+### DEC-011: Toolchain Versions Confirmed via Official Documentation
+
+**Date:** 2026-10-25
+**Phase:** PHASE-00 (Correction Task)
+**Status:** Accepted — Unverified by build
+
+**Decision:** Retain the planned toolchain: AGP 8.7.3, Kotlin 2.0.21, Compose BOM 2024.11.00, Gradle 8.9, compileSdk 35, targetSdk 35, minSdk 26, JDK 17/21.
+
+**Verification source:** Official Android and Kotlin documentation (reviewed 2026-10-25).
+- AGP 8.7.3 requires Gradle 8.9 minimum — confirmed via Android developer documentation.
+- Kotlin 2.0+ bundles the Compose Compiler plugin; `kotlinCompilerExtensionVersion` is no longer used — confirmed.
+- Compose BOM 2024.11.00 is compatible with Kotlin 2.0 and AGP 8.7 — confirmed.
+- JDK 21 is compatible with AGP 8.7 and Kotlin 2.0 — confirmed.
+
+**Important note:** No application build has been run. Compatibility is based on official documentation. Actual build success will be confirmed in Phase 1. If a conflict is discovered, update this decision and TECH_STACK.md accordingly.

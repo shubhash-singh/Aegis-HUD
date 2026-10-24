@@ -1,22 +1,36 @@
 # TECH_STACK.md — AEGIS HUD Launcher
 
-**Version:** 0.1.0-planning
-**Last Updated:** 2026-10-25
+**Version:** 0.1.1-planning
+**Last Updated:** 2026-10-25 (Correction Task)
+
+---
+
+> **Note on API Level Status (verified 2026-10-25):**
+> Android API 35 (Android 15) is stable (released June 2024). Android API 36 (Android 16) is
+> also stable (Platform Stability reached; SDK Platform Revision 1 released March 2025).
+> The statement "API 35 is the latest stable" is therefore outdated. AEGIS targets API 35
+> deliberately — see DEC-002 in DECISIONS.md for the rationale. Upgrade to targetSdk 36 may
+> be evaluated before the Phase 15 release. The Google Play Store requires API 36 targeting
+> for new and updated apps from August 31, 2026.
 
 ---
 
 ## 1. Core Technologies
 
-| Technology | Version | Rationale |
+| Technology | Version | Rationale / Notes |
 |---|---|---|
-| Kotlin | 2.0.21 | Stable, current; required for Compose Compiler plugin |
-| Jetpack Compose BOM | 2024.11.00 | Compose stable BOM; pins all Compose library versions |
-| Android Gradle Plugin | 8.7.3 | Latest stable compatible with Gradle 8.9 and SDK 35 |
-| Gradle Wrapper | 8.9 | Stable; matches AGP 8.7 requirements |
-| Android compileSdk | 35 | Android 15 (latest stable API) |
-| Android targetSdk | 35 | Targets Android 15 |
-| Android minSdk | 26 | Android 8.0 Oreo; covers 97%+ of active devices |
-| Java source compatibility | 17 | Required for modern Kotlin and AGP |
+| Kotlin | 2.0.21 | Stable; required for Compose Compiler plugin (bundled in Kotlin 2.0+) |
+| Jetpack Compose BOM | 2024.11.00 | Stable BOM (Nov 2024); pins all Compose library versions coherently |
+| Android Gradle Plugin | 8.7.3 | Stable; requires Gradle 8.9; compatible with Kotlin 2.0 and Compose BOM 2024.11 |
+| Gradle Wrapper | 8.9 | Minimum required by AGP 8.7; use ./gradlew, not system Gradle |
+| Android compileSdk | 35 | Android 15. Compile against API 35 SDK platform. |
+| Android targetSdk | 35 | Android 15. API 36 is available but AEGIS targets 35 for now (see DEC-002). |
+| Android minSdk | 26 | Android 8.0 Oreo; covers 97%+ of active devices (see DEC-001). |
+| Java source compatibility | 17 | Required for modern AGP and Kotlin 2.0; JDK 21 is available and compatible. |
+
+> **Unverified assumption:** Dependency versions above are documented based on official compatibility
+> matrices and release notes. No application build has been executed yet. Actual compatibility
+> will be confirmed when Phase 1 runs `./gradlew assembleDebug`.
 
 ---
 
@@ -139,11 +153,32 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 
 ## 7. Build Environment Compatibility
 
-| Component | Confirmed Available |
-|---|---|
-| JDK 21 | Yes (OpenJDK 21.0.12) |
-| Android SDK API 35 | Yes |
-| Build Tools 35.0.0 | Yes |
-| adb | Yes (v1.0.41) |
-| System Gradle | No — always use ./gradlew |
-| ANDROID_HOME env var | Not set; use local.properties |
+| Component | Status | Notes |
+|---|---|---|
+| JDK 21 | Confirmed available | OpenJDK 21.0.12 at /etc/profiles/per-user/ragnar/bin/java |
+| Android SDK API 35 | Confirmed available | ~/Android/Sdk/platforms/android-35 |
+| Android SDK API 36 | Confirmed available | ~/Android/Sdk/platforms/android-36 and android-36.1 |
+| Build Tools 34–37 | Confirmed available | 34.0.0, 35.0.0, 36.0.0, 36.1.0, 37.0.0 |
+| adb | Confirmed available | /run/current-system/sw/bin/adb v1.0.41 |
+| System Gradle | Not available | Always use ./gradlew wrapper |
+| ANDROID_HOME env var | Not set | Configure via local.properties (see Section 8) |
+| AGP 8.7.3 build | Not yet verified | No project scaffold exists yet; to be verified in Phase 1 |
+
+---
+
+## 8. Local Configuration
+
+The Android SDK path must be set in `local.properties` at the repository root. This file is machine-specific and must not be committed to version control.
+
+**File:** `local.properties`
+**Contents:**
+```
+sdk.dir=<absolute path to your Android SDK>
+```
+
+**Example for this development machine:**
+```
+sdk.dir=/home/ragnar/Android/Sdk
+```
+
+This path is specific to this machine. On a different computer, use the correct path for that system. Android Studio can set this file automatically when you open the project. See the README for setup instructions.

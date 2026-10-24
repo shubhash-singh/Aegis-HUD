@@ -1,7 +1,7 @@
 # ARCHITECTURE.md — AEGIS HUD Launcher
 
-**Version:** 0.1.0-planning
-**Last Updated:** 2026-10-25
+**Version:** 0.1.1-planning
+**Last Updated:** 2026-10-25 (Correction Task)
 
 ---
 
@@ -149,25 +149,43 @@ BatteryManager sticky broadcast (platform)
 
 ## 6. Android Launcher-Specific Concerns
 
-### Activity Flags
+### Activity Manifest Attributes
 
-`MainActivity` must use:
-```xml
-<activity
-    android:launchMode="singleTask"
-    android:stateNotNeeded="true"
-    android:excludeFromRecents="true" />
-```
+The launcher's `MainActivity` uses three non-default attributes. Each is documented here with its justification. Decisions are also recorded in `docs/DECISIONS.md` (DEC-010).
 
-`stateNotNeeded="true"` allows Android to kill the launcher process without saving state, which is expected behavior. The launcher must rebuild from scratch on each start without depending on saved instance state for critical data.
+#### `android:launchMode="singleTask"` — Accepted
 
-`excludeFromRecents="true"` prevents the launcher from appearing in the recents screen.
+**Behavior:** Android ensures only one instance of the Activity exists at a time. If the launcher is already running and a new launch intent arrives (e.g., the user presses Home), Android routes the intent to `onNewIntent()` rather than creating a second instance.
+
+**Justification for launchers:** A launcher should never have multiple stacked instances. Without `singleTask`, pressing Home while already on the home screen could create a second Activity on the back stack, leading to unexpected "AEGIS inside AEGIS" navigation bugs. All production launchers (AOSP Launcher3, Pixel Launcher) use this launch mode.
+
+**Test requirement:** Pressing the Home button repeatedly must not stack multiple Activity instances. Verified by observing that the back stack contains exactly one root entry after multiple Home presses.
+
+#### `android:stateNotNeeded="true"` — Accepted
+
+**Behavior:** Informs the Android OS that this Activity can be killed without saving instance state via `onSaveInstanceState()`. The system will not call `onSaveInstanceState()`, and `onCreate()` will always receive a null bundle.
+
+**Justification for launchers:** The launcher is the home screen; its state (app list, clock) must be rebuilt from live sources on every start, not from a stale saved bundle. Accepting that the system may kill the launcher without saving state is correct behavior. AEGIS must be designed to reconstruct its display cleanly from `onCreate()` without relying on a saved bundle.
+
+**Design consequence:** No critical launcher state may depend on the saved instance state bundle. All persistent data must come from DataStore or live platform APIs.
+
+**Test requirement:** Kill the launcher process via `adb shell am kill dev.ragnar.aegis`, then press Home. AEGIS must restart and display the home screen correctly without errors.
+
+#### `android:excludeFromRecents="true"` — Accepted
+
+**Behavior:** The task containing this Activity is not shown in the Android Overview (Recents) screen.
+
+**Justification for launchers:** The home screen launcher should not appear as a card in the Recents screen alongside regular apps. Appearing in Recents would allow the user to accidentally dismiss the launcher task, which is unexpected behavior for a home screen. This attribute is standard for launcher activities.
+
+**Test requirement:** Open the Recents screen (via swipe up or Recents button). AEGIS must not appear as a card.
+
+---
 
 ### Back Press
 
 In a launcher, the back press from the home screen should do nothing (or optionally show a quick settings overlay). Do not `finish()` on back press from the home screen. Use `BackHandler { /* no-op or show overlay */ }` in Compose.
 
-### Recents and Task Stack
+### App Launch Task Flags
 
 Apps launched from the launcher should start in their own task. Use `Intent.FLAG_ACTIVITY_NEW_TASK` when launching apps.
 
