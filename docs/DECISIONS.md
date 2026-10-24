@@ -177,7 +177,7 @@ Significant architectural and implementation decisions are recorded here with al
 Without this, pressing Home while the launcher is already displayed could push a second `MainActivity` instance onto the back stack, causing nested launcher screens and broken navigation. A single guaranteed instance is required for correct home-screen behavior. Standard practice for Android launcher activities.
 
 **`stateNotNeeded="true"` — Accepted**
-The launcher home screen is always reconstructed from live data sources (PackageManager, BatteryManager, DataStore); it does not depend on a saved UI bundle. Declaring `stateNotNeeded="true"` makes this design contract explicit to the OS and avoids unnecessary `onSaveInstanceState()` serialization. This is a deliberate design choice suited to AEGIS's stateless-reconstruction model, not a universal launcher requirement.
+The launcher home screen is always reconstructed from live data sources (PackageManager, BatteryManager, DataStore); it does not depend on a saved UI bundle. Declaring `stateNotNeeded="true"` makes this design contract explicit to the OS and avoids unnecessary `onSaveInstanceState()` serialization. This is a deliberate design choice suited to AEGIS's stateless-reconstruction model, not a universal launcher requirement. Trade-off: transient UI positions (e.g., drawer scroll offset) are lost on process death, which is acceptable because the launcher always returns the user to the home screen after a restart.
 
 **`excludeFromRecents="true"` — Accepted**
 The home screen should not appear as a card in the Android Overview (Recents) screen. Appearing in Recents would allow the user to accidentally swipe away the launcher task, which is unexpected behavior for a home screen application.

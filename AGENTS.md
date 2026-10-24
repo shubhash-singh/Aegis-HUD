@@ -82,9 +82,11 @@ After every phase, update:
 | UI Framework | Jetpack Compose |
 | Min SDK | 26 (Android 8.0 Oreo) |
 | Target SDK | 35 (Android 15) |
-| Repository dir | /home/ragnar/AndroidStudioProjects/AR_HUD_Luncher |
+| Repository dir | (this repository's root directory) |
 | Documentation root | docs/ |
 | Git branch | main |
+
+> **Current development machine path:** `/home/ragnar/AndroidStudioProjects/AR_HUD_Luncher`. This is environment-specific and may differ on another machine.
 
 ---
 

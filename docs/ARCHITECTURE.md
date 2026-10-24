@@ -167,7 +167,7 @@ The launcher's `MainActivity` uses three non-default attributes. Each is documen
 
 **Justification:** A launcher's home screen is always reconstructed from live data sources (PackageManager, BatteryManager, DataStore), not from a previously saved UI bundle. Declaring `stateNotNeeded="true"` makes this design contract explicit to the OS and avoids unnecessary bundle serialization. It is a deliberate choice that fits the stateless-reconstruction model, not a universal requirement for launchers.
 
-**Design consequence:** No critical launcher state may depend on the saved instance state bundle. All persistent data must come from DataStore or live platform APIs. `onCreate()` must handle a null bundle correctly at all times.
+**Design consequence:** No critical launcher state may depend on the saved instance state bundle. All persistent data must come from DataStore or live platform APIs. `onCreate()` must handle a null bundle correctly at all times. Transient UI positions (e.g., scroll offset in the app drawer) will be lost on process death; this is acceptable because the launcher should always return the user to the home screen after a restart, not to a mid-scroll position in a sub-screen.
 
 **Test requirement:** Kill the launcher process via `adb shell am kill dev.ragnar.aegis`, then press Home. AEGIS must restart and display the home screen correctly with no crash or missing data.
 
