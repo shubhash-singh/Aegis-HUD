@@ -5,6 +5,7 @@ build/
 
 # Gradle
 .gradle/
+.kotlin/
 gradle-app.setting
 
 # Local configuration (machine-specific SDK path)

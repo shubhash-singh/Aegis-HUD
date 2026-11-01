@@ -1,81 +1,72 @@
 # NEXT_STEPS.md — AEGIS HUD Launcher
 
-**Last Updated:** 2026-10-25 (Phase 1 implementation complete)
-**Current Phase:** PHASE-01 — Implementation Complete, Device Validation Pending
-**Next Phase:** PHASE-02 — HUD Design System
+**Last Updated:** 2026-11-01 (Phase 2 complete)
+**Current Phase:** PHASE-02 — Implementation Complete, Build Verified
+**Next Phase:** PHASE-03 — HUD Home Screen
 
 ---
 
 ## Immediate Next Tasks
 
-### Task 1: Phase 1 Device Validation (when device is available)
+### Task 1: Phase 1 Device Validation (still pending)
 
-**Phase:** PHASE-01 — F-001-P3 through F-001-P5
+**Phase:** PHASE-01 — B-002
 
 Connect a physical Android device and run:
 
-1. `./gradlew installDebug` or `adb install -r app/build/outputs/apk/debug/app-debug.apk`
-2. Open Settings > Apps > Default Apps > Home App. Verify AEGIS appears (AC-LAUNCH-01).
-3. Select AEGIS as default home. Press Home. Verify AEGIS renders (AC-LAUNCH-02).
-4. Press Back on home screen. Verify launcher does not close (AC-LAUNCH-03, DT-MANIFEST-01).
-5. Open Recents. Verify AEGIS does not appear as a card (DT-MANIFEST-02).
-6. Press Home repeatedly. Verify no stacked instances (DT-MANIFEST-01).
-7. Run `adb shell am kill dev.ragnar.aegis`, press Home. Verify clean restart (DT-MANIFEST-03, DT-MANIFEST-04).
+1. `./gradlew installDebug`
+2. Settings > Default Apps > Home > select AEGIS
+3. Verify AEGIS renders when Home is pressed
+4. Verify Back does not exit, AEGIS not in Recents, no stacked instances
+5. `adb shell am kill dev.ragnar.aegis` > press Home > verify clean restart
 
-After device validation passes, update Phase 1 status from "Implementation Complete — Device Validation Pending" to "Complete" in PROGRESS_TRACKER.md.
+### Task 2: Begin Phase 3 — HUD Home Screen
 
-### Task 2: Begin Phase 2 — HUD Design System
-
-**Phase:** PHASE-02 — F-002
+**Phase:** PHASE-03 — F-003
 
 **Objective:**
-Implement the full AEGIS HUD design system: color palette with CompositionLocal, typography with bundled JetBrains Mono and Inter fonts, spacing tokens, HUD panel components, status indicators, and responsive layout handling.
+Build the full HUD home screen dashboard: live clock display, system status bar, telemetry panels with real data (battery, network), quick-launch app row, and the overall screen layout from UI_UX_SPECIFICATION.md Section 5.
 
 **Prerequisites:**
-- Phase 1 device validation passed (or device validation documented as pending with no blocking issues).
+- Phase 2 design system complete (done)
 
 **Read before starting:**
-- `docs/phases/PHASE-02-DESIGN-SYSTEM.md` (to be created)
-- `docs/UI_UX_SPECIFICATION.md`
-- `docs/ARCHITECTURE.md` Section 7 (Theming)
+- `docs/phases/PHASE-03-HOME-SCREEN.md` (to be created)
+- `docs/UI_UX_SPECIFICATION.md` Section 5 (layout), Section 6 (components)
+- `docs/ARCHITECTURE.md` Section 9 (background work policy)
 
 ---
 
-## Phase 1 Completion Summary
+## Phase 2 Completion Summary
 
 **What was completed:**
-- Full Android project scaffold (Gradle, Kotlin, Compose)
-- Gradle 8.9 wrapper bootstrapped with SHA-256 verification (DEC-012)
-- AndroidManifest.xml with launcher registration, singleTask, stateNotNeeded, excludeFromRecents
-- MainActivity with enableEdgeToEdge() and setContent
-- Minimal HomeScreen with BackHandler and "AEGIS" placeholder
-- AegisTheme, Color, Typography stubs with spec-compliant tokens
-- Stub unit and instrumented tests
+- Bundled JetBrains Mono (Regular, Bold) and Inter (Regular, Medium, SemiBold) — 5 TTF files
+- CompositionLocal theming: `AegisColorScheme`, `AegisTypographyScheme`, `AegisSpacing`
+- `AegisTheme` composable + accessor object (`AegisTheme.colors`, `.typography`, `.spacing`)
+- `HudPanel` composable with borders, corner ticks, section header
+- `StatusIndicator` composable with pulse animation
+- `HudDivider` composable
+- Updated HomeScreen demonstrating all components
+- 5 new unit tests in ThemeTokensTest
 
 **What was validated:**
-- `./gradlew assembleDebug` — BUILD SUCCESSFUL (1m 46s)
-- `./gradlew testDebugUnitTest` — BUILD SUCCESSFUL (36s, 2 tests)
-- `./gradlew lintDebug` — 0 errors, 34 warnings (all advisory)
-- APK: 9.4MB at `app/build/outputs/apk/debug/app-debug.apk`
-
-**What remains unverified:**
-- DT-MANIFEST-01: Repeated Home presses don't stack instances
-- DT-MANIFEST-02: AEGIS not in Recents
-- DT-MANIFEST-03: Clean restart after process kill
-- DT-MANIFEST-04: No crash from null bundle in onCreate
+- `./gradlew assembleDebug` — BUILD SUCCESSFUL (13s)
+- `./gradlew testDebugUnitTest` — BUILD SUCCESSFUL (3s, 7 tests)
+- `./gradlew lintDebug` — 0 errors, 34 warnings
+- APK: 11MB at `app/build/outputs/apk/debug/app-debug.apk`
 
 **Blockers:**
-- B-002: No physical device connected during this session.
+- B-002: Phase 1 device tests still pending (no device connected)
 
 ---
 
 ## Files to Inspect When Resuming
 
-1. `AGENTS.md` — session instructions
-2. `docs/PROGRESS_TRACKER.md` — overall status
-3. `docs/NEXT_STEPS.md` — this file
-4. `docs/UI_UX_SPECIFICATION.md` — HUD visual design for Phase 2
-5. `docs/ARCHITECTURE.md` Section 7 — theming architecture
+1. `AGENTS.md`
+2. `docs/PROGRESS_TRACKER.md`
+3. `docs/NEXT_STEPS.md`
+4. `docs/UI_UX_SPECIFICATION.md` Section 5
+5. `docs/ARCHITECTURE.md` Section 9
 
 ---
 
