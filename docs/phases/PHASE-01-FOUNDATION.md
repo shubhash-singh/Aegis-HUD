@@ -51,32 +51,32 @@ Create a complete, buildable Android Gradle project configured as a valid Androi
 
 | # | Task | Status |
 |---|---|---|
-| 1 | Create `.gitignore` (local.properties, build/, .gradle/, .idea/, *.keystore, *.jks) | Not started |
-| 2 | Create `settings.gradle.kts` | Not started |
-| 3 | Create root `build.gradle.kts` | Not started |
-| 4 | Create `gradle/libs.versions.toml` | Not started |
-| 5 | Create `gradle.properties` | Not started |
-| 6 | Create `local.properties` (sdk.dir=<your Android SDK path> — not committed) | Not started |
-| 7 | Download and SHA-256 verify the official Gradle 8.9 bootstrap distribution outside the repository | Not started |
-| 8 | Generate Gradle wrapper (`gradlew`, `gradlew.bat`, `gradle/wrapper/`) from the verified distribution | Not started |
-| 9 | Create `app/build.gradle.kts` with Compose config | Not started |
-| 10 | Create `AndroidManifest.xml` with launcher + queries | Not started |
-| 11 | Create `MainActivity.kt` | Not started |
-| 12 | Create `AegisTheme.kt`, `Color.kt`, `Typography.kt` stubs | Not started |
-| 13 | Create `HomeScreen.kt` minimal placeholder | Not started |
-| 14 | Create `strings.xml` | Not started |
-| 15 | Create stub `ExampleUnitTest.kt` | Not started |
-| 16 | Create stub `ExampleInstrumentedTest.kt` | Not started |
-| 17 | Run `./gradlew assembleDebug` | Not started |
-| 18 | Fix build errors | Not started |
-| 19 | Run `./gradlew testDebugUnitTest` | Not started |
-| 20 | Run `./gradlew lintDebug` | Not started |
-| 21 | Verify .gitignore excludes local.properties before any commit | Not started |
-| 22 | Run DT-MANIFEST-01 on a physical device | Not started |
-| 23 | Run DT-MANIFEST-02 on a physical device | Not started |
-| 24 | Update PROGRESS_TRACKER.md | Not started |
-| 25 | Update PHASE_LOG.md | Not started |
-| 26 | Update NEXT_STEPS.md | Not started |
+| 1 | Create `.gitignore` (local.properties, build/, .gradle/, .idea/, *.keystore, *.jks) | ✅ Done |
+| 2 | Create `settings.gradle.kts` | ✅ Done |
+| 3 | Create root `build.gradle.kts` | ✅ Done |
+| 4 | Create `gradle/libs.versions.toml` | ✅ Done |
+| 5 | Create `gradle.properties` | ✅ Done |
+| 6 | Create `local.properties` (sdk.dir — not committed) | ✅ Done |
+| 7 | Download and SHA-256 verify the official Gradle 8.9 bootstrap distribution outside the repository | ✅ Done (2026-10-25) |
+| 8 | Generate Gradle wrapper (`gradlew`, `gradlew.bat`, `gradle/wrapper/`) from the verified distribution | ✅ Done |
+| 9 | Create `app/build.gradle.kts` with Compose config | ✅ Done |
+| 10 | Create `AndroidManifest.xml` with launcher + queries | ✅ Done |
+| 11 | Create `MainActivity.kt` | ✅ Done |
+| 12 | Create `AegisTheme.kt`, `Color.kt`, `Typography.kt` stubs | ✅ Done |
+| 13 | Create `HomeScreen.kt` minimal placeholder | ✅ Done |
+| 14 | Create `strings.xml` | ✅ Done |
+| 15 | Create stub `ExampleUnitTest.kt` | ✅ Done |
+| 16 | Create stub `ExampleInstrumentedTest.kt` | ✅ Done |
+| 17 | Run `./gradlew assembleDebug` | ✅ BUILD SUCCESSFUL (2026-10-25) |
+| 18 | Fix build errors | ✅ No errors encountered |
+| 19 | Run `./gradlew testDebugUnitTest` | ✅ BUILD SUCCESSFUL (2026-10-25) |
+| 20 | Run `./gradlew lintDebug` | ✅ 0 errors, 34 warnings (2026-10-25) |
+| 21 | Verify .gitignore excludes local.properties before any commit | ✅ Verified |
+| 22 | Run DT-MANIFEST-01 on a physical device | ⏳ Pending — no device connected |
+| 23 | Run DT-MANIFEST-02 on a physical device | ⏳ Pending — no device connected |
+| 24 | Update PROGRESS_TRACKER.md | ✅ Done |
+| 25 | Update PHASE_LOG.md | ✅ Done |
+| 26 | Update NEXT_STEPS.md | ✅ Done |
 
 ---
 
