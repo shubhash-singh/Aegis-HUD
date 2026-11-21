@@ -222,17 +222,17 @@ Display live battery level, charge state, and temperature. No polling; use stick
 **Priority:** P1
 **Dependencies:** F-002
 **Implementation Phase:** Phase 6
-**Status:** Not Started
+**Status:** Implementation Complete — Build Verified (Device Validation Pending)
 
 **Phases:**
 
 | Phase | ID | Title | Status |
 |---|---|---|---|
-| 1 | F-007-P1 | Radar rings and tick marks (Canvas composable) | Not Started |
-| 2 | F-007-P2 | Rotating sweep animation | Not Started |
-| 3 | F-007-P3 | Grid and scan-line overlay | Not Started |
-| 4 | F-007-P4 | Configurable animation speed | Not Started |
-| 5 | F-007-P5 | Pause/reduce on low-power or battery-saver mode | Not Started |
+| 1 | F-007-P1 | Radar rings and tick marks (Canvas composable) | Implemented — Build Verified |
+| 2 | F-007-P2 | Rotating sweep animation | Implemented — Build Verified |
+| 3 | F-007-P3 | Grid and scan-line overlay | Implemented — Build Verified |
+| 4 | F-007-P4 | Configurable animation speed | Implemented — Build Verified |
+| 5 | F-007-P5 | Pause/reduce on low-power or battery-saver mode | Implemented — Build Verified |
 
 **Acceptance Criteria:**
 - Radar renders at consistent frame rate without jank.

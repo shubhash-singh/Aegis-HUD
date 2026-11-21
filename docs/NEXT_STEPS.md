@@ -1,47 +1,48 @@
 # NEXT_STEPS.md — AEGIS HUD Launcher
 
-**Last Updated:** 2026-11-21 (Phase 5 build verified)
-**Current Phase:** PHASE-05 — Implementation Complete, Build Verified (Device Validation Pending)
-**Next Phase:** PHASE-06 — Animated Radar and Technical HUD Graphics (or Battery Telemetry F-006 / Device Validation)
+**Last Updated:** 2026-11-21 (Phase 6 build verified)
+**Current Phase:** PHASE-06 — Implementation Complete, Build Verified (Device Validation Pending)
+**Next Phase:** PHASE-07 — System Telemetry Dashboard / F-006 Battery Telemetry
 
 ---
 
 ## Completed This Session
 
-- Implemented **PHASE-05 (Application Search)**:
-  - Added pure Kotlin `filter()` function to `AppListNormalizer`.
-  - Added search query state, `filteredApps`, and `launchTopResult()` to `AppDrawerViewModel`.
-  - Created `HudSearchBar` component with HUD styling, 48dp minimum touch target clear button, and IME action handling.
-  - Integrated search into `AppDrawer` with clear no-results messaging and live filtering.
-  - Wired bottom navigation search placeholder to open drawer with search focus.
-  - Added 4 unit tests (`UT-005-01` through `UT-005-04`) to `AppListNormalizerTest`.
-- Validated Phase 5 implementation:
-  - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (21s).
-  - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 19 tests passed with 0 failures).
-  - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (33s, 0 errors).
-- Synchronized all project documentation (Progress Tracker, Feature Plan, Phase Log, Changelog, Phase 5 doc, Test Plan).
+- Implemented **PHASE-06 (Animated Radar and Technical HUD Graphics)**:
+  - Created `RadarMath` pure Kotlin geometric utilities.
+  - Created `RadarDisplay` Compose Canvas component with range rings, measurement ticks, center reticle, rotating sweep sector, and azimuth readout.
+  - Created `ScanLineOverlay` translating vertically with soft bloom.
+  - Integrated `RadarDisplay` and `ScanLineOverlay` into `HomeScreen`.
+  - Added dynamic `PowerManager.ACTION_POWER_SAVE_MODE_CHANGED` receiver to pause animations automatically when battery-saver mode is active.
+  - Added 7 unit tests in `RadarMathTest` (26 total project unit tests passing).
+- Validated Phase 6 implementation:
+  - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (22s).
+  - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 26 tests passed with 0 failures).
+  - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (34s, 0 errors).
+- Synchronized all project documentation (Progress Tracker, Feature Plan, Phase Log, Changelog, Phase 6 doc, Project Plan).
 
 ## Outstanding Blockers
 
 1. **B-002:** Connect a physical Android device or emulator and run the pending Phase 1 manifest
-   tests (`DT-MANIFEST-01` through `DT-MANIFEST-04`), plus manual validation of Phase 4 & 5
-   (app discovery, icon rendering, launching, live search filtering, and IME actions). (Low severity; development can proceed).
+   tests (`DT-MANIFEST-01` through `DT-MANIFEST-04`), plus manual validation of Phases 4, 5, and 6
+   (app discovery, live search, radar animation 60fps, and battery-saver pause). (Low severity; development can proceed).
 
 ## Exact Next Task
 
-Begin **PHASE-06 (Animated Radar and HUD Graphics)** or **PHASE-06 / F-006 (Battery Telemetry)**:
-1. Per `PROJECT_PLAN.md`, Phase 6 is Animated Radar and HUD Graphics (F-007) and F-006 is Battery Telemetry.
-2. Review `docs/FEATURE_PLAN.md` for F-006 or F-007 scope.
-3. Create the corresponding phase plan document in `docs/phases/`.
-4. Implement HUD Canvas composables (radar rings, sweep animation) or battery telemetry sticky broadcast.
-5. Add unit tests and verify via Gradle.
+Begin **PHASE-07 (System Telemetry Dashboard)** or **F-006 (Battery Telemetry)**:
+1. Review `docs/FEATURE_PLAN.md` for F-006 (Battery Telemetry) and F-008 (System Telemetry Dashboard).
+2. Create the corresponding phase plan document in `docs/phases/`.
+3. Implement `BatteryRepository` using `Intent.ACTION_BATTERY_CHANGED` sticky broadcast.
+4. Implement `NetworkRepository` using `ConnectivityManager.NetworkCallback`.
+5. Wire real battery and network telemetry into the HUD status and telemetry panels (replacing "---" placeholders per DEC-009).
+6. Add unit tests and verify via Gradle.
 
 ## Files to Inspect Before Resuming
 
 - `docs/PROGRESS_TRACKER.md`
-- `docs/phases/PHASE-05-SEARCH.md`
-- `docs/FEATURE_PLAN.md` (F-006: Battery Telemetry, F-007: Animated Radar)
-- `docs/UI_UX_SPECIFICATION.md` (Section 6: Radar Graphic)
+- `docs/phases/PHASE-06-HUD-GRAPHICS.md`
+- `docs/FEATURE_PLAN.md` (F-006: Battery Telemetry, F-008: System Telemetry Dashboard)
+- `docs/UI_UX_SPECIFICATION.md` (Section 2: Status Colors, Section 5: Telemetry Panels)
 
 ## Commands to Run When Resuming
 

@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.6.0
-**Last Updated:** 2026-11-21 (Phase 5 build verified; device validation pending)
-**Current Stage:** Phase 5 — Application Search
-**Overall Status:** Phase 5 implementation complete & build verified; device validation pending (B-002)
+**Version:** 0.7.0
+**Last Updated:** 2026-11-21 (Phase 6 build verified; device validation pending)
+**Current Stage:** Phase 6 — Animated Radar & HUD Graphics
+**Overall Status:** Phase 6 implementation complete & build verified; device validation pending (B-002)
 
 ---
 
@@ -13,17 +13,17 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 5 — Application Search |
+| Stage | Phase 6 — Animated Radar & HUD Graphics |
 | Status | Implementation Complete — Build Verified (Device Validation Pending) |
 | Last Updated | 2026-11-21 |
-| Last Completed Phase | PHASE-05 (Application Search — build verified) |
-| Current Phase | PHASE-05 (build verified; device validation pending) |
-| Next Step | Proceed to PHASE-06 (Animated Radar and HUD Graphics); run device validation when connected |
-| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (21s, 2026-11-21) |
-| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 19 tests passed, 2026-11-21) |
+| Last Completed Phase | PHASE-06 (Animated Radar & HUD Graphics — build verified) |
+| Current Phase | PHASE-06 (build verified; device validation pending) |
+| Next Step | Proceed to PHASE-07 (System Telemetry) / F-006 (Battery Telemetry); run device validation when connected |
+| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (22s, 2026-11-21) |
+| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 26 tests passed, 2026-11-21) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | 31aa9ce — feat(phase-5): implement real-time application search in drawer |
+| Latest Commit | 3d1c719 — feat(phase-6): implement animated HUD radar graphics and scan-line overlay |
 
 ---
 
@@ -91,7 +91,7 @@ Rules:
 | F-004 | App Discovery & Launching | P0 | 6 | 6 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-001 |
 | F-005 | Application Search | P0 | 4 | 4 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-004 |
 | F-006 | Battery Telemetry | P0 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
-| F-007 | Animated Radar & HUD Graphics | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
+| F-007 | Animated Radar & HUD Graphics | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
 | F-008 | System Telemetry Dashboard | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-006, F-002 |
 | F-009 | Quick Actions | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
 | F-010 | Customization | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
@@ -105,7 +105,7 @@ Rules:
 | F-018 | Extended Automation | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-013 |
 | F-019 | Open-Source Preparation | P3 | 6 | 0 | Not Started | Not Tested | Deferred | All |
 
-**Implementation Progress: 27%** (23 / 86 active planned implementation phases implemented)
+**Implementation Progress: 33%** (28 / 86 active planned implementation phases implemented)
 
 > **Denominator basis:** 86 active (non-deferred) planned phases — 31 P0 + 24 P1 + 31 P2. Deferred P3 phases (16) are excluded per the formula in Section B.2. Phase 4 counts implementation work only; its Gradle and device validation remain pending.
 
@@ -287,6 +287,34 @@ Rules:
 
 ---
 
+### PHASE-06: Animated Radar and Technical HUD Graphics
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-06 |
+| Objective | Animated technical radar graphics, concentric rings, measurement ticks, rotating sweep, scan-line overlay, and battery-saver throttling |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (22s, 2026-11-21) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (16s, 26 tests passed, 2026-11-21) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (34s, 0 errors, 2026-11-21) |
+| Dependencies | PHASE-02, PHASE-03 |
+| Started | 2026-11-21 |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (26 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+
+**Implemented:**
+
+- Pure mathematical geometry utilities (`RadarMath`) for polar conversions, tick mark vectors, angle normalization, and sweep interpolation.
+- Compose Canvas `RadarDisplay` with concentric range rings, measurement ticks, center reticle crosshairs, rotating sweep sector, leading sweep line, and dynamic azimuth readout.
+- Full-screen `ScanLineOverlay` with soft bloom and translating scan line (3s linear repeat).
+- Home screen integration with dynamic `PowerManager.ACTION_POWER_SAVE_MODE_CHANGED` receiver to pause animations automatically when battery-saver mode is active.
+- Seven new JVM unit tests in `RadarMathTest` verifying all polar calculations and bounds.
+
+**Validation:**
+- Assemble, unit tests, and lint all completed successfully with zero errors.
+- Device testing deferred pending physical device / emulator (B-002).
+
+---
+
 ## F. Build and Test History
 
 | Date | Command | Environment | Result | Notes | Feature/Phase |
@@ -306,6 +334,9 @@ Rules:
 | 2026-11-21 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (21s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-05 |
 | 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (16s) | 19 tests passed (2 Example + 5 ThemeTokens + 5 ClockViewModel + 7 AppListNormalizer) | PHASE-05 |
 | 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (33s) | 0 errors | PHASE-05 |
+| 2026-11-21 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (22s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-06 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (16s) | 26 tests passed (7 new RadarMath tests) | PHASE-06 |
+| 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (34s) | 0 errors | PHASE-06 |
 
 ---
 
@@ -329,42 +360,40 @@ Rules:
 | 2026-10-25 | **Phase 1 implemented:** Android project scaffold created; Gradle 8.9 wrapper bootstrapped (SHA-256 verified); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all passed; device tests pending | PHASE-01-FOUNDATION.md |
 | 2026-11-21 | **Phase 4 implemented & build verified:** app discovery, drawer, launch flow, package refresh, and JVM tests added; B-003 resolved via patchelf (DEC-013); `assembleDebug`, `testDebugUnitTest` (15 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-04-APP-DISCOVERY.md |
 | 2026-11-21 | **Phase 5 implemented & build verified:** real-time app search filtering, HudSearchBar, bottom nav wiring, IME launch action, no-results state, and 4 JVM tests added; `assembleDebug`, `testDebugUnitTest` (19 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-05-SEARCH.md |
+| 2026-11-21 | **Phase 6 implemented & build verified:** animated Canvas radar graphic, concentric range rings, measurement ticks, center reticle, rotating sweep sector, CRT scan-line overlay, battery-saver throttling, and 7 JVM geometry tests added; `assembleDebug`, `testDebugUnitTest` (26 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-06-HUD-GRAPHICS.md |
 
 ---
 
 ## I. Session Handoff
 
-**Session:** Phase 5 — Application Search
+**Session:** Phase 6 — Animated Radar and Technical HUD Graphics
 **Date:** 2026-11-21
 
-1. **Completed:** Full Phase 5 Application Search. Real-time search filtering in `AppDrawer` with `AppListNormalizer.filter`. `HudSearchBar` with HUD aesthetics, 48dp touch target clear button, and IME search action. Interactive bottom navigation search placeholder opening drawer with auto-focus. 4 JVM unit tests for search filter.
+1. **Completed:** Full Phase 6 Animated Radar & HUD Graphics. Implemented `RadarMath` pure geometric formulas, `RadarDisplay` Canvas composable with range rings, measurement ticks, center reticle, rotating sweep, and azimuth readout. Implemented `ScanLineOverlay` with soft bloom and vertical translation. Wired power-saver observation to throttle/pause animations when in battery-saver mode. Added 7 unit tests in `RadarMathTest`.
 2. **Changed files:**
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/apps/HudSearchBar.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/data/apps/AppListNormalizer.kt`
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/apps/AppDrawerViewModel.kt`
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/apps/AppDrawer.kt`
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/components/RadarMath.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/components/RadarDisplay.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/components/ScanLine.kt` (new)
    - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/HomeScreen.kt`
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/BottomNavBar.kt`
-   - `app/src/test/kotlin/dev/ragnar/aegis/data/apps/AppListNormalizerTest.kt`
-   - `docs/phases/PHASE-05-SEARCH.md` (new)
+   - `app/src/test/kotlin/dev/ragnar/aegis/ui/components/RadarMathTest.kt` (new)
+   - `docs/phases/PHASE-06-HUD-GRAPHICS.md` (new)
    - `docs/PROGRESS_TRACKER.md`
    - `docs/FEATURE_PLAN.md`
    - `docs/PHASE_LOG.md`
    - `docs/NEXT_STEPS.md`
    - `docs/CHANGELOG.md`
-   - `docs/TEST_PLAN.md`
    - `docs/PROJECT_PLAN.md`
    - `docs/README.md`
    - `README.md`
 3. **Validated:**
-   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (21s)
-   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 19 tests passed)
-   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (33s, 0 errors)
+   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (22s)
+   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 26 tests passed)
+   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (34s, 0 errors)
    - APK produced: `app/build/outputs/apk/debug/app-debug.apk`
-4. **Unverified:** Device testing (DT-MANIFEST-01 through DT-MANIFEST-04, manual search interaction).
+4. **Unverified:** Device testing (radar frame rate, battery consumption profiling on physical device).
 5. **Blockers:** B-002 — No device available for on-device tests.
-6. **Next Task:** Phase 6 — Animated Radar & HUD Graphics (or F-006 Battery Telemetry).
-7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-05-SEARCH.md`.
+6. **Next Task:** Phase 7 — System Telemetry Dashboard / F-006 Battery Telemetry.
+7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-06-HUD-GRAPHICS.md`.
 8. **Commands to run when resuming:**
    ```bash
    git status

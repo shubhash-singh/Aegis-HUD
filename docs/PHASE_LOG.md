@@ -354,4 +354,40 @@ All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) pass
 
 ---
 
+### PHASE-06 — Animated Radar and Technical HUD Graphics
+
+| Field | Value |
+|---|---|
+| Phase | PHASE-06 |
+| Title | Animated Radar and Technical HUD Graphics |
+| Date Started | 2026-11-21 |
+| Date Completed | 2026-11-21 (build verified; device validation pending) |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Result | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (22s) |
+| Test Result | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (16s, 26 tests passed) |
+| Lint Result | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (34s, 0 errors) |
+
+**Summary:**
+
+Phase 6 implemented animated sci-fi HUD radar graphics and technical overlay on the home screen:
+
+1. **RadarMath**: Pure Kotlin geometric utility library implementing polar-to-cartesian conversions, radial tick vectors, angle normalization `[0°, 360°)`, and animation progress interpolation. Pure logic decoupled from Android APIs for 100% JVM testability.
+2. **RadarDisplay**: Compose Canvas component implementing:
+   - Concentric range rings at 0.25, 0.5, 0.75, and 1.0 outer radius.
+   - Perimeter measurement tick marks (major every 90°, minor every 30°).
+   - Technical crosshair reticle with center micro-ring and dot.
+   - 45° trailing sweep sector with sweep gradient alpha bloom.
+   - Bright leading sweep line with cyan head.
+   - Live azimuth degree readout (`AZ 142°` / `STANDBY`).
+   - Configurable speed (default 4000ms per revolution) and pausable state.
+3. **ScanLineOverlay**: CRT-style horizontal scan-line overlay translating vertically across the screen (3s repeat cycle) with soft gradient glow.
+4. **HomeScreen Integration & Power Management**: Integrated radar and scan line into the center HUD zone, wrapped in a vertical scroll container for small-screen resilience. Registered a dynamic `PowerManager.ACTION_POWER_SAVE_MODE_CHANGED` receiver to automatically pause animations when battery-saver mode is active.
+5. **Unit Tests**: Added 7 unit tests in `RadarMathTest` validating coordinate conversions, angle wrapping, tick calculations, and sweep interpolation. All 26 project unit tests pass.
+
+All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) passed with zero errors. Device validation remains pending connection of a target device (B-002).
+
+**Next phase:** PHASE-07 — System Telemetry Dashboard / F-006 Battery Telemetry
+
+---
+
 *(Subsequent phases will be logged as they are completed.)*

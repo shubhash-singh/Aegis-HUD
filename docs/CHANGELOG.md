@@ -4,6 +4,21 @@
 
 ## [Unreleased] — Development
 
+### Phase 6 — Animated Radar and Technical HUD Graphics — 2026-11-21
+
+**Added:**
+- Animated technical radar graphic (`RadarDisplay`) rendered via Compose Canvas with concentric range rings, measurement ticks, center crosshair reticle, rotating sweep sector with trailing gradient, and live azimuth readout.
+- Full-screen CRT scan-line overlay (`ScanLineOverlay`) with subtle glow.
+- Pure geometric utility library (`RadarMath`) with polar conversions, tick vectors, and angle calculations.
+- Automatic animation throttling/pausing when device battery-saver mode is active (`PowerManager.ACTION_POWER_SAVE_MODE_CHANGED`).
+- 7 JVM unit tests in `RadarMathTest` (26 total project unit tests passing).
+
+**Validation:**
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (22s).
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 26 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (34s, 0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### Phase 5 — Application Search — 2026-11-21
 
 **Added:**
