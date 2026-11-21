@@ -23,7 +23,7 @@
 | Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (20s, 108 tests passed, 2026-11-22) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | 16af2f9 — docs: update latest commit hash for phase 14 in progress tracker |
+| Latest Commit | 2c8d38b — feat(phase-15): implement launcher reliability and performance (F-016) with zero-allocation render loop and exception-safe teardown |
 
 ---
 
