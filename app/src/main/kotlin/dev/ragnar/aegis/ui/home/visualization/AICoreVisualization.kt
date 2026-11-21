@@ -42,19 +42,26 @@ fun AICoreVisualization(
     val anim = rememberNeuralAnimationState(isPaused = isPaused, speedMultiplier = speedMultiplier)
     val mesh = remember { NeuralMesh3D.build() }
     val frame = remember(mesh) { NeuralProjection(mesh.count) }
+    val codeRain = remember { AegisCodeRainRenderer() }
 
     Canvas(
         modifier = modifier
             .fillMaxSize()
             .semantics { contentDescription = "AEGIS Neural AI Core Visualization" },
     ) {
+        // Kept behind the hologram and panels so it adds atmosphere without competing with live data.
+        drawAegisCodeRain(
+            renderer = codeRain,
+            phase = anim.codeRainPhase.value,
+            colors = colors,
+        )
         val geo = NeuralGeometry.build(size.width, size.height)
         // State is read here, in the draw phase, so animation ticks redraw without recomposing.
         drawBrainMesh3D(
             mesh, frame, geo,
             brainPulse = anim.brainPulse.value,
             pulsePhase = anim.pulsePhase.value,
-            rotationDeg = anim.outerRotation.value,
+            driftPhase = anim.meshDriftPhase.value,
             colors = colors,
         )
     }

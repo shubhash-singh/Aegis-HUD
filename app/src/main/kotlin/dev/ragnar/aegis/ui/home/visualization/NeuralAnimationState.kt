@@ -31,11 +31,11 @@ class NeuralAnimationState(
     val innerRotation: State<Float>,
     /** Outer circular indicator rotation: 360 → 0 in 10s, counter-clockwise. */
     val outerRotation: State<Float>,
-    /** Brain pulse scale: 1.0 → 1.05 → 1.0, 3s. */
+    /** Brain pulse scale: 1.0 → 1.018 → 1.0, 7s. */
     val brainPulse: State<Float>,
     /** Vertical beam alpha: 0.3 → 1.0 → 0.3, 2s. */
     val beamAlpha: State<Float>,
-    /** Data pulse travel: 0 → 1 (fraction along each edge), 2s, offset per edge. */
+    /** Data pulse travel: 0 → 1 (fraction along each edge), 3s, offset per edge. */
     val pulsePhase: State<Float>,
     /** Particle drift phase: 0 → 1, 6s — drives vertical + alpha drift. */
     val particlePhase: State<Float>,
@@ -43,6 +43,10 @@ class NeuralAnimationState(
     val ringPhase: State<Float>,
     /** Waveform phase shift: 0 → 2π, 4s. */
     val wavePhase: State<Float>,
+    /** Slow 0 → 1 phase used exclusively for the neural mesh's organic camera drift. */
+    val meshDriftPhase: State<Float>,
+    /** Slow 0 → 1 phase used by the faint application-source code rain. */
+    val codeRainPhase: State<Float>,
 )
 
 /**
@@ -67,6 +71,8 @@ fun rememberNeuralAnimationState(
                 particlePhase = mutableStateOf(0f),
                 ringPhase = mutableStateOf(0f),
                 wavePhase = mutableStateOf(0f),
+                meshDriftPhase = mutableStateOf(0f),
+                codeRainPhase = mutableStateOf(0f),
             )
         }
     }
@@ -98,9 +104,10 @@ fun rememberNeuralAnimationState(
 
     val brainPulse = transition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.05f,
+        targetValue = 1.018f,
         animationSpec = infiniteRepeatable(
-            animation = tween(ms(3000), easing = LinearEasing),
+            // A low-amplitude, slow pulse reads as a living hologram rather than a scaled sprite.
+            animation = tween(ms(3500), easing = LinearEasing),
             repeatMode = RepeatMode.Reverse,
         ),
         label = "BrainPulse",
@@ -120,7 +127,7 @@ fun rememberNeuralAnimationState(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(ms(2000), easing = LinearEasing),
+            animation = tween(ms(3000), easing = LinearEasing),
             repeatMode = RepeatMode.Restart,
         ),
         label = "PulsePhase",
@@ -156,6 +163,27 @@ fun rememberNeuralAnimationState(
         label = "WavePhase",
     )
 
+    val meshDriftPhase = transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            // Keep this independent from the HUD rings: a brain should drift, not spin with an indicator.
+            animation = tween(ms(26000), easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "MeshDrift",
+    )
+
+    val codeRainPhase = transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(ms(18000), easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "CodeRain",
+    )
+
     return remember(isPaused, speedMultiplier) {
         NeuralAnimationState(
             innerRotation = innerRotation,
@@ -166,6 +194,8 @@ fun rememberNeuralAnimationState(
             particlePhase = particlePhase,
             ringPhase = ringPhase,
             wavePhase = wavePhase,
+            meshDriftPhase = meshDriftPhase,
+            codeRainPhase = codeRainPhase,
         )
     }
 }

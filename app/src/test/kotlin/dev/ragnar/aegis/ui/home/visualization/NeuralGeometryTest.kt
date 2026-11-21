@@ -63,4 +63,23 @@ class NeuralGeometryTest {
         assertTrue("Stem emitter must be below center Y", geo.stemEmitterOffset.y > geo.centerY)
         assertTrue("Stem emitter must be above platform Y", geo.stemEmitterOffset.y < geo.platformCenter.y)
     }
+
+    @Test
+    fun organicMeshPose_isContinuousAtLoopBoundary() {
+        val start = organicMeshPose(0f)
+        val end = organicMeshPose(1f)
+
+        assertEquals("Yaw must not jump when the infinite animation restarts", start.yaw, end.yaw, 0.0001f)
+        assertEquals("Pitch must not jump when the infinite animation restarts", start.pitch, end.pitch, 0.0001f)
+    }
+
+    @Test
+    fun organicMeshPose_keepsTheCameraMotionSubtle() {
+        val poses = (0..100).map { organicMeshPose(it / 100f) }
+        val yawRange = poses.maxOf { it.yaw } - poses.minOf { it.yaw }
+        val pitchRange = poses.maxOf { it.pitch } - poses.minOf { it.pitch }
+
+        assertTrue("Yaw drift should remain under 16 degrees", yawRange < 0.28f)
+        assertTrue("Pitch drift should remain under 3 degrees", pitchRange < 0.053f)
+    }
 }
