@@ -390,4 +390,41 @@ All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) pass
 
 ---
 
+### PHASE-07 — System & Battery Telemetry Dashboard
+
+| Field | Value |
+|---|---|
+| Phase | PHASE-07 |
+| Title | System & Battery Telemetry Dashboard (F-006 & F-008) |
+| Date Started | 2026-11-21 |
+| Date Completed | 2026-11-21 (build verified; device validation pending) |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Result | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (34s) |
+| Test Result | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (21s, 34 tests passed) |
+| Lint Result | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (44s, 0 errors) |
+
+**Summary:**
+
+Phase 7 delivered real-time, zero-polling battery and network telemetry to the AEGIS HUD dashboard:
+
+1. **Battery Telemetry (F-006)**:
+   - Implemented `BatteryNormalizer` pure mapping engine converting Android's `ACTION_BATTERY_CHANGED` sticky extras to a platform-neutral `BatteryState` model (percentage, charging status, plug type, temperature in °C, voltage, health).
+   - Implemented `AndroidBatteryRepository` using sticky broadcasts without background services or polling.
+   - Enforces DEC-009: missing or invalid values safely default to null/unknown and render as "---".
+2. **System & Network Telemetry (F-008)**:
+   - Declared `android.permission.ACCESS_NETWORK_STATE` in manifest.
+   - Implemented `NetworkNormalizer` pure mapping engine converting network capability flags to `NetworkState` (Wi-Fi, Cellular, Ethernet, Offline, meteredness, VPN).
+   - Implemented `AndroidNetworkRepository` using lifecycle-aware `ConnectivityManager.NetworkCallback`.
+   - Real system uptime tracking using `SystemClock.elapsedRealtime()`.
+3. **TelemetryViewModel & HomeScreen**:
+   - `TelemetryViewModel` combines battery, network, and uptime flows into UI state.
+   - Wired live telemetry into `HomeScreen`'s System Status (Network status dot & label, Battery status dot & label, Storage) and Telemetry (Battery temp, Uptime, Voltage) panels.
+4. **Unit Tests**: Added 8 new unit tests (4 in `BatteryNormalizerTest` and 4 in `NetworkNormalizerTest`) covering charging states, temperature conversion, default handling, percentage clamping, and network capability detection. All 34 project unit tests pass.
+
+All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) passed with zero errors. Device validation remains pending connection of a target device (B-002).
+
+**Next phase:** PHASE-08 — Quick Actions (F-009)
+
+---
+
 *(Subsequent phases will be logged as they are completed.)*

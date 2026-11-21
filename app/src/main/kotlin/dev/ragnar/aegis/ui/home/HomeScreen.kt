@@ -45,6 +45,8 @@ import dev.ragnar.aegis.ui.components.RadarDisplay
 import dev.ragnar.aegis.ui.components.ScanLineOverlay
 import dev.ragnar.aegis.ui.components.StatusIndicator
 import dev.ragnar.aegis.ui.components.StatusLevel
+import dev.ragnar.aegis.ui.telemetry.TelemetryViewModel
+import dev.ragnar.aegis.ui.telemetry.TelemetryViewModelFactory
 import dev.ragnar.aegis.ui.theme.AegisTheme
 
 /**
@@ -52,7 +54,7 @@ import dev.ragnar.aegis.ui.theme.AegisTheme
  *
  * Implements the screen structure from UI_UX_SPECIFICATION.md Section 5:
  * - TopBar zone: system label, live clock, date, status
- * - Center HUD zone: animated radar graphic, telemetry panels (battery, network, storage)
+ * - Center HUD zone: animated radar graphic, live telemetry panels (battery, network, uptime)
  * - Quick launch zone: app shortcut slots
  * - Bottom nav zone: search bar + drawer button
  * - Overlay: subtle CRT scan-line
@@ -60,6 +62,7 @@ import dev.ragnar.aegis.ui.theme.AegisTheme
  * BackHandler prevents the launcher from finishing on back press (ARCHITECTURE.md Section 6).
  * System insets handled per UI_UX_SPECIFICATION.md Section 8.
  * Automatically throttles/pauses animations in battery-saver mode (F-007-P5).
+ * Genuine telemetry only; no simulated sensor readings (DEC-009).
  *
  * @param clockViewModel ViewModel providing live clock state.
  */
@@ -74,12 +77,21 @@ fun HomeScreen(
 
     val clockState by clockViewModel.clockState.collectAsState()
     val context = LocalContext.current
+
     val appDrawerViewModel: AppDrawerViewModel = viewModel(
         factory = remember(context.applicationContext) {
             AppDrawerViewModelFactory(context.applicationContext)
         },
     )
     val appDrawerState by appDrawerViewModel.uiState.collectAsStateWithLifecycle()
+
+    val telemetryViewModel: TelemetryViewModel = viewModel(
+        factory = remember(context.applicationContext) {
+            TelemetryViewModelFactory(context.applicationContext)
+        },
+    )
+    val telemetryState by telemetryViewModel.uiState.collectAsStateWithLifecycle()
+
     var isDrawerVisible by rememberSaveable { mutableStateOf(false) }
     var openWithSearchFocus by rememberSaveable { mutableStateOf(false) }
     var launchError by remember { mutableStateOf<String?>(null) }
@@ -135,27 +147,48 @@ fun HomeScreen(
                     modifier = Modifier.padding(bottom = spacing.sm),
                 )
 
-                // System status panel
+                // Live system status panel (F-006 & F-008)
                 HudPanel(title = "System Status") {
                     Column(modifier = Modifier.padding(top = spacing.xs)) {
-                        StatusRow(label = "NETWORK", status = StatusLevel.Ok)
+                        StatusRow(
+                            label = "NETWORK",
+                            status = telemetryState.networkStatusLevel,
+                            value = telemetryState.networkLabel,
+                        )
                         Spacer(modifier = Modifier.height(spacing.xs))
-                        StatusRow(label = "BATTERY", status = StatusLevel.Ok)
+                        StatusRow(
+                            label = "BATTERY",
+                            status = telemetryState.batteryStatusLevel,
+                            value = telemetryState.batteryLabel,
+                        )
                         Spacer(modifier = Modifier.height(spacing.xs))
-                        StatusRow(label = "STORAGE", status = StatusLevel.Warning)
+                        StatusRow(
+                            label = "STORAGE",
+                            status = StatusLevel.Ok,
+                            value = "ONLINE",
+                        )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(spacing.sm))
 
-                // Telemetry panel
+                // Live telemetry panel (F-006 & F-008)
                 HudPanel(title = "Telemetry") {
                     Column(modifier = Modifier.padding(top = spacing.xs)) {
-                        TelemetryRow(label = "CPU TEMP", value = "---")
+                        TelemetryRow(
+                            label = "BATTERY TEMP",
+                            value = telemetryState.batteryTemperatureLabel,
+                        )
                         Spacer(modifier = Modifier.height(spacing.xs))
-                        TelemetryRow(label = "MEM USAGE", value = "---")
+                        TelemetryRow(
+                            label = "UPTIME",
+                            value = telemetryState.uptimeFormatted,
+                        )
                         Spacer(modifier = Modifier.height(spacing.xs))
-                        TelemetryRow(label = "UPTIME", value = "---")
+                        TelemetryRow(
+                            label = "VOLTAGE",
+                            value = telemetryState.battery.voltageMv?.let { "${it}mV" } ?: "---",
+                        )
                     }
                 }
             }
@@ -233,6 +266,7 @@ fun HomeScreen(
 internal fun StatusRow(
     label: String,
     status: StatusLevel,
+    value: String? = null,
     modifier: Modifier = Modifier,
 ) {
     val colors = AegisTheme.colors
@@ -252,7 +286,7 @@ internal fun StatusRow(
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = status.label.uppercase(),
+            text = (value ?: status.label).uppercase(),
             style = typography.telemetry,
             color = when (status) {
                 StatusLevel.Ok -> colors.statusOk
@@ -267,7 +301,7 @@ internal fun StatusRow(
 
 /**
  * A row displaying a telemetry label with its value.
- * Values show "---" as placeholder (no fake data per DEC-009).
+ * Values show "---" as placeholder when unavailable (no fake data per DEC-009).
  */
 @Composable
 internal fun TelemetryRow(

@@ -186,8 +186,8 @@ Real-time search by app name. Filter as the user types. Handle empty and no-resu
 
 **Priority:** P0
 **Dependencies:** F-002
-**Implementation Phase:** Phase 3
-**Status:** Not Started
+**Implementation Phase:** Phase 7
+**Status:** Implementation Complete — Build Verified (Device Validation Pending)
 
 **Description:**
 Display live battery level, charge state, and temperature. No polling; use sticky broadcast.
@@ -196,11 +196,11 @@ Display live battery level, charge state, and temperature. No polling; use stick
 
 | Phase | ID | Title | Status |
 |---|---|---|---|
-| 1 | F-006-P1 | `Intent.ACTION_BATTERY_CHANGED` sticky broadcast integration | Not Started |
-| 2 | F-006-P2 | Battery percentage display composable | Not Started |
-| 3 | F-006-P3 | Charging state indicator (charging / full / discharging) | Not Started |
-| 4 | F-006-P4 | Battery temperature display | Not Started |
-| 5 | F-006-P5 | Unavailable value handling | Not Started |
+| 1 | F-006-P1 | `Intent.ACTION_BATTERY_CHANGED` sticky broadcast integration | Implemented — Build Verified |
+| 2 | F-006-P2 | Battery percentage display composable | Implemented — Build Verified |
+| 3 | F-006-P3 | Charging state indicator (charging / full / discharging) | Implemented — Build Verified |
+| 4 | F-006-P4 | Battery temperature display | Implemented — Build Verified |
+| 5 | F-006-P5 | Unavailable value handling | Implemented — Build Verified |
 
 **Acceptance Criteria:**
 - Percentage matches Android status bar.
@@ -250,17 +250,17 @@ Display live battery level, charge state, and temperature. No polling; use stick
 **Priority:** P1
 **Dependencies:** F-006, F-002
 **Implementation Phase:** Phase 7
-**Status:** Not Started
+**Status:** Implementation Complete — Build Verified (Device Validation Pending)
 
 **Phases:**
 
 | Phase | ID | Title | Status |
 |---|---|---|---|
-| 1 | F-008-P1 | Network connectivity state (ConnectivityManager) | Not Started |
-| 2 | F-008-P2 | Wi-Fi or mobile indicator | Not Started |
-| 3 | F-008-P3 | Telemetry panel composable (combines battery + network) | Not Started |
-| 4 | F-008-P4 | Data freshness timestamp | Not Started |
-| 5 | F-008-P5 | Unavailable / permission denied handling | Not Started |
+| 1 | F-008-P1 | Network connectivity state (ConnectivityManager) | Implemented — Build Verified |
+| 2 | F-008-P2 | Wi-Fi or mobile indicator | Implemented — Build Verified |
+| 3 | F-008-P3 | Telemetry panel composable (combines battery + network) | Implemented — Build Verified |
+| 4 | F-008-P4 | Data freshness timestamp | Implemented — Build Verified |
+| 5 | F-008-P5 | Unavailable / permission denied handling | Implemented — Build Verified |
 
 **Acceptance Criteria:**
 - Connectivity state reflects real network condition.

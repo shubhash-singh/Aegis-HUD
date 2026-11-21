@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.7.0
-**Last Updated:** 2026-11-21 (Phase 6 build verified; device validation pending)
-**Current Stage:** Phase 6 — Animated Radar & HUD Graphics
-**Overall Status:** Phase 6 implementation complete & build verified; device validation pending (B-002)
+**Version:** 0.8.0
+**Last Updated:** 2026-11-21 (Phase 7 build verified; device validation pending)
+**Current Stage:** Phase 7 — System Telemetry Dashboard
+**Overall Status:** Phase 7 implementation complete & build verified; device validation pending (B-002)
 
 ---
 
@@ -13,17 +13,17 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 6 — Animated Radar & HUD Graphics |
+| Stage | Phase 7 — System Telemetry Dashboard |
 | Status | Implementation Complete — Build Verified (Device Validation Pending) |
 | Last Updated | 2026-11-21 |
-| Last Completed Phase | PHASE-06 (Animated Radar & HUD Graphics — build verified) |
-| Current Phase | PHASE-06 (build verified; device validation pending) |
-| Next Step | Proceed to PHASE-07 (System Telemetry) / F-006 (Battery Telemetry); run device validation when connected |
-| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (22s, 2026-11-21) |
-| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 26 tests passed, 2026-11-21) |
+| Last Completed Phase | PHASE-07 (System Telemetry Dashboard — build verified) |
+| Current Phase | PHASE-07 (build verified; device validation pending) |
+| Next Step | Proceed to PHASE-08 (Quick Actions F-009) / Customization (F-010); run device validation when connected |
+| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (34s, 2026-11-21) |
+| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (21s, 34 tests passed, 2026-11-21) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | 3d1c719 — feat(phase-6): implement animated HUD radar graphics and scan-line overlay |
+| Latest Commit | 74d8959 — feat(phase-7): implement live battery and system telemetry dashboard |
 
 ---
 
@@ -90,9 +90,9 @@ Rules:
 | F-003 | HUD Home Screen | P0 | 6 | 6 | All phases done | Build Verified | Implementation Complete — Build Verified | F-002 |
 | F-004 | App Discovery & Launching | P0 | 6 | 6 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-001 |
 | F-005 | Application Search | P0 | 4 | 4 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-004 |
-| F-006 | Battery Telemetry | P0 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
+| F-006 | Battery Telemetry | P0 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
 | F-007 | Animated Radar & HUD Graphics | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
-| F-008 | System Telemetry Dashboard | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-006, F-002 |
+| F-008 | System Telemetry Dashboard | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-006, F-002 |
 | F-009 | Quick Actions | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
 | F-010 | Customization | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
 | F-011 | Application Organization | P1 | 4 | 0 | Not Started | Not Tested | Not Started | F-004, F-010 |
@@ -105,7 +105,7 @@ Rules:
 | F-018 | Extended Automation | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-013 |
 | F-019 | Open-Source Preparation | P3 | 6 | 0 | Not Started | Not Tested | Deferred | All |
 
-**Implementation Progress: 33%** (28 / 86 active planned implementation phases implemented)
+**Implementation Progress: 44%** (38 / 86 active planned implementation phases implemented)
 
 > **Denominator basis:** 86 active (non-deferred) planned phases — 31 P0 + 24 P1 + 31 P2. Deferred P3 phases (16) are excluded per the formula in Section B.2. Phase 4 counts implementation work only; its Gradle and device validation remain pending.
 
@@ -315,6 +315,36 @@ Rules:
 
 ---
 
+### PHASE-07: System & Battery Telemetry Dashboard
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-07 |
+| Objective | Live battery percentage, charging state, temperature, network connectivity, meteredness, genuine system uptime |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (34s, 2026-11-21) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (21s, 34 tests passed, 2026-11-21) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (44s, 0 errors, 2026-11-21) |
+| Dependencies | PHASE-02, PHASE-03, PHASE-06 |
+| Started | 2026-11-21 |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (34 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+
+**Implemented:**
+
+- Domain models `BatteryState` and `NetworkState`.
+- Pure parsing and normalization engines `BatteryNormalizer` and `NetworkNormalizer` with safe fallback handling (DEC-009).
+- `AndroidBatteryRepository` using `Intent.ACTION_BATTERY_CHANGED` sticky broadcast without background polling services.
+- `AndroidNetworkRepository` using `ConnectivityManager.NetworkCallback` with internet capability tracking.
+- `TelemetryViewModel` combining battery, network, and system uptime into formatted HUD UI state.
+- Live `HomeScreen` telemetry integration for System Status and Telemetry panels.
+- Eight new JVM unit tests in `BatteryNormalizerTest` and `NetworkNormalizerTest`.
+
+**Validation:**
+- Assemble, unit tests, and lint all completed successfully with zero errors.
+- Device testing deferred pending physical device / emulator (B-002).
+
+---
+
 ## F. Build and Test History
 
 | Date | Command | Environment | Result | Notes | Feature/Phase |
@@ -337,6 +367,9 @@ Rules:
 | 2026-11-21 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (22s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-06 |
 | 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (16s) | 26 tests passed (7 new RadarMath tests) | PHASE-06 |
 | 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (34s) | 0 errors | PHASE-06 |
+| 2026-11-21 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (34s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-07 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (21s) | 34 tests passed (8 new telemetry tests) | PHASE-07 |
+| 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (44s) | 0 errors | PHASE-07 |
 
 ---
 
@@ -361,39 +394,49 @@ Rules:
 | 2026-11-21 | **Phase 4 implemented & build verified:** app discovery, drawer, launch flow, package refresh, and JVM tests added; B-003 resolved via patchelf (DEC-013); `assembleDebug`, `testDebugUnitTest` (15 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-04-APP-DISCOVERY.md |
 | 2026-11-21 | **Phase 5 implemented & build verified:** real-time app search filtering, HudSearchBar, bottom nav wiring, IME launch action, no-results state, and 4 JVM tests added; `assembleDebug`, `testDebugUnitTest` (19 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-05-SEARCH.md |
 | 2026-11-21 | **Phase 6 implemented & build verified:** animated Canvas radar graphic, concentric range rings, measurement ticks, center reticle, rotating sweep sector, CRT scan-line overlay, battery-saver throttling, and 7 JVM geometry tests added; `assembleDebug`, `testDebugUnitTest` (26 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-06-HUD-GRAPHICS.md |
+| 2026-11-21 | **Phase 7 implemented & build verified:** real-time battery and network telemetry, pure normalizers, sticky broadcast / NetworkCallback repositories, genuine uptime tracking, and 8 JVM tests added; `assembleDebug`, `testDebugUnitTest` (34 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-07-TELEMETRY.md |
 
 ---
 
 ## I. Session Handoff
 
-**Session:** Phase 6 — Animated Radar and Technical HUD Graphics
+**Session:** Phase 7 — System & Battery Telemetry Dashboard
 **Date:** 2026-11-21
 
-1. **Completed:** Full Phase 6 Animated Radar & HUD Graphics. Implemented `RadarMath` pure geometric formulas, `RadarDisplay` Canvas composable with range rings, measurement ticks, center reticle, rotating sweep, and azimuth readout. Implemented `ScanLineOverlay` with soft bloom and vertical translation. Wired power-saver observation to throttle/pause animations when in battery-saver mode. Added 7 unit tests in `RadarMathTest`.
+1. **Completed:** Full Phase 7 System Telemetry Dashboard (F-006 & F-008). Implemented `BatteryNormalizer`, `NetworkNormalizer`, `AndroidBatteryRepository`, `AndroidNetworkRepository`, `TelemetryViewModel`, and wired live telemetry into `HomeScreen`. Declared `ACCESS_NETWORK_STATE` in manifest. Added 8 unit tests across `BatteryNormalizerTest` and `NetworkNormalizerTest`.
 2. **Changed files:**
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/components/RadarMath.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/components/RadarDisplay.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/components/ScanLine.kt` (new)
+   - `app/src/main/AndroidManifest.xml`
+   - `app/src/main/kotlin/dev/ragnar/aegis/domain/telemetry/BatteryState.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/domain/telemetry/NetworkState.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/BatteryNormalizer.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/BatteryRepository.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/AndroidBatteryRepository.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/NetworkNormalizer.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/NetworkRepository.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/AndroidNetworkRepository.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/telemetry/TelemetryViewModel.kt` (new)
    - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/HomeScreen.kt`
-   - `app/src/test/kotlin/dev/ragnar/aegis/ui/components/RadarMathTest.kt` (new)
-   - `docs/phases/PHASE-06-HUD-GRAPHICS.md` (new)
+   - `app/src/test/kotlin/dev/ragnar/aegis/data/telemetry/BatteryNormalizerTest.kt` (new)
+   - `app/src/test/kotlin/dev/ragnar/aegis/data/telemetry/NetworkNormalizerTest.kt` (new)
+   - `docs/phases/PHASE-07-TELEMETRY.md` (new)
    - `docs/PROGRESS_TRACKER.md`
    - `docs/FEATURE_PLAN.md`
    - `docs/PHASE_LOG.md`
    - `docs/NEXT_STEPS.md`
    - `docs/CHANGELOG.md`
+   - `docs/TEST_PLAN.md`
    - `docs/PROJECT_PLAN.md`
    - `docs/README.md`
    - `README.md`
 3. **Validated:**
-   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (22s)
-   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 26 tests passed)
-   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (34s, 0 errors)
+   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (34s)
+   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (21s, 34 tests passed)
+   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (44s, 0 errors)
    - APK produced: `app/build/outputs/apk/debug/app-debug.apk`
-4. **Unverified:** Device testing (radar frame rate, battery consumption profiling on physical device).
+4. **Unverified:** Device testing (real-world network transitions and status bar battery alignment on physical hardware).
 5. **Blockers:** B-002 — No device available for on-device tests.
-6. **Next Task:** Phase 7 — System Telemetry Dashboard / F-006 Battery Telemetry.
-7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-06-HUD-GRAPHICS.md`.
+6. **Next Task:** Phase 8 — Quick Actions (F-009).
+7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-07-TELEMETRY.md`.
 8. **Commands to run when resuming:**
    ```bash
    git status

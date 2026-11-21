@@ -35,6 +35,7 @@ This directory contains all project documentation for AEGIS HUD Launcher.
 | [phases/PHASE-04-APP-DISCOVERY.md](phases/PHASE-04-APP-DISCOVERY.md) | Phase 4: App Discovery — build verified (device validation pending) |
 | [phases/PHASE-05-SEARCH.md](phases/PHASE-05-SEARCH.md) | Phase 5: Application Search — build verified (device validation pending) |
 | [phases/PHASE-06-HUD-GRAPHICS.md](phases/PHASE-06-HUD-GRAPHICS.md) | Phase 6: Animated Radar & HUD Graphics — build verified (device validation pending) |
+| [phases/PHASE-07-TELEMETRY.md](phases/PHASE-07-TELEMETRY.md) | Phase 7: System & Battery Telemetry — build verified (device validation pending) |
 
 ---
 
@@ -42,4 +43,4 @@ This directory contains all project documentation for AEGIS HUD Launcher.
 
 See [PROGRESS_TRACKER.md](PROGRESS_TRACKER.md) for authoritative project status.
 
-Current stage: **Phase 6 implementation and build validation complete (build verified, 26 tests passed, lint passed); device validation pending B-002.**
+Current stage: **Phase 7 implementation and build validation complete (build verified, 34 tests passed, lint passed); device validation pending B-002.**

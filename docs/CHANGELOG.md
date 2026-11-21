@@ -4,6 +4,23 @@
 
 ## [Unreleased] — Development
 
+### Phase 7 — System & Battery Telemetry Dashboard — 2026-11-21
+
+**Added:**
+- Live battery telemetry via sticky broadcast (`AndroidBatteryRepository`): charge level %, charging status (`CHG`, `DIS`, `FULL`), temperature in °C, voltage, health.
+- Live network connectivity tracking via `ConnectivityManager.NetworkCallback` (`AndroidNetworkRepository`): Wi-Fi, Cellular, Ethernet, Offline.
+- Pure parsing and normalization engines (`BatteryNormalizer`, `NetworkNormalizer`) with safe default handling.
+- Real system uptime tracking via `SystemClock.elapsedRealtime()`.
+- Declared `android.permission.ACCESS_NETWORK_STATE` in manifest.
+- Wired live telemetry into `HomeScreen` status and telemetry panels (DEC-009 compliant).
+- 8 JVM unit tests across `BatteryNormalizerTest` and `NetworkNormalizerTest` (34 total project unit tests passing).
+
+**Validation:**
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (34s).
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (21s, 34 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (44s, 0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### Phase 6 — Animated Radar and Technical HUD Graphics — 2026-11-21
 
 **Added:**

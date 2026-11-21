@@ -54,9 +54,9 @@
 
 ### F-006: Battery Telemetry
 - [ ] `IT-006-01`: Battery adapter extracts values from `Intent.ACTION_BATTERY_CHANGED` extras (instrumentation test).
-- [ ] `UT-006-02`: Platform-neutral battery values map to charging state correctly (unit test).
-- [ ] `UT-006-03`: Temperature converts from tenths of degrees to degrees (unit test).
-- [ ] `UT-006-04`: Missing platform-neutral values produce safe defaults (unit test).
+- [x] `UT-006-02`: Platform-neutral battery values map to charging state correctly (unit test).
+- [x] `UT-006-03`: Temperature converts from tenths of degrees to degrees (unit test).
+- [x] `UT-006-04`: Missing platform-neutral values produce safe defaults (unit test).
 
 ### F-007: Animated Radar
 - [ ] `CT-007-01`: Radar composable renders without crash (Compose instrumentation test).
@@ -64,7 +64,7 @@
 
 ### F-008: System Telemetry
 - [ ] `IT-008-01`: Network adapter maps `NetworkCapabilities` correctly (instrumentation test).
-- [ ] `UT-008-02`: Fake network source produces the correct offline `NetworkState` (unit test).
+- [x] `UT-008-02`: Fake network source produces the correct offline `NetworkState` (unit test).
 
 ### F-009: Quick Actions
 - [ ] `UT-009-01`: Flashlight action calls a fake `TorchController` (unit test).
@@ -156,6 +156,8 @@ The following tests verify the manifest attributes accepted in DEC-010:
 | 2026-11-01 | `./gradlew testDebugUnitTest` | PASS | 12 tests passed | 3 |
 | 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | PASS | 15 tests passed | 4 |
 | 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | PASS | 19 tests passed (4 search filter tests) | 5 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | PASS | 26 tests passed (7 radar math tests) | 6 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | PASS | 34 tests passed (8 battery/network telemetry tests) | 7 |
 
 ---
 
