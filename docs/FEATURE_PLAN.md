@@ -277,17 +277,17 @@ Display live battery level, charge state, and temperature. No polling; use stick
 **Priority:** P1
 **Dependencies:** F-002
 **Implementation Phase:** Phase 8
-**Status:** Not Started
+**Status:** Implementation Complete — Build Verified (Device Validation Pending)
 
 **Phases:**
 
 | Phase | ID | Title | Status |
 |---|---|---|---|
-| 1 | F-009-P1 | Settings shortcut composable | Not Started |
-| 2 | F-009-P2 | Flashlight toggle (CameraManager API) | Not Started |
-| 3 | F-009-P3 | Wi-Fi settings intent | Not Started |
-| 4 | F-009-P4 | Bluetooth settings intent | Not Started |
-| 5 | F-009-P5 | Action state feedback and error handling | Not Started |
+| 1 | F-009-P1 | Settings shortcut composable | Implemented — Build Verified |
+| 2 | F-009-P2 | Flashlight toggle (CameraManager API) | Implemented — Build Verified |
+| 3 | F-009-P3 | Wi-Fi settings intent | Implemented — Build Verified |
+| 4 | F-009-P4 | Bluetooth settings intent | Implemented — Build Verified |
+| 5 | F-009-P5 | Action state feedback and error handling | Implemented — Build Verified |
 
 **Acceptance Criteria:**
 - Each action performs its intended function or opens the correct Settings screen.

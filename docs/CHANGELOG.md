@@ -4,6 +4,22 @@
 
 ## [Unreleased] — Development
 
+### Phase 8 — Quick Actions — 2026-11-21
+
+**Added:**
+- `TorchController` interface and `AndroidTorchController` implementation using `CameraManager.setTorchMode`. Checks for real back-facing camera flash; silently disabled when hardware unavailable — no crash.
+- `QuickActionsViewModel` tracking real torch ON/OFF state and hardware-failure error.
+- `QuickActionsPanel` composable: a row of four 48dp HUD-styled action buttons — ⚙ Settings, ○/◉ Torch, ⌘ Wi-Fi, ✦ Bluetooth. Torch button renders in muted style when unavailable; active state highlighted with `aegis.borderActive`. Inline error message on torch failure.
+- All settings intents launched with `FLAG_ACTIVITY_NEW_TASK` (required from launcher task context).
+- `QuickActionsPanel` integrated into `HomeScreen` between Telemetry and Quick Launch rows.
+- 6 JVM unit tests in `QuickActionsViewModelTest` (47 total project unit tests passing).
+
+**Validation:**
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (44s).
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (37s, 47 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (81s, 0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### Phase 7 — System & Battery Telemetry Dashboard — 2026-11-21
 
 **Added:**

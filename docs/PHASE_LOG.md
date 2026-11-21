@@ -429,4 +429,45 @@ All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) pass
 
 ---
 
+### PHASE-08 — Quick Actions
+
+| Field | Value |
+|---|---|
+| Phase | PHASE-08 |
+| Title | Quick Actions (F-009) |
+| Date Started | 2026-11-21 |
+| Date Completed | 2026-11-21 (build verified; device validation pending) |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Result | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (44s) |
+| Test Result | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (37s, 47 tests passed) |
+| Lint Result | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (81s, 0 errors) |
+
+**Summary:**
+
+Phase 8 delivered a Quick Actions panel to the AEGIS HUD home screen:
+
+1. **TorchController Facade (F-009-P2):**
+   - `TorchController` pure interface: `isAvailable` + `setTorch(enable: Boolean): Boolean`.
+   - `AndroidTorchController`: iterates `CameraManager.cameraIdList`, finds first back-facing camera with `FLASH_INFO_AVAILABLE == true`, calls `setTorchMode`. Returns `false` on any exception or when hardware unavailable.
+2. **QuickActionsViewModel (F-009-P5):**
+   - Tracks real `isTorchOn` and `torchError` state via `MutableStateFlow<QuickActionsUiState>`.
+   - `toggleTorch()` inverts state on success; sets error message without changing state on failure.
+   - `clearTorchError()` resets the error without touching torch state.
+3. **QuickActionsPanel Composable (F-009-P1, P3, P4, P5):**
+   - Four 48dp HUD-styled buttons in a row: ⚙ Settings, ○/◉ Torch, ⌘ Wi-Fi, ✦ Bluetooth.
+   - Active torch state highlighted with `aegis.borderActive` and `aegis.cyan` icon.
+   - Unavailable torch shown muted — not clickable, no crash.
+   - Settings intents: `Settings.ACTION_SETTINGS`, `Settings.ACTION_WIFI_SETTINGS`, `Settings.ACTION_BLUETOOTH_SETTINGS` — all with `FLAG_ACTIVITY_NEW_TASK`.
+   - Inline `⚠ torchError` message rendered below buttons when hardware fails.
+4. **HomeScreen Integration:**
+   - `QuickActionsPanel()` placed between the Telemetry panel and the Quick Launch row.
+5. **Unit Tests**: Added 6 JVM unit tests in `QuickActionsViewModelTest` covering initial state, torch toggle on/off, hardware failure handling, and error clearing. All 47 project unit tests pass.
+
+All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) passed with zero errors. Device validation remains pending connection of a target device (B-002).
+
+**Next phase:** PHASE-09 — Customization (F-010)
+
+---
+
 *(Subsequent phases will be logged as they are completed.)*
+

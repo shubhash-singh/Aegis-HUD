@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.8.0
-**Last Updated:** 2026-11-21 (Phase 7 build verified; device validation pending)
-**Current Stage:** Phase 7 — System Telemetry Dashboard
-**Overall Status:** Phase 7 implementation complete & build verified; device validation pending (B-002)
+**Version:** 0.9.0
+**Last Updated:** 2026-11-21 (Phase 8 build verified; device validation pending)
+**Current Stage:** Phase 8 — Quick Actions
+**Overall Status:** Phase 8 implementation complete & build verified; device validation pending (B-002)
 
 ---
 
@@ -13,17 +13,17 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 7 — System Telemetry Dashboard |
+| Stage | Phase 8 — Quick Actions |
 | Status | Implementation Complete — Build Verified (Device Validation Pending) |
 | Last Updated | 2026-11-21 |
-| Last Completed Phase | PHASE-07 (System Telemetry Dashboard — build verified) |
-| Current Phase | PHASE-07 (build verified; device validation pending) |
-| Next Step | Proceed to PHASE-08 (Quick Actions F-009) / Customization (F-010); run device validation when connected |
-| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (16s, 2026-11-21) |
-| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (21s, 41 tests passed, 2026-11-21) |
+| Last Completed Phase | PHASE-08 (Quick Actions — build verified) |
+| Current Phase | PHASE-08 (build verified; device validation pending) |
+| Next Step | Proceed to PHASE-09 (Customization F-010); run device validation when connected |
+| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (44s, 2026-11-21) |
+| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (37s, 47 tests passed, 2026-11-21) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | 74d8959 — feat(phase-7): implement live battery and system telemetry dashboard |
+| Latest Commit | 83b7b3e — feat(phase-8): implement Quick Actions panel (settings, torch, wi-fi, bluetooth) |
 
 ---
 
@@ -93,7 +93,7 @@ Rules:
 | F-006 | Battery Telemetry | P0 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
 | F-007 | Animated Radar & HUD Graphics | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
 | F-008 | System Telemetry Dashboard | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-006, F-002 |
-| F-009 | Quick Actions | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
+| F-009 | Quick Actions | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
 | F-010 | Customization | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
 | F-011 | Application Organization | P1 | 4 | 0 | Not Started | Not Tested | Not Started | F-004, F-010 |
 | F-012 | Widget Hosting | P2 | 6 | 0 | Not Started | Not Tested | Not Started | F-001 |
@@ -105,7 +105,7 @@ Rules:
 | F-018 | Extended Automation | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-013 |
 | F-019 | Open-Source Preparation | P3 | 6 | 0 | Not Started | Not Tested | Deferred | All |
 
-**Implementation Progress: 44%** (38 / 86 active planned implementation phases implemented)
+**Implementation Progress: 50%** (43 / 86 active planned implementation phases implemented)
 
 > **Denominator basis:** 86 active (non-deferred) planned phases — 31 P0 + 24 P1 + 31 P2. Deferred P3 phases (16) are excluded per the formula in Section B.2. Phase 4 counts implementation work only; its Gradle and device validation remain pending.
 
@@ -345,6 +345,37 @@ Rules:
 
 ---
 
+---
+
+### PHASE-08: Quick Actions
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-08 |
+| Objective | Settings shortcut, flashlight toggle, Wi-Fi & Bluetooth settings intents, state feedback |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (44s, 2026-11-21) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (37s, 47 tests passed, 2026-11-21) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (81s, 0 errors, 2026-11-21) |
+| Dependencies | PHASE-02, PHASE-03 |
+| Started | 2026-11-21 |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (47 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+
+**Implemented:**
+
+- `TorchController` pure interface and `AndroidTorchController` using `CameraManager.setTorchMode` with graceful fallback for devices without flash hardware.
+- `QuickActionsViewModel` with real torch ON/OFF state tracking and error flag on hardware failure.
+- `QuickActionsPanel` composable with four HUD-styled 48dp buttons: Settings, Torch (live state), Wi-Fi, Bluetooth.
+- Torch button disabled (muted style) when hardware unavailable; error message shown on failure.
+- Settings intents use `FLAG_ACTIVITY_NEW_TASK` for correct launcher task behavior.
+- Integrated into `HomeScreen` between Telemetry panel and Quick Launch row.
+- 6 JVM unit tests in `QuickActionsViewModelTest` covering initial state, toggle ON/OFF, hardware failure, and error clearing.
+
+**Validation:**
+- Assemble, unit tests, and lint all completed successfully with zero errors.
+- Device testing deferred pending physical device / emulator (B-002).
+
+
 ## F. Build and Test History
 
 | Date | Command | Environment | Result | Notes | Feature/Phase |
@@ -398,48 +429,40 @@ Rules:
 | 2026-11-21 | **Phase 5 implemented & build verified:** real-time app search filtering, HudSearchBar, bottom nav wiring, IME launch action, no-results state, and 4 JVM tests added; `assembleDebug`, `testDebugUnitTest` (19 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-05-SEARCH.md |
 | 2026-11-21 | **Phase 6 implemented & build verified:** animated Canvas radar graphic, concentric range rings, measurement ticks, center reticle, rotating sweep sector, CRT scan-line overlay, battery-saver throttling, and 7 JVM geometry tests added; `assembleDebug`, `testDebugUnitTest` (26 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-06-HUD-GRAPHICS.md |
 | 2026-11-21 | **Phase 7 implemented & build verified:** real-time battery and network telemetry, pure normalizers, sticky broadcast / NetworkCallback repositories, genuine uptime tracking, and 8 JVM tests added; `assembleDebug`, `testDebugUnitTest` (34 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-07-TELEMETRY.md |
+| 2026-11-21 | **Phase 7 network speed addition:** live TrafficStats bandwidth sampling, `formatSpeed` utility, `formatNetworkLabel` with `↓↑` arrows, 7 additional JVM tests (41 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all successful | PHASE-07-TELEMETRY.md |
+| 2026-11-21 | **Phase 8 implemented & build verified:** `TorchController` facade, `AndroidTorchController`, `QuickActionsViewModel`, `QuickActionsPanel` with Settings/Torch/Wi-Fi/BT buttons, integrated into HomeScreen, 6 JVM tests added (47 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all successful; device testing pending (B-002) | PHASE-08-QUICK-ACTIONS.md |
 
 ---
 
 ## I. Session Handoff
 
-**Session:** Phase 7 — System & Battery Telemetry Dashboard
+**Session:** Phase 8 — Quick Actions
 **Date:** 2026-11-21
 
-1. **Completed:** Full Phase 7 System Telemetry Dashboard (F-006 & F-008). Implemented `BatteryNormalizer`, `NetworkNormalizer`, `AndroidBatteryRepository`, `AndroidNetworkRepository`, `TelemetryViewModel`, and wired live telemetry into `HomeScreen`. Declared `ACCESS_NETWORK_STATE` in manifest. Added 8 unit tests across `BatteryNormalizerTest` and `NetworkNormalizerTest`.
+1. **Completed:** Full Phase 8 Quick Actions (F-009). Implemented `TorchController` interface, `AndroidTorchController` using `CameraManager.setTorchMode`, `QuickActionsViewModel` with real torch state tracking and error handling, `QuickActionsPanel` composable with four HUD-styled buttons (Settings, Torch, Wi-Fi, Bluetooth), integrated into `HomeScreen`. Added 6 JVM unit tests in `QuickActionsViewModelTest`.
 2. **Changed files:**
-   - `app/src/main/AndroidManifest.xml`
-   - `app/src/main/kotlin/dev/ragnar/aegis/domain/telemetry/BatteryState.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/domain/telemetry/NetworkState.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/BatteryNormalizer.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/BatteryRepository.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/AndroidBatteryRepository.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/NetworkNormalizer.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/NetworkRepository.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/data/telemetry/AndroidNetworkRepository.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/telemetry/TelemetryViewModel.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/quickactions/TorchController.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/quickactions/AndroidTorchController.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/quickactions/QuickActionsViewModel.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/quickactions/QuickActionsPanel.kt` (new)
    - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/HomeScreen.kt`
-   - `app/src/test/kotlin/dev/ragnar/aegis/data/telemetry/BatteryNormalizerTest.kt` (new)
-   - `app/src/test/kotlin/dev/ragnar/aegis/data/telemetry/NetworkNormalizerTest.kt` (new)
-   - `docs/phases/PHASE-07-TELEMETRY.md` (new)
+   - `app/src/test/kotlin/dev/ragnar/aegis/ui/quickactions/QuickActionsViewModelTest.kt` (new)
+   - `docs/phases/PHASE-08-QUICK-ACTIONS.md` (new)
    - `docs/PROGRESS_TRACKER.md`
-   - `docs/FEATURE_PLAN.md`
    - `docs/PHASE_LOG.md`
    - `docs/NEXT_STEPS.md`
    - `docs/CHANGELOG.md`
    - `docs/TEST_PLAN.md`
-   - `docs/PROJECT_PLAN.md`
-   - `docs/README.md`
-   - `README.md`
+   - `docs/FEATURE_PLAN.md`
 3. **Validated:**
-   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (16s)
-   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (21s, 41 tests passed)
-   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (39s, 0 errors)
+   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (44s)
+   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (37s, 47 tests passed)
+   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (81s, 0 errors)
    - APK produced: `app/build/outputs/apk/debug/app-debug.apk`
-4. **Unverified:** Device testing (real-world network transitions and status bar battery alignment on physical hardware).
+4. **Unverified:** Device testing (torch toggle, settings intents, physical device).
 5. **Blockers:** B-002 — No device available for on-device tests.
-6. **Next Task:** Phase 8 — Quick Actions (F-009).
-7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-07-TELEMETRY.md`.
+6. **Next Task:** Phase 9 — Customization (F-010).
+7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-08-QUICK-ACTIONS.md`.
 8. **Commands to run when resuming:**
    ```bash
    git status

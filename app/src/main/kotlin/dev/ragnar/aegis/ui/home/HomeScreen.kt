@@ -45,6 +45,7 @@ import dev.ragnar.aegis.ui.components.RadarDisplay
 import dev.ragnar.aegis.ui.components.ScanLineOverlay
 import dev.ragnar.aegis.ui.components.StatusIndicator
 import dev.ragnar.aegis.ui.components.StatusLevel
+import dev.ragnar.aegis.ui.quickactions.QuickActionsPanel
 import dev.ragnar.aegis.ui.telemetry.TelemetryViewModel
 import dev.ragnar.aegis.ui.telemetry.TelemetryViewModelFactory
 import dev.ragnar.aegis.ui.theme.AegisTheme
@@ -191,6 +192,11 @@ fun HomeScreen(
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(spacing.sm))
+
+                // Quick Actions panel (F-009)
+                QuickActionsPanel()
             }
 
             Spacer(modifier = Modifier.height(spacing.sm))
