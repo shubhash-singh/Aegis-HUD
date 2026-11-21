@@ -46,11 +46,9 @@ fun AICoreVisualization(
     val innerRot by anim.innerRotation
     val outerRot by anim.outerRotation
     val brainPulse by anim.brainPulse
-    val beamAlpha by anim.beamAlpha
     val pulsePhase by anim.pulsePhase
     val particlePhase by anim.particlePhase
     val ringPhase by anim.ringPhase
-    val wavePhase by anim.wavePhase
 
     Canvas(
         modifier = modifier
@@ -62,22 +60,13 @@ fun AICoreVisualization(
         // 1. Surrounding tech HUD rings & outer rotating indicators
         drawSurroundingTechRings(geo, innerRot, outerRot, colors)
 
-        // 2. Horizontal flowing wave ribbons
-        drawHorizontalWaveRibbons(geo, wavePhase, colors)
-
-        // 3. Downward holographic projection cone
-        drawProjectionCone(geo, beamAlpha, colors)
-
-        // 4. Perspective concentric elliptical energy platform
-        drawEnergyPlatform(geo, innerRot, colors)
-
-        // 5. Brain neural network (connection lines + data pulses + nodes)
+        // 2. Brain neural network (connection lines + data pulses + nodes)
         drawBrainNeuralMesh(geo, brainPulse, pulsePhase, colors)
 
-        // 6. Upper glowing measurement arc indicator
+        // 3. Upper glowing measurement arc indicator
         drawUpperMeasurementArc(geo, colors)
 
-        // 7. Ambient floating particles
+        // 4. Ambient floating particles
         drawAmbientParticles(geo, particlePhase, colors)
     }
 }
@@ -187,166 +176,6 @@ private fun DrawScope.drawUpperMeasurementArc(
         val p2 = Offset(center.x + r2 * cos(rad).toFloat(), center.y + r2 * sin(rad).toFloat())
         drawLine(colors.cyan.copy(alpha = 0.7f), p1, p2, strokeWidth = 1.2.dp.toPx())
     }
-}
-
-/**
- * Flowing horizontal sine-wave particle ribbons extending across both sides of the brain.
- */
-private fun DrawScope.drawHorizontalWaveRibbons(
-    geo: NeuralGeometry,
-    wavePhase: Float,
-    colors: AegisColorScheme,
-) {
-    val phase = wavePhase * 2f * PI.toFloat()
-    val steps = 80
-    val w = size.width
-    val baseCy = geo.centerY + geo.brainHeight * 0.15f
-
-    // Draw left and right wave ribbons with glowing envelope
-    fun drawRibbon(yOffset: Float, amplitude: Float, freq: Float, alphaBase: Float) {
-        val path = Path()
-        for (i in 0..steps) {
-            val t = i.toFloat() / steps
-            val x = t * w
-            // Distance from center: maximum amplitude on sides, tapers near center and screen edges
-            val distNorm = abs(x - geo.centerX) / (w / 2f)
-            val envelope = (sin(distNorm * PI.toFloat()) * distNorm).coerceIn(0f, 1f)
-            val y = baseCy + yOffset + amplitude * sin(t * freq * 2f * PI.toFloat() + phase) * envelope
-
-            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
-        }
-        drawPath(
-            path = path,
-            color = colors.cyan.copy(alpha = alphaBase),
-            style = Stroke(width = 1.5.dp.toPx(), cap = StrokeCap.Round),
-        )
-    }
-
-    drawRibbon(yOffset = -8.dp.toPx(), amplitude = 18.dp.toPx(), freq = 3.2f, alphaBase = 0.28f)
-    drawRibbon(yOffset = 4.dp.toPx(), amplitude = 24.dp.toPx(), freq = 2.8f, alphaBase = 0.22f)
-    drawRibbon(yOffset = 16.dp.toPx(), amplitude = 14.dp.toPx(), freq = 3.6f, alphaBase = 0.18f)
-}
-
-/**
- * Downward holographic projection cone and fine ray lines originating from the brain stem.
- */
-private fun DrawScope.drawProjectionCone(
-    geo: NeuralGeometry,
-    beamAlpha: Float,
-    colors: AegisColorScheme,
-) {
-    val origin = geo.stemEmitterOffset
-    val platform = geo.platformCenter
-    val halfW = geo.platformRadiusX * 0.95f
-
-    // Luminous gradient cone
-    val conePath = Path().apply {
-        moveTo(origin.x, origin.y)
-        lineTo(platform.x + halfW, platform.y)
-        lineTo(platform.x - halfW, platform.y)
-        close()
-    }
-
-    drawPath(
-        path = conePath,
-        brush = Brush.verticalGradient(
-            colors = listOf(
-                colors.cyan.copy(alpha = beamAlpha * 0.35f),
-                colors.cyan.copy(alpha = beamAlpha * 0.15f),
-                colors.cyan.copy(alpha = 0.02f),
-            ),
-            startY = origin.y,
-            endY = platform.y,
-        ),
-    )
-
-    // Fine projection ray lines fanning out
-    val rayCount = 14
-    for (i in 0 until rayCount) {
-        val t = (i.toFloat() / (rayCount - 1)) * 2f - 1f // -1 to 1
-        val targetX = platform.x + halfW * t
-        val alpha = (1f - abs(t) * 0.4f) * beamAlpha * 0.4f
-        drawLine(
-            color = colors.cyan.copy(alpha = alpha),
-            start = origin,
-            end = Offset(targetX, platform.y),
-            strokeWidth = 0.8.dp.toPx(),
-        )
-    }
-}
-
-/**
- * 3D perspective concentric elliptical energy platform at the projection base.
- */
-private fun DrawScope.drawEnergyPlatform(
-    geo: NeuralGeometry,
-    innerRot: Float,
-    colors: AegisColorScheme,
-) {
-    val center = geo.platformCenter
-    val rx = geo.platformRadiusX
-    val ry = geo.platformRadiusY
-    val strokeWidth = 1.2.dp.toPx()
-
-    // Outer ellipse ring
-    drawOval(
-        color = colors.cyan.copy(alpha = 0.6f),
-        topLeft = Offset(center.x - rx, center.y - ry),
-        size = Size(rx * 2, ry * 2),
-        style = Stroke(width = strokeWidth),
-    )
-
-    // Outer subtle glow
-    drawOval(
-        color = colors.cyan.copy(alpha = 0.25f),
-        topLeft = Offset(center.x - rx - 2.dp.toPx(), center.y - ry - 1.dp.toPx()),
-        size = Size((rx + 2.dp.toPx()) * 2, (ry + 1.dp.toPx()) * 2),
-        style = Stroke(width = 3.dp.toPx()),
-    )
-
-    // Mid concentric ellipse
-    val midRx = rx * 0.72f
-    val midRy = ry * 0.72f
-    drawOval(
-        color = colors.cyan.copy(alpha = 0.45f),
-        topLeft = Offset(center.x - midRx, center.y - midRy),
-        size = Size(midRx * 2, midRy * 2),
-        style = Stroke(width = strokeWidth),
-    )
-
-    // Inner concentric ellipse
-    val inRx = rx * 0.45f
-    val inRy = ry * 0.45f
-    drawOval(
-        color = colors.cyan.copy(alpha = 0.75f),
-        topLeft = Offset(center.x - inRx, center.y - inRy),
-        size = Size(inRx * 2, inRy * 2),
-        style = Stroke(width = 1.5.dp.toPx()),
-    )
-
-    // Radial measurement tick marks around outer ellipse
-    rotate(degrees = innerRot * 0.3f, pivot = center) {
-        val tickCount = 18
-        for (i in 0 until tickCount) {
-            val angle = i * (360f / tickCount)
-            val rad = Math.toRadians(angle.toDouble())
-            val p1 = Offset(center.x + (rx * 0.95f) * cos(rad).toFloat(), center.y + (ry * 0.95f) * sin(rad).toFloat())
-            val p2 = Offset(center.x + (rx * 1.05f) * cos(rad).toFloat(), center.y + (ry * 1.05f) * sin(rad).toFloat())
-            drawLine(colors.cyan.copy(alpha = 0.5f), p1, p2, strokeWidth = 1.dp.toPx())
-        }
-    }
-
-    // Brilliant central energy hotspot (white-cyan core + bloom)
-    drawCircle(
-        color = colors.cyan.copy(alpha = 0.4f),
-        radius = 12.dp.toPx(),
-        center = center,
-    )
-    drawCircle(
-        color = Color.White.copy(alpha = 0.85f),
-        radius = 4.dp.toPx(),
-        center = center,
-    )
 }
 
 /**

@@ -82,9 +82,9 @@ fun AppDrawer(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xEA071E30), // Frosted cyber dark navy
-                            Color(0xF4030F1A),
-                            Color(0xF9010710),
+                            Color(0xAA071E30), // More transparent — lets neural bg show through
+                            Color(0xBB030F1A),
+                            Color(0xCC010710),
                         ),
                     ),
                     shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
@@ -301,8 +301,16 @@ private fun PinnedAppCell(
     Column(
         modifier = Modifier
             .width(68.dp)
-            .background(colors.surfaceElevated, shape)
-            .border(1.dp, colors.cyan, shape)
+            .background(
+                brush = Brush.radialGradient(
+                    colors = listOf(
+                        colors.surfaceElevated.copy(alpha = 0.95f),
+                        colors.surface.copy(alpha = 0.75f),
+                    ),
+                    radius = 140f,
+                ),
+                shape = shape,
+            )
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick,
@@ -349,10 +357,17 @@ private fun AppDrawerCell(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(if (isPinned) colors.surfaceElevated else colors.surface, shape)
-            .border(
-                width = spacing.panelBorderWidth,
-                color = if (isPinned) colors.cyan.copy(alpha = 0.7f) else colors.border,
+            .background(
+                brush = Brush.radialGradient(
+                    colors = if (isPinned) listOf(
+                        colors.surfaceElevated.copy(alpha = 0.95f),
+                        colors.surface.copy(alpha = 0.80f),
+                    ) else listOf(
+                        colors.surface.copy(alpha = 0.72f),
+                        Color(0x55010710),
+                    ),
+                    radius = 160f,
+                ),
                 shape = shape,
             )
             .combinedClickable(
