@@ -40,6 +40,8 @@ class DataStorePreferencesRepository(
         val FAVORITE_APPS = stringSetPreferencesKey("favorite_apps")
         val APP_SORT_ORDER = stringPreferencesKey("app_sort_order")
         val DRAWER_GRID_COLUMNS = intPreferencesKey("drawer_grid_columns")
+        val CONTEXT_AWARE_HUD_ENABLED = booleanPreferencesKey("context_aware_hud_enabled")
+        val ENABLED_CONTEXT_RULES = stringSetPreferencesKey("enabled_context_rules")
     }
 
     override val userPreferences: Flow<UserPreferences> = context.dataStore.data
@@ -138,6 +140,31 @@ class DataStorePreferencesRepository(
         }
     }
 
+    override suspend fun setContextAwareHudEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.CONTEXT_AWARE_HUD_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun toggleContextRule(ruleId: String) {
+        context.dataStore.edit { preferences ->
+            val current = preferences[PreferencesKeys.ENABLED_CONTEXT_RULES]
+                ?: dev.ragnar.aegis.domain.context.StandardContextRules.DEFAULT_ENABLED_IDS
+            val updated = if (current.contains(ruleId)) {
+                current - ruleId
+            } else {
+                current + ruleId
+            }
+            preferences[PreferencesKeys.ENABLED_CONTEXT_RULES] = updated
+        }
+    }
+
+    override suspend fun setEnabledContextRules(ruleIds: Set<String>) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.ENABLED_CONTEXT_RULES] = ruleIds
+        }
+    }
+
     override suspend fun resetToDefaults() {
         context.dataStore.edit { preferences ->
             preferences.clear()
@@ -149,6 +176,9 @@ class DataStorePreferencesRepository(
         val speedId = preferences[PreferencesKeys.ANIMATION_SPEED]
         val sortId = preferences[PreferencesKeys.APP_SORT_ORDER]
         val columns = preferences[PreferencesKeys.DRAWER_GRID_COLUMNS] ?: 4
+        val contextAwareEnabled = preferences[PreferencesKeys.CONTEXT_AWARE_HUD_ENABLED] ?: false
+        val enabledRules = preferences[PreferencesKeys.ENABLED_CONTEXT_RULES]
+            ?: dev.ragnar.aegis.domain.context.StandardContextRules.DEFAULT_ENABLED_IDS
         return UserPreferences(
             accentColor = AccentColor.fromId(accentId),
             animationSpeed = AnimationSpeed.fromId(speedId),
@@ -161,6 +191,8 @@ class DataStorePreferencesRepository(
             favoriteApps = preferences[PreferencesKeys.FAVORITE_APPS] ?: emptySet(),
             appSortOrder = AppSortOrder.fromId(sortId),
             drawerGridColumns = columns.coerceIn(3, 5),
+            contextAwareHudEnabled = contextAwareEnabled,
+            enabledContextRules = enabledRules,
         )
     }
 }

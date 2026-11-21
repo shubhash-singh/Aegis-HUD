@@ -95,6 +95,21 @@ class AppDrawerViewModelTest {
             flow.value = flow.value.copy(drawerGridColumns = columns.coerceIn(3, 5))
         }
 
+        override suspend fun setContextAwareHudEnabled(enabled: Boolean) {
+            flow.value = flow.value.copy(contextAwareHudEnabled = enabled)
+        }
+
+        override suspend fun toggleContextRule(ruleId: String) {
+            val current = flow.value.enabledContextRules
+            flow.value = flow.value.copy(
+                enabledContextRules = if (current.contains(ruleId)) current - ruleId else current + ruleId,
+            )
+        }
+
+        override suspend fun setEnabledContextRules(ruleIds: Set<String>) {
+            flow.value = flow.value.copy(enabledContextRules = ruleIds)
+        }
+
         override suspend fun resetToDefaults() {
             flow.value = UserPreferences()
         }

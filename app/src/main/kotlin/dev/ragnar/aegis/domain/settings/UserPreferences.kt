@@ -79,4 +79,6 @@ data class UserPreferences(
     val favoriteApps: Set<String> = emptySet(),
     val appSortOrder: AppSortOrder = AppSortOrder.AZ,
     val drawerGridColumns: Int = 4,
+    val contextAwareHudEnabled: Boolean = false,
+    val enabledContextRules: Set<String> = dev.ragnar.aegis.domain.context.StandardContextRules.DEFAULT_ENABLED_IDS,
 )

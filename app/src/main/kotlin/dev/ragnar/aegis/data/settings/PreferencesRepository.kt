@@ -25,5 +25,8 @@ interface PreferencesRepository {
     suspend fun clearFavorites()
     suspend fun setAppSortOrder(order: AppSortOrder)
     suspend fun setDrawerGridColumns(columns: Int)
+    suspend fun setContextAwareHudEnabled(enabled: Boolean)
+    suspend fun toggleContextRule(ruleId: String)
+    suspend fun setEnabledContextRules(ruleIds: Set<String>)
     suspend fun resetToDefaults()
 }

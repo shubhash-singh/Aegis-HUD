@@ -39,11 +39,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.ragnar.aegis.data.diagnostics.AndroidDiagnosticsRepository
+import dev.ragnar.aegis.domain.context.ContextRuleEvaluator
+import dev.ragnar.aegis.domain.context.ContextSnapshot
+import dev.ragnar.aegis.domain.context.StandardContextRules
+import dev.ragnar.aegis.domain.settings.AccentColor
 import dev.ragnar.aegis.ui.apps.AppDrawer
 import dev.ragnar.aegis.ui.apps.AppDrawerViewModel
 import dev.ragnar.aegis.ui.apps.AppDrawerViewModelFactory
 import dev.ragnar.aegis.ui.components.HudCornerBrackets
 import dev.ragnar.aegis.ui.components.ScanLineOverlay
+import dev.ragnar.aegis.ui.components.TacticalAlertBanner
 import dev.ragnar.aegis.ui.console.DeveloperConsoleScreen
 import dev.ragnar.aegis.ui.console.DeveloperConsoleViewModel
 import dev.ragnar.aegis.ui.console.DeveloperConsoleViewModelFactory
@@ -149,32 +154,72 @@ fun HomeScreen(
         else -> AiStatus.IDLE
     }
 
-    val colors = AegisColorScheme.default().withAccent(preferences.accentColor)
+    // Observe battery-saver mode dynamically (F-007-P5)
+    var isPowerSaveMode by remember {
+        val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+        mutableStateOf(pm?.isPowerSaveMode == true)
+    }
+
+    DisposableEffect(context) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(c: Context?, intent: Intent?) {
+                val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+                isPowerSaveMode = pm?.isPowerSaveMode == true
+            }
+        }
+        val filter = IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
+        context.registerReceiver(receiver, filter)
+        onDispose {
+            context.unregisterReceiver(receiver)
+        }
+    }
+
+    // Context-Aware HUD snapshot and evaluation (F-013)
+    val currentHour = remember(clockState.hours) {
+        java.time.LocalTime.now().hour
+    }
+    val currentMinute = remember(clockState.minutes) {
+        java.time.LocalTime.now().minute
+    }
+
+    val contextSnapshot = remember(
+        currentHour,
+        currentMinute,
+        telemetryState.battery.percentage,
+        isPowerSaveMode,
+        telemetryState.network.isConnected,
+    ) {
+        ContextSnapshot(
+            hourOfDay = currentHour,
+            minute = currentMinute,
+            batteryPercent = telemetryState.battery.percentage ?: 100,
+            isPowerSaveMode = isPowerSaveMode,
+            isNetworkConnected = telemetryState.network.isConnected,
+        )
+    }
+
+    val contextEvaluation = remember(
+        preferences.contextAwareHudEnabled,
+        preferences.enabledContextRules,
+        contextSnapshot,
+    ) {
+        ContextRuleEvaluator.evaluate(
+            isContextAwareEnabled = preferences.contextAwareHudEnabled,
+            enabledRuleIds = preferences.enabledContextRules,
+            rules = StandardContextRules.ALL_RULES,
+            snapshot = contextSnapshot,
+        )
+    }
+
+    val effectiveAccent = contextEvaluation.effectiveAccent ?: preferences.accentColor
+    val effectiveSpeed = contextEvaluation.effectiveAnimationSpeed ?: preferences.animationSpeed
+
+    val colors = AegisColorScheme.default().withAccent(effectiveAccent)
 
     AegisTheme(colors = colors) {
-        // Observe battery-saver mode dynamically (F-007-P5)
-        var isPowerSaveMode by remember {
-            val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
-            mutableStateOf(pm?.isPowerSaveMode == true)
-        }
-
-        DisposableEffect(context) {
-            val receiver = object : BroadcastReceiver() {
-                override fun onReceive(c: Context?, intent: Intent?) {
-                    val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
-                    isPowerSaveMode = pm?.isPowerSaveMode == true
-                }
-            }
-            val filter = IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
-            context.registerReceiver(receiver, filter)
-            onDispose {
-                context.unregisterReceiver(receiver)
-            }
-        }
-
-        val isAnimationPaused = isPowerSaveMode || !preferences.animationSpeed.isEnabled
-        val animationSpeedMultiplier = if (preferences.animationSpeed.isEnabled) {
-            when (preferences.animationSpeed.durationMillis) {
+        val isAnimationPaused = isPowerSaveMode || !effectiveSpeed.isEnabled
+        val animationSpeedMultiplier = if (effectiveSpeed.isEnabled) {
+            when (effectiveSpeed.durationMillis) {
                 2000 -> 2.0f
                 8000 -> 0.5f
                 else -> 1.0f
@@ -237,6 +282,18 @@ fun HomeScreen(
                         showSeconds = preferences.showClockSeconds,
                         onSettingsClick = { isSettingsVisible = true },
                     )
+
+                    if (contextEvaluation.activeAlerts.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        TacticalAlertBanner(
+                            message = contextEvaluation.activeAlerts.first(),
+                            alertColor = if (effectiveAccent == AccentColor.Crimson) {
+                                colors.statusCritical
+                            } else {
+                                colors.statusWarning
+                            },
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -368,6 +425,9 @@ fun HomeScreen(
                 onAppSortOrderChange = settingsViewModel::setAppSortOrder,
                 onGridColumnsChange = settingsViewModel::setDrawerGridColumns,
                 onClearFavorites = settingsViewModel::clearFavorites,
+                onToggleContextAwareHud = settingsViewModel::setContextAwareHudEnabled,
+                onToggleContextRule = settingsViewModel::toggleContextRule,
+                activeContextRuleIds = contextEvaluation.activeRuleIds,
                 onOpenDeveloperConsole = {
                     isSettingsVisible = false
                     isConsoleVisible = true

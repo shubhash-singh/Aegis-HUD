@@ -88,6 +88,18 @@ class SettingsViewModel(
         }
     }
 
+    fun setContextAwareHudEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setContextAwareHudEnabled(enabled)
+        }
+    }
+
+    fun toggleContextRule(ruleId: String) {
+        viewModelScope.launch {
+            preferencesRepository.toggleContextRule(ruleId)
+        }
+    }
+
     fun clearFavorites() {
         viewModelScope.launch {
             preferencesRepository.clearFavorites()

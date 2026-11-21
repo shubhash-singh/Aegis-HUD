@@ -51,6 +51,9 @@ fun SettingsSheet(
     onAppSortOrderChange: (AppSortOrder) -> Unit = {},
     onGridColumnsChange: (Int) -> Unit = {},
     onClearFavorites: () -> Unit = {},
+    onToggleContextAwareHud: (Boolean) -> Unit = {},
+    onToggleContextRule: (String) -> Unit = {},
+    activeContextRuleIds: Set<String> = emptySet(),
     onOpenDeveloperConsole: () -> Unit = {},
     onResetDefaults: () -> Unit,
     onDismiss: () -> Unit,
@@ -336,6 +339,77 @@ fun SettingsSheet(
                                 style = typography.telemetryLabel,
                                 color = colors.statusWarning,
                             )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(spacing.sm))
+
+            // 6. Context-Aware HUD Protocols (F-013)
+            HudPanel(title = "Context-Aware HUD Protocols") {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                    SettingsToggleRow(
+                        label = "CONTEXT-AWARE HUD",
+                        isChecked = preferences.contextAwareHudEnabled,
+                        onToggle = onToggleContextAwareHud,
+                    )
+
+                    if (preferences.contextAwareHudEnabled) {
+                        Spacer(modifier = Modifier.height(spacing.xs))
+                        Text(
+                            text = "AUTOMATED ADAPTIVE PROTOCOLS",
+                            style = typography.telemetryLabel,
+                            color = colors.cyanDim,
+                        )
+
+                        dev.ragnar.aegis.domain.context.StandardContextRules.ALL_RULES.forEach { rule ->
+                            val isEnabled = preferences.enabledContextRules.contains(rule.id)
+                            val isActive = activeContextRuleIds.contains(rule.id)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        if (isActive) colors.surfaceElevated else colors.surface,
+                                        RoundedCornerShape(spacing.panelCornerRadius),
+                                    )
+                                    .border(
+                                        width = spacing.panelBorderWidth,
+                                        color = if (isActive) colors.borderActive else colors.border,
+                                        shape = RoundedCornerShape(spacing.panelCornerRadius),
+                                    )
+                                    .clickable { onToggleContextRule(rule.id) }
+                                    .padding(horizontal = spacing.md, vertical = spacing.sm),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = rule.name,
+                                        style = typography.body,
+                                        color = if (isEnabled) colors.textPrimary else colors.textMuted,
+                                    )
+                                    Text(
+                                        text = rule.description,
+                                        style = typography.telemetryLabel,
+                                        color = colors.textSecondary,
+                                    )
+                                }
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = if (isEnabled) "[ENABLED]" else "[MUTED]",
+                                        style = typography.telemetryLabel,
+                                        color = if (isEnabled) colors.cyan else colors.textMuted,
+                                    )
+                                    if (isEnabled) {
+                                        Text(
+                                            text = if (isActive) "● ACTIVE" else "○ STANDBY",
+                                            style = typography.telemetryLabel,
+                                            color = if (isActive) colors.statusOk else colors.textMuted,
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
