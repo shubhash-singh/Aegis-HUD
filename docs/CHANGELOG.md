@@ -4,6 +4,25 @@
 
 ## [Unreleased] — Development
 
+### Phase 11 — Application Organization — 2026-11-22
+
+**Added:**
+- Persistent application pinning/favoriting backed by DataStore Preferences (`favoriteApps: Set<String>`).
+- Long-press on app drawer cells to pin/unpin apps with haptic/tactile feedback and glowing cyan star badges (`★`).
+- Dedicated "PINNED // QUICK LAUNCH" section at the top of the App Drawer displaying pinned favorites with instant 1-tap launching.
+- Dynamic sort order system (`AppSortOrder`): Alphabetical (A-Z), Alphabetical (Z-A), Favorites First, and Recently Installed.
+- Package install timestamp tracking (`AppInfo.installTimeMillis`) for installation date sorting.
+- Configurable drawer grid layout with 3, 4, or 5 columns.
+- Interactive header controls in the App Drawer to cycle sort modes (`[SORT: A-Z]`) and grid density (`[N COL]`).
+- App Drawer configuration section in `SettingsSheet` for sort selection, column count, and favorites clearing.
+- 13 new unit tests across sorting, preferences, and ViewModel state flow (79 total project tests passing).
+
+**Validation:**
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (27s).
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (13s, 79 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (1m 6s, 0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### Phase 10 — Full-Screen AI Command Interface — 2026-11-21
 
 **Added:**

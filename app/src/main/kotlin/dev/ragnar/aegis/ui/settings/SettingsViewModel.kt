@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import dev.ragnar.aegis.data.settings.DataStorePreferencesRepository
 import dev.ragnar.aegis.data.settings.PreferencesRepository
+import dev.ragnar.aegis.domain.apps.AppSortOrder
 import dev.ragnar.aegis.domain.settings.AccentColor
 import dev.ragnar.aegis.domain.settings.AnimationSpeed
 import dev.ragnar.aegis.domain.settings.UserPreferences
@@ -15,7 +16,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel managing user customization and preferences state (F-010).
+ * ViewModel managing user customization and preferences state (F-010, F-011).
  */
 class SettingsViewModel(
     private val preferencesRepository: PreferencesRepository,
@@ -72,6 +73,24 @@ class SettingsViewModel(
     fun setShowClockSeconds(showSeconds: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setShowClockSeconds(showSeconds)
+        }
+    }
+
+    fun setAppSortOrder(order: AppSortOrder) {
+        viewModelScope.launch {
+            preferencesRepository.setAppSortOrder(order)
+        }
+    }
+
+    fun setDrawerGridColumns(columns: Int) {
+        viewModelScope.launch {
+            preferencesRepository.setDrawerGridColumns(columns)
+        }
+    }
+
+    fun clearFavorites() {
+        viewModelScope.launch {
+            preferencesRepository.clearFavorites()
         }
     }
 

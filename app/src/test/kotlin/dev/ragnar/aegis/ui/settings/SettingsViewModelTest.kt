@@ -76,6 +76,29 @@ class SettingsViewModelTest {
             _flow.value = _flow.value.copy(showClockSeconds = showSeconds)
         }
 
+        override suspend fun toggleFavorite(componentName: String) {
+            val cur = _flow.value.favoriteApps
+            _flow.value = _flow.value.copy(
+                favoriteApps = if (cur.contains(componentName)) cur - componentName else cur + componentName,
+            )
+        }
+
+        override suspend fun setFavorites(favorites: Set<String>) {
+            _flow.value = _flow.value.copy(favoriteApps = favorites)
+        }
+
+        override suspend fun clearFavorites() {
+            _flow.value = _flow.value.copy(favoriteApps = emptySet())
+        }
+
+        override suspend fun setAppSortOrder(order: dev.ragnar.aegis.domain.apps.AppSortOrder) {
+            _flow.value = _flow.value.copy(appSortOrder = order)
+        }
+
+        override suspend fun setDrawerGridColumns(columns: Int) {
+            _flow.value = _flow.value.copy(drawerGridColumns = columns.coerceIn(3, 5))
+        }
+
         override suspend fun resetToDefaults() {
             _flow.value = UserPreferences()
         }
@@ -137,6 +160,25 @@ class SettingsViewModelTest {
 
         vm.setShowClockSeconds(false)
         assertFalse(vm.uiState.value.showClockSeconds)
+    }
+
+    @Test
+    fun `drawer organization settings update state`() = runTest {
+        val repo = FakePreferencesRepository(UserPreferences(favoriteApps = setOf("app1", "app2")))
+        val vm = SettingsViewModel(repo)
+
+        assertEquals(2, vm.uiState.value.favoriteApps.size)
+        assertEquals(dev.ragnar.aegis.domain.apps.AppSortOrder.AZ, vm.uiState.value.appSortOrder)
+        assertEquals(4, vm.uiState.value.drawerGridColumns)
+
+        vm.setAppSortOrder(dev.ragnar.aegis.domain.apps.AppSortOrder.FavoritesFirst)
+        assertEquals(dev.ragnar.aegis.domain.apps.AppSortOrder.FavoritesFirst, vm.uiState.value.appSortOrder)
+
+        vm.setDrawerGridColumns(5)
+        assertEquals(5, vm.uiState.value.drawerGridColumns)
+
+        vm.clearFavorites()
+        assertTrue(vm.uiState.value.favoriteApps.isEmpty())
     }
 
     @Test

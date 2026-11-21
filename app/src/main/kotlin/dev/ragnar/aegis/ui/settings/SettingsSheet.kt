@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import dev.ragnar.aegis.domain.apps.AppSortOrder
 import dev.ragnar.aegis.domain.settings.AccentColor
 import dev.ragnar.aegis.domain.settings.AnimationSpeed
 import dev.ragnar.aegis.domain.settings.UserPreferences
@@ -34,7 +35,7 @@ import dev.ragnar.aegis.ui.components.HudPanel
 import dev.ragnar.aegis.ui.theme.AegisTheme
 
 /**
- * Full-screen HUD customization overlay / sheet (F-010).
+ * Full-screen HUD customization overlay / sheet (F-010, F-011).
  */
 @Composable
 fun SettingsSheet(
@@ -47,6 +48,9 @@ fun SettingsSheet(
     onToggleQuickActions: (Boolean) -> Unit,
     onToggle24HourClock: (Boolean) -> Unit,
     onToggleClockSeconds: (Boolean) -> Unit,
+    onAppSortOrderChange: (AppSortOrder) -> Unit = {},
+    onGridColumnsChange: (Int) -> Unit = {},
+    onClearFavorites: () -> Unit = {},
     onResetDefaults: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -226,6 +230,113 @@ fun SettingsSheet(
                         isChecked = preferences.showClockSeconds,
                         onToggle = onToggleClockSeconds,
                     )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(spacing.sm))
+
+            // 5. Application Drawer Configuration (F-011)
+            HudPanel(title = "App Drawer Organization") {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                    Text(
+                        text = "DEFAULT SORT ORDER",
+                        style = typography.telemetryLabel,
+                        color = colors.cyanDim,
+                    )
+                    AppSortOrder.entries.forEach { sortOrder ->
+                        val isSelected = preferences.appSortOrder == sortOrder
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    if (isSelected) colors.surfaceElevated else colors.surface,
+                                    RoundedCornerShape(spacing.panelCornerRadius),
+                                )
+                                .border(
+                                    width = spacing.panelBorderWidth,
+                                    color = if (isSelected) colors.borderActive else colors.border,
+                                    shape = RoundedCornerShape(spacing.panelCornerRadius),
+                                )
+                                .clickable { onAppSortOrderChange(sortOrder) }
+                                .padding(horizontal = spacing.md, vertical = spacing.sm),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = sortOrder.displayName,
+                                style = typography.body,
+                                color = if (isSelected) colors.textPrimary else colors.textSecondary,
+                            )
+                            Text(
+                                text = if (isSelected) "[ACTIVE]" else "[SELECT]",
+                                style = typography.telemetryLabel,
+                                color = if (isSelected) colors.cyan else colors.textMuted,
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(spacing.xs))
+
+                    Text(
+                        text = "DRAWER GRID COLUMNS",
+                        style = typography.telemetryLabel,
+                        color = colors.cyanDim,
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(spacing.xs),
+                    ) {
+                        listOf(3, 4, 5).forEach { cols ->
+                            val isSelected = preferences.drawerGridColumns == cols
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .background(
+                                        if (isSelected) colors.surfaceElevated else colors.surface,
+                                        RoundedCornerShape(spacing.panelCornerRadius),
+                                    )
+                                    .border(
+                                        width = spacing.panelBorderWidth,
+                                        color = if (isSelected) colors.borderActive else colors.border,
+                                        shape = RoundedCornerShape(spacing.panelCornerRadius),
+                                    )
+                                    .clickable { onGridColumnsChange(cols) }
+                                    .padding(vertical = spacing.sm),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = "$cols COL",
+                                    style = typography.telemetryLabel,
+                                    color = if (isSelected) colors.cyan else colors.textSecondary,
+                                )
+                            }
+                        }
+                    }
+
+                    if (preferences.favoriteApps.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(spacing.xs))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(colors.surface, RoundedCornerShape(spacing.panelCornerRadius))
+                                .border(spacing.panelBorderWidth, colors.border, RoundedCornerShape(spacing.panelCornerRadius))
+                                .clickable(onClick = onClearFavorites)
+                                .padding(horizontal = spacing.md, vertical = spacing.sm),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = "PINNED APPS (${preferences.favoriteApps.size})",
+                                style = typography.body,
+                                color = colors.textPrimary,
+                            )
+                            Text(
+                                text = "CLEAR ALL [✕]",
+                                style = typography.telemetryLabel,
+                                color = colors.statusWarning,
+                            )
+                        }
+                    }
                 }
             }
 

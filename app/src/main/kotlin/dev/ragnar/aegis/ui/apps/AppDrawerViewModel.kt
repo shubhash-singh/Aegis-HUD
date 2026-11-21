@@ -7,7 +7,10 @@ import androidx.lifecycle.viewModelScope
 import dev.ragnar.aegis.data.apps.AndroidAppRepository
 import dev.ragnar.aegis.data.apps.AppListNormalizer
 import dev.ragnar.aegis.data.apps.AppRepository
+import dev.ragnar.aegis.data.settings.DataStorePreferencesRepository
+import dev.ragnar.aegis.data.settings.PreferencesRepository
 import dev.ragnar.aegis.domain.apps.AppInfo
+import dev.ragnar.aegis.domain.apps.AppSortOrder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -15,13 +18,23 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import java.util.Locale
 
-/** State rendered by the app drawer and quick-launch row. */
+/** State rendered by the app drawer. */
 data class AppDrawerUiState(
-    /** All launchable apps (unfiltered). Used by Quick Launch row. */
+    /** All launchable apps (unfiltered, normalized). */
     val apps: List<AppInfo> = emptyList(),
-    /** Apps visible in the drawer after applying the search query. */
+    /** Apps visible in the drawer after applying sort order and search query. */
     val filteredApps: List<AppInfo> = emptyList(),
+    /** Pinned / favorite apps for quick access. */
+    val pinnedApps: List<AppInfo> = emptyList(),
+    /** Set of pinned activity component names. */
+    val favoriteComponents: Set<String> = emptySet(),
+    /** Current sort order. */
+    val sortOrder: AppSortOrder = AppSortOrder.AZ,
+    /** Configurable column count (3, 4, or 5). */
+    val gridColumns: Int = 4,
     val isLoading: Boolean = true,
     val errorMessage: String? = null,
     /** Current search query text. */
@@ -30,23 +43,34 @@ data class AppDrawerUiState(
     val isNoResults: Boolean = false,
 )
 
-/** Owns the app-discovery subscription for the visible launcher UI. */
+/** Owns the app-discovery subscription, sorting, pinning, and layout settings for the launcher UI. */
 class AppDrawerViewModel(
     private val appRepository: AppRepository,
+    private val preferencesRepository: PreferencesRepository,
+    started: SharingStarted = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
 ) : ViewModel() {
 
-    /** Backing search query state. */
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     val uiState = combine(
         appRepository.observeLaunchableApps(),
+        preferencesRepository.userPreferences,
         _searchQuery,
-    ) { apps, query ->
-        val filtered = AppListNormalizer.filter(apps, query)
+    ) { apps, prefs, query ->
+        val favorites = prefs.favoriteApps
+        val sortedApps = AppListNormalizer.sort(apps, prefs.appSortOrder, favorites)
+        val filtered = AppListNormalizer.filter(sortedApps, query)
+        val pinned = apps.filter { it.componentName in favorites }
+            .sortedBy { it.label.lowercase(Locale.ROOT) }
+
         AppDrawerUiState(
             apps = apps,
             filteredApps = filtered,
+            pinnedApps = pinned,
+            favoriteComponents = favorites,
+            sortOrder = prefs.appSortOrder,
+            gridColumns = prefs.drawerGridColumns,
             isLoading = false,
             searchQuery = query,
             isNoResults = query.isNotBlank() && filtered.isEmpty(),
@@ -62,34 +86,73 @@ class AppDrawerViewModel(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+            started = started,
             initialValue = AppDrawerUiState(),
         )
 
-    /** Updates the search query; the filtered app list recomputes automatically. */
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
     }
 
-    /** Resets the search query to empty. */
     fun clearSearch() {
         _searchQuery.value = ""
     }
 
-    /** Starts the selected target and exposes a recoverable failure in the drawer UI. */
+    fun toggleFavorite(app: AppInfo) {
+        toggleFavorite(app.componentName)
+    }
+
+    fun toggleFavorite(componentName: String) {
+        viewModelScope.launch {
+            preferencesRepository.toggleFavorite(componentName)
+        }
+    }
+
+    fun cycleSortOrder() {
+        val current = uiState.value.sortOrder
+        val all = AppSortOrder.entries
+        val nextIndex = (all.indexOf(current) + 1) % all.size
+        setSortOrder(all[nextIndex])
+    }
+
+    fun setSortOrder(order: AppSortOrder) {
+        viewModelScope.launch {
+            preferencesRepository.setAppSortOrder(order)
+        }
+    }
+
+    fun cycleGridColumns() {
+        val current = uiState.value.gridColumns
+        val next = when (current) {
+            3 -> 4
+            4 -> 5
+            else -> 3
+        }
+        setGridColumns(next)
+    }
+
+    fun setGridColumns(columns: Int) {
+        viewModelScope.launch {
+            preferencesRepository.setDrawerGridColumns(columns)
+        }
+    }
+
     fun launch(app: AppInfo): String? = appRepository.launch(app)
         .exceptionOrNull()
         ?.let { "UNABLE TO OPEN ${app.label.uppercase()}" }
 
-    /** Launches the first app in the filtered list (called on IME search action). */
     fun launchTopResult(): String? {
         val topApp = uiState.value.filteredApps.firstOrNull() ?: return null
         return launch(topApp)
     }
 }
 
-/** Manual DI factory; Phase 5 deliberately does not introduce a DI framework. */
-class AppDrawerViewModelFactory(context: Context) : ViewModelProvider.Factory {
+/** Manual DI factory; provides AppRepository and PreferencesRepository. */
+class AppDrawerViewModelFactory(
+    context: Context,
+    private val appRepository: AppRepository? = null,
+    private val preferencesRepository: PreferencesRepository? = null,
+) : ViewModelProvider.Factory {
     private val appContext = context.applicationContext
 
     @Suppress("UNCHECKED_CAST")
@@ -97,6 +160,8 @@ class AppDrawerViewModelFactory(context: Context) : ViewModelProvider.Factory {
         check(modelClass.isAssignableFrom(AppDrawerViewModel::class.java)) {
             "Unknown ViewModel class: ${modelClass.name}"
         }
-        return AppDrawerViewModel(AndroidAppRepository(appContext)) as T
+        val appRepo = appRepository ?: AndroidAppRepository(appContext)
+        val prefRepo = preferencesRepository ?: DataStorePreferencesRepository(appContext)
+        return AppDrawerViewModel(appRepo, prefRepo) as T
     }
 }

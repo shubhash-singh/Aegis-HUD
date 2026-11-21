@@ -90,6 +90,18 @@ class AndroidAppRepository(
                     ?.toString()
                     ?.takeIf(String::isNotBlank)
                     ?: activityInfo.name
+                val installTime = runCatching {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        packageManager.getPackageInfo(
+                            activityInfo.packageName,
+                            PackageManager.PackageInfoFlags.of(0),
+                        ).firstInstallTime
+                    } else {
+                        @Suppress("DEPRECATION")
+                        packageManager.getPackageInfo(activityInfo.packageName, 0).firstInstallTime
+                    }
+                }.getOrDefault(0L)
+
                 AppInfo(
                     label = label,
                     packageName = activityInfo.packageName,
@@ -97,6 +109,7 @@ class AndroidAppRepository(
                         activityInfo.packageName,
                         activityInfo.name,
                     ).flattenToString(),
+                    installTimeMillis = installTime,
                 )
             }
         return AppListNormalizer.normalize(launchableApps)

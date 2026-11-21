@@ -312,6 +312,9 @@ fun HomeScreen(
                         appDrawerViewModel.clearSearch()
                     }
                 },
+                onToggleFavorite = appDrawerViewModel::toggleFavorite,
+                onCycleSortOrder = appDrawerViewModel::cycleSortOrder,
+                onCycleGridColumns = appDrawerViewModel::cycleGridColumns,
                 onSearchQueryChange = appDrawerViewModel::onSearchQueryChanged,
                 onClearSearch = appDrawerViewModel::clearSearch,
                 onSearchAction = {
@@ -341,6 +344,9 @@ fun HomeScreen(
                 onToggleQuickActions = settingsViewModel::setShowQuickActions,
                 onToggle24HourClock = settingsViewModel::set24HourClock,
                 onToggleClockSeconds = settingsViewModel::setShowClockSeconds,
+                onAppSortOrderChange = settingsViewModel::setAppSortOrder,
+                onGridColumnsChange = settingsViewModel::setDrawerGridColumns,
+                onClearFavorites = settingsViewModel::clearFavorites,
                 onResetDefaults = settingsViewModel::resetToDefaults,
                 onDismiss = { isSettingsVisible = false },
             )

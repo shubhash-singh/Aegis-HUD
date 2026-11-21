@@ -1,5 +1,6 @@
 package dev.ragnar.aegis.data.settings
 
+import dev.ragnar.aegis.domain.apps.AppSortOrder
 import dev.ragnar.aegis.domain.settings.AccentColor
 import dev.ragnar.aegis.domain.settings.AnimationSpeed
 import dev.ragnar.aegis.domain.settings.UserPreferences
@@ -19,5 +20,10 @@ interface PreferencesRepository {
     suspend fun setShowQuickActions(show: Boolean)
     suspend fun set24HourClock(is24Hour: Boolean)
     suspend fun setShowClockSeconds(showSeconds: Boolean)
+    suspend fun toggleFavorite(componentName: String)
+    suspend fun setFavorites(favorites: Set<String>)
+    suspend fun clearFavorites()
+    suspend fun setAppSortOrder(order: AppSortOrder)
+    suspend fun setDrawerGridColumns(columns: Int)
     suspend fun resetToDefaults()
 }

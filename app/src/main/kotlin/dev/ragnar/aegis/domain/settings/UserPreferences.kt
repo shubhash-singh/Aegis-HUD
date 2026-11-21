@@ -1,5 +1,7 @@
 package dev.ragnar.aegis.domain.settings
 
+import dev.ragnar.aegis.domain.apps.AppSortOrder
+
 /**
  * Supported accent colors for the AEGIS HUD.
  */
@@ -74,4 +76,7 @@ data class UserPreferences(
     val showQuickActions: Boolean = true,
     val is24HourClock: Boolean = true,
     val showClockSeconds: Boolean = true,
+    val favoriteApps: Set<String> = emptySet(),
+    val appSortOrder: AppSortOrder = AppSortOrder.AZ,
+    val drawerGridColumns: Int = 4,
 )

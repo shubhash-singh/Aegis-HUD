@@ -6,8 +6,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import dev.ragnar.aegis.domain.apps.AppSortOrder
 import dev.ragnar.aegis.domain.settings.AccentColor
 import dev.ragnar.aegis.domain.settings.AnimationSpeed
 import dev.ragnar.aegis.domain.settings.UserPreferences
@@ -34,6 +37,9 @@ class DataStorePreferencesRepository(
         val SHOW_QUICK_ACTIONS = booleanPreferencesKey("show_quick_actions")
         val IS_24_HOUR_CLOCK = booleanPreferencesKey("is_24_hour_clock")
         val SHOW_CLOCK_SECONDS = booleanPreferencesKey("show_clock_seconds")
+        val FAVORITE_APPS = stringSetPreferencesKey("favorite_apps")
+        val APP_SORT_ORDER = stringPreferencesKey("app_sort_order")
+        val DRAWER_GRID_COLUMNS = intPreferencesKey("drawer_grid_columns")
     }
 
     override val userPreferences: Flow<UserPreferences> = context.dataStore.data
@@ -96,6 +102,42 @@ class DataStorePreferencesRepository(
         }
     }
 
+    override suspend fun toggleFavorite(componentName: String) {
+        context.dataStore.edit { preferences ->
+            val current = preferences[PreferencesKeys.FAVORITE_APPS] ?: emptySet()
+            preferences[PreferencesKeys.FAVORITE_APPS] = if (current.contains(componentName)) {
+                current - componentName
+            } else {
+                current + componentName
+            }
+        }
+    }
+
+    override suspend fun setFavorites(favorites: Set<String>) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.FAVORITE_APPS] = favorites
+        }
+    }
+
+    override suspend fun clearFavorites() {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.FAVORITE_APPS] = emptySet()
+        }
+    }
+
+    override suspend fun setAppSortOrder(order: AppSortOrder) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.APP_SORT_ORDER] = order.id
+        }
+    }
+
+    override suspend fun setDrawerGridColumns(columns: Int) {
+        val clamped = columns.coerceIn(3, 5)
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.DRAWER_GRID_COLUMNS] = clamped
+        }
+    }
+
     override suspend fun resetToDefaults() {
         context.dataStore.edit { preferences ->
             preferences.clear()
@@ -105,6 +147,8 @@ class DataStorePreferencesRepository(
     private fun mapUserPreferences(preferences: Preferences): UserPreferences {
         val accentId = preferences[PreferencesKeys.ACCENT_COLOR]
         val speedId = preferences[PreferencesKeys.ANIMATION_SPEED]
+        val sortId = preferences[PreferencesKeys.APP_SORT_ORDER]
+        val columns = preferences[PreferencesKeys.DRAWER_GRID_COLUMNS] ?: 4
         return UserPreferences(
             accentColor = AccentColor.fromId(accentId),
             animationSpeed = AnimationSpeed.fromId(speedId),
@@ -114,6 +158,9 @@ class DataStorePreferencesRepository(
             showQuickActions = preferences[PreferencesKeys.SHOW_QUICK_ACTIONS] ?: true,
             is24HourClock = preferences[PreferencesKeys.IS_24_HOUR_CLOCK] ?: true,
             showClockSeconds = preferences[PreferencesKeys.SHOW_CLOCK_SECONDS] ?: true,
+            favoriteApps = preferences[PreferencesKeys.FAVORITE_APPS] ?: emptySet(),
+            appSortOrder = AppSortOrder.fromId(sortId),
+            drawerGridColumns = columns.coerceIn(3, 5),
         )
     }
 }

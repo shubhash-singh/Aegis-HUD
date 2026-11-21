@@ -24,6 +24,19 @@ class UserPreferencesTest {
         assertTrue(prefs.showQuickActions)
         assertTrue(prefs.is24HourClock)
         assertTrue(prefs.showClockSeconds)
+        assertTrue(prefs.favoriteApps.isEmpty())
+        assertEquals(dev.ragnar.aegis.domain.apps.AppSortOrder.AZ, prefs.appSortOrder)
+        assertEquals(4, prefs.drawerGridColumns)
+    }
+
+    @Test
+    fun `UT-011-01 AppSortOrder fromId mapping and fallback`() {
+        assertEquals(dev.ragnar.aegis.domain.apps.AppSortOrder.AZ, dev.ragnar.aegis.domain.apps.AppSortOrder.fromId("az"))
+        assertEquals(dev.ragnar.aegis.domain.apps.AppSortOrder.ZA, dev.ragnar.aegis.domain.apps.AppSortOrder.fromId("za"))
+        assertEquals(dev.ragnar.aegis.domain.apps.AppSortOrder.FavoritesFirst, dev.ragnar.aegis.domain.apps.AppSortOrder.fromId("favorites_first"))
+        assertEquals(dev.ragnar.aegis.domain.apps.AppSortOrder.InstallDate, dev.ragnar.aegis.domain.apps.AppSortOrder.fromId("install_date"))
+        assertEquals(dev.ragnar.aegis.domain.apps.AppSortOrder.AZ, dev.ragnar.aegis.domain.apps.AppSortOrder.fromId("unknown"))
+        assertEquals(dev.ragnar.aegis.domain.apps.AppSortOrder.AZ, dev.ragnar.aegis.domain.apps.AppSortOrder.fromId(null))
     }
 
     @Test

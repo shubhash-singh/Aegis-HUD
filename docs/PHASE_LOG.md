@@ -571,5 +571,62 @@ All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) pass
 
 ---
 
+### PHASE-11 — Application Organization
+
+| Field | Value |
+|---|---|
+| Phase | PHASE-11 |
+| Title | Application Organization (F-011) |
+| Date Started | 2026-11-21 |
+| Date Completed | 2026-11-22 (build verified; device validation pending) |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Result | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (27s) |
+| Test Result | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (13s, 79 tests passed) |
+| Lint Result | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (1m 6s, 0 errors) |
+
+**Summary:**
+
+Phase 11 delivered comprehensive application organization capabilities to the AEGIS launcher, completing all planned P1 features:
+
+1. **Pin / Favorite Applications (F-011-P1):**
+   - Extended `UserPreferences` and `DataStorePreferencesRepository` to persist `favoriteApps: Set<String>` containing activity component names.
+   - Added long-press gesture handling on app drawer cells (`combinedClickable(onClick, onLongClick)`) allowing immediate pinning and unpinning.
+   - Pinned apps feature a glowing cyan star badge (`★`) in the corner of their cell and highlighted border.
+   - In `SettingsSheet`, added favorites count indicator and a one-click "CLEAR ALL [✕]" button.
+
+2. **Configurable Quick-Launch Slots (F-011-P2):**
+   - When the user is not actively searching, a dedicated "PINNED // QUICK LAUNCH" row renders at the top of the App Drawer.
+   - Displays all pinned applications with instant 1-tap launching and distinct elevated HUD styling.
+
+3. **Sort by Name or User Preference (F-011-P3):**
+   - Implemented `AppSortOrder` domain enum supporting:
+     - `AZ`: Alphabetical ascending (default)
+     - `ZA`: Alphabetical descending
+     - `FavoritesFirst`: Pinned applications sorted A-Z first, followed by remaining apps sorted A-Z
+     - `InstallDate`: Most recently installed apps first (based on package install time)
+   - Extended `AppInfo` with `installTimeMillis` populated dynamically via `PackageManager.getPackageInfo().firstInstallTime`.
+   - Pure sorting logic in `AppListNormalizer.sort()` handles all four sort modes deterministically.
+   - Added interactive `[SORT: A-Z]` button in the App Drawer header to quickly cycle sort modes, plus full sort selection chips in `SettingsSheet`.
+
+4. **Grid Layout Configuration (F-011-P4):**
+   - Persistent `drawerGridColumns` setting (3, 4, or 5 columns) in DataStore.
+   - Interactive `[N COL]` button in the App Drawer header allows cycling density on the fly.
+   - Full column selector chips in `SettingsSheet`.
+   - Dynamic `LazyVerticalGrid(columns = GridCells.Fixed(state.gridColumns))` reconfigures the layout immediately.
+
+5. **Unit Tests:**
+   - Added 13 new unit tests across:
+     - `AppListNormalizerSortTest` (5 tests): AZ order, ZA order, FavoritesFirst order, InstallDate order, tie-breaking.
+     - `UserPreferencesTest` (1 test): `AppSortOrder.fromId` mapping and fallback; default preferences verification.
+     - `SettingsViewModelTest` (1 test): sort order, grid columns, and favorites clearing updates.
+     - `AppDrawerViewModelTest` (6 tests): reactive state combination, search filtering, pinning/unpinning, sort cycling, column cycling, and top result launching.
+   - All 79 project unit tests pass.
+
+All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) passed with zero errors. Device validation remains pending connection of a target device (B-002).
+
+**Next phase:** PHASE-12 — Developer Console (F-014) / Widget Hosting (F-012)
+
+---
+
 *(Subsequent phases will be logged as they are completed.)*
 
