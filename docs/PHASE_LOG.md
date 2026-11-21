@@ -624,7 +624,62 @@ Phase 11 delivered comprehensive application organization capabilities to the AE
 
 All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) passed with zero errors. Device validation remains pending connection of a target device (B-002).
 
-**Next phase:** PHASE-12 — Developer Console (F-014) / Widget Hosting (F-012)
+**Next phase:** PHASE-12 — Developer Console (F-014)
+
+---
+
+### PHASE-12 — Developer Console
+
+| Field | Value |
+|---|---|
+| Phase | PHASE-12 |
+| Title | Developer Console |
+| Date Started | 2026-11-22 |
+| Date Completed | 2026-11-22 (build verified; device validation pending) |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Result | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (22s) |
+| Test Result | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (17s, 87 tests passed) |
+| Lint Result | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (1m 6s, 0 errors) |
+
+**Summary:**
+
+Phase 12 delivered an authentic, cyber-tactical developer diagnostics console (F-014) to the AEGIS HUD Launcher:
+
+1. **Console Scaffold & Navigation (F-014-P1):**
+   - Implemented `DeveloperConsoleScreen` full-screen modal with cyan tactical HUD borders, semi-transparent background, and monospaced typography.
+   - Wired into `SettingsSheet` via "OPEN DEVELOPER CONSOLE [>]" action with proper `BackHandler` support in `HomeScreen`.
+   - Header with `AEGIS // DEV CONSOLE` title, manual `[REFRESH]` action, `[COPY DIAGNOSTICS]` button, and `[✕]` close button.
+
+2. **Launcher Diagnostics (F-014-P2):**
+   - Genuine JVM runtime memory reporting via `Runtime.getRuntime()`: allocated heap (MB), max heap (MB), and utilization percentage.
+   - Process uptime formatted dynamically from `SystemClock.elapsedRealtime()`.
+   - Accurate tracking counts for launchable apps and user-pinned favorite apps.
+
+3. **System Hardware & OS Info (F-014-P3):**
+   - Real platform introspection from `android.os.Build`: manufacturer, model, build ID, Android OS version, SDK API level, security patch level, and CPU ABI.
+
+4. **Permission Audit Panel (F-014-P4):**
+   - Real-time audit of declared Android permissions (`ACCESS_NETWORK_STATE`, `CAMERA`, etc.) using `ContextCompat.checkSelfPermission` reporting live `[GRANTED]` and `[DENIED]` states.
+
+5. **In-Memory Ring-Buffer Log Viewer (F-014-P5):**
+   - Thread-safe circular buffer (`AegisLogBuffer`) maintaining up to 100 recent launcher events without memory leaks or disk I/O.
+   - Interactive log level filter tabs (`ALL`, `DEBUG`, `INFO`, `WARN`, `ERROR`).
+   - Color-coded monospace log stream and one-tap `[CLEAR LOGS]` action.
+
+6. **Export Diagnostics Snapshot (F-014-P6):**
+   - Clean formatted markdown report generation (`DiagnosticsSnapshot.toFormattedMarkdown()`).
+   - One-tap clipboard copy via `ClipboardManager` with animated visual copy confirmation banner.
+
+7. **Unit Tests:**
+   - Added 8 new unit tests across:
+     - `AegisLogBufferTest` (3 tests): capacity rollover, level capture, clear behavior.
+     - `DiagnosticsSnapshotTest` (1 test): structured markdown report formatting.
+     - `DeveloperConsoleViewModelTest` (4 tests): snapshot loading, log filtering, clear logs, and clipboard copy.
+   - All 87 project unit tests pass.
+
+All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) passed with zero errors. Device validation remains pending connection of a target device (B-002).
+
+**Next phase:** PHASE-13 — Context-Aware HUD (F-013)
 
 ---
 

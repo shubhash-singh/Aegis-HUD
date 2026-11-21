@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.13.0
-**Last Updated:** 2026-11-22 (Phase 11 build verified; device validation pending)
-**Current Stage:** Phase 11 — Application Organization
-**Overall Status:** Phase 11 implementation complete & build verified; device validation pending (B-002)
+**Version:** 0.15.0
+**Last Updated:** 2026-11-22 (Phase 12 build verified)
+**Current Stage:** Phase 12 Complete (Build Verified) / Starting Phase 13
+**Overall Status:** Phase 12 Complete (Build Verified)
 
 ---
 
@@ -13,14 +13,14 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 11 — Application Organization |
-| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Stage | Phase 12 Complete (Build Verified) |
+| Status | Complete (Build Verified; Device Validation Pending) |
 | Last Updated | 2026-11-22 |
-| Last Completed Phase | PHASE-11 (Application Organization — build verified) |
-| Current Phase | PHASE-11 (build verified; device validation pending) |
-| Next Step | Proceed to PHASE-12 (Widget Hosting F-012 or Developer Console F-014); run device validation when connected |
-| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (27s, 2026-11-22) |
-| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (13s, 79 tests passed, 2026-11-22) |
+| Last Completed Phase | PHASE-12 (Developer Console — build verified) |
+| Current Phase | PHASE-13 (Context-Aware HUD — F-013) (Starting) |
+| Next Step | Begin PHASE-13 (Context-Aware HUD — F-013) planning and implementation |
+| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (22s, 2026-11-22) |
+| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (17s, 87 tests passed, 2026-11-22) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
 | Latest Commit | 8a215da — feat(phase-11): implement application organization (F-011) with pinning, sorting, and grid layout |
@@ -98,7 +98,7 @@ Rules:
 | F-011 | Application Organization | P1 | 4 | 4 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-004, F-010 |
 | F-012 | Widget Hosting | P2 | 6 | 0 | Not Started | Not Tested | Not Started | F-001 |
 | F-013 | Context-Aware HUD | P2 | 7 | 0 | Not Started | Not Tested | Not Started | F-010 |
-| F-014 | Developer Console | P2 | 6 | 0 | Not Started | Not Tested | Not Started | F-008 |
+| F-014 | Developer Console | P2 | 6 | 6 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-008 |
 | F-015 | Gesture Navigation | P2 | 5 | 0 | Not Started | Not Tested | Not Started | F-001 |
 | F-016 | Reliability & Performance | P2 | 7 | 0 | Not Started | Not Tested | Not Started | All P0 |
 | F-017 | Advanced HUD Themes | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-010 |
@@ -106,7 +106,7 @@ Rules:
 | F-019 | Open-Source Preparation | P3 | 6 | 0 | Not Started | Not Tested | Deferred | All |
 | F-020 | Swipe-Up App Drawer Gesture | P0 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-004, F-005 |
 
-**Implementation Progress: 67%** (64 / 95 active planned implementation phases implemented)
+**Implementation Progress: 74%** (70 / 95 active planned implementation phases implemented)
 
 > **Denominator basis:** 95 active (non-deferred) planned phases — includes Phase 10 redesign additions to F-003 (3 new sub-phases), F-007 (4 new sub-phases, AICoreVisualization), and new F-020 (5 phases). Deferred P3 phases (16) are excluded per the formula in Section B.2.
 
@@ -114,7 +114,7 @@ Rules:
 
 **P0 phase total:** 36 phases across 7 features (includes F-020 and Phase 10 additions) — **100% Implemented (36/36)**
 **P1 phase total:** 28 phases across 5 features (includes F-007 Phase 10 additions) — **100% Implemented (28/28)**
-**P2 phase total:** 31 phases across 5 features
+**P2 phase total:** 31 phases across 5 features — **19% Implemented (6/31)**
 **P3 phase total (Deferred):** 16 phases across 3 features — excluded from active denominator
 
 **Active (non-deferred) total planned phases:** 95
@@ -536,6 +536,74 @@ Rules:
 
 ---
 
+### PHASE-11: Application Organization
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-11 |
+| Title | Application Organization |
+| Objective | App pinning/favorites, quick-launch drawer section, 4 sort modes (AZ, ZA, FavoritesFirst, InstallDate), 3/4/5 column grid layout |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (27s, 2026-11-22) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (13s, 79 tests passed, 2026-11-22) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (1m 6s, 0 errors, 2026-11-22) |
+| Dependencies | PHASE-04, PHASE-05, PHASE-09, PHASE-10 |
+| Design Docs | `docs/phases/PHASE-11-APP-ORGANIZATION.md` |
+| Started | 2026-11-21 |
+| Completed | 2026-11-22 (Build Verified) |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (79 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+
+**Implemented:**
+
+- `AppSortOrder` domain enum supporting: `AZ`, `ZA`, `FavoritesFirst`, `InstallDate`.
+- Extended `AppInfo` with `installTimeMillis` from `PackageManager`.
+- Pure `AppListNormalizer.sort()` implementing deterministic sorting across all 4 modes.
+- Extended `UserPreferences` and `DataStorePreferencesRepository` with `favoriteApps: Set<String>`, `appSortOrder: AppSortOrder`, and `drawerGridColumns: Int`.
+- Enhanced `AppDrawer` with dedicated "PINNED // QUICK LAUNCH" row, long-press pin/unpin gesture, glowing star badge (`★`), interactive header buttons `[SORT: A-Z]` and `[N COL]`.
+- Added App Drawer Organization section to `SettingsSheet`.
+- 13 new unit tests across sorting, preferences, and ViewModel state (79 total project tests passing).
+
+**Validation:**
+- Assemble, unit tests, and lint all completed successfully with zero errors.
+- Device testing deferred pending physical device / emulator (B-002).
+
+---
+
+### PHASE-12: Developer Console
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-12 |
+| Title | Developer Console |
+| Objective | In-memory log viewer, genuine memory footprint, system hardware & platform info, permission audit, snapshot clipboard export |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (22s, 2026-11-22) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (17s, 87 tests passed, 2026-11-22) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (1m 6s, 0 errors, 2026-11-22) |
+| Dependencies | PHASE-02, PHASE-08, PHASE-09, PHASE-10 |
+| Design Docs | `docs/phases/PHASE-12-DEVELOPER-CONSOLE.md` |
+| Started | 2026-11-22 |
+| Completed | 2026-11-22 (Build Verified) |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (87 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+
+**Implemented:**
+
+- `DeveloperConsoleScreen` full-screen cyber-tactical HUD overlay with cyan borders and monospaced typography.
+- Real JVM memory diagnostics from `Runtime.getRuntime()` (allocated heap, max heap, percentage).
+- Real device and platform info from `android.os.Build` (model, manufacturer, build ID, Android OS version, SDK API level, security patch, CPU ABI).
+- Real permission audit querying `ContextCompat.checkSelfPermission` for manifest permissions.
+- Thread-safe circular buffer (`AegisLogBuffer`) capturing 100 recent launcher events across `DEBUG`, `INFO`, `WARN`, `ERROR` with zero disk I/O.
+- Log level filtering tabs and clear logs action.
+- Formatted markdown snapshot generator (`toFormattedMarkdown()`) and one-tap clipboard export (`COPY DIAGNOSTICS`) with visual toast feedback.
+- Accessible via `SettingsSheet` ("OPEN DEVELOPER CONSOLE [>]") with Android system back-press handling.
+- 8 new unit tests across `AegisLogBufferTest`, `DiagnosticsSnapshotTest`, and `DeveloperConsoleViewModelTest` (87 total project tests passing).
+
+**Validation:**
+- Assemble, unit tests, and lint all completed successfully with zero errors.
+- Device testing deferred pending physical device / emulator (B-002).
+
+---
+
 ## F. Build and Test History
 
 | Date | Command | Environment | Result | Notes | Feature/Phase |
@@ -573,6 +641,12 @@ Rules:
 | 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (23s) | 66 tests passed (8 new Phase 10 tests: 4 NeuralGeometry + 4 FloatingPanelFormatter) | PHASE-10 |
 | 2026-11-21 | `./gradlew --no-daemon assembleDebug` | Same | BUILD SUCCESSFUL (16s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-10 |
 | 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (1m) | 0 errors | PHASE-10 |
+| 2026-11-22 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (27s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-11 |
+| 2026-11-22 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (13s) | 79 tests passed (13 new Phase 11 tests across sorting & favorites) | PHASE-11 |
+| 2026-11-22 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (1m 6s) | 0 errors | PHASE-11 |
+| 2026-11-22 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (22s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-12 |
+| 2026-11-22 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (17s) | 87 tests passed (8 new Phase 12 tests across diagnostics & console) | PHASE-12 |
+| 2026-11-22 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (1m 6s) | 0 errors | PHASE-12 |
 
 ---
 
@@ -598,16 +672,54 @@ Rules:
 | 2026-11-21 | **Phase 5 implemented & build verified:** real-time app search filtering, HudSearchBar, bottom nav wiring, IME launch action, no-results state, and 4 JVM tests added; `assembleDebug`, `testDebugUnitTest` (19 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-05-SEARCH.md |
 | 2026-11-21 | **Phase 6 implemented & build verified:** animated Canvas radar graphic, concentric range rings, measurement ticks, center reticle, rotating sweep sector, CRT scan-line overlay, battery-saver throttling, and 7 JVM geometry tests added; `assembleDebug`, `testDebugUnitTest` (26 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-06-HUD-GRAPHICS.md |
 | 2026-11-21 | **Phase 7 implemented & build verified:** real-time battery and network telemetry, pure normalizers, sticky broadcast / NetworkCallback repositories, genuine uptime tracking, and 8 JVM tests added; `assembleDebug`, `testDebugUnitTest` (34 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-07-TELEMETRY.md |
-| 2026-11-21 | **Phase 7 network speed addition:** live TrafficStats bandwidth sampling, `formatSpeed` utility, `formatNetworkLabel` with `↓↑` arrows, 7 additional JVM tests (41 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all successful | PHASE-07-TELEMETRY.md |
+| 2026-11-21 | **Phase 7 network speed addition:** live TrafficStats bandwidth sampling, `formatSpeed` utility, `formatNetworkLabel` with `↓↑` arrows, 7 additional JVM tests (41 total); `assembleDebug`, `testDebugUnitTest` (41 passed), `lintDebug` all successful | PHASE-07-TELEMETRY.md |
 | 2026-11-21 | **Phase 8 implemented & build verified:** `TorchController` facade, `AndroidTorchController`, `QuickActionsViewModel`, `QuickActionsPanel` with Settings/Torch/Wi-Fi/BT buttons, integrated into HomeScreen, 6 JVM tests added (47 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all successful; device testing pending (B-002) | PHASE-08-QUICK-ACTIONS.md |
 | 2026-11-21 | **Phase 9 implemented & build verified:** DataStore preferences, accent color themes (Cyan/Amber/Green/Crimson), panel visibility toggles, radar animation speed control, clock 12H/24H style, SettingsSheet modal, and 11 JVM tests added (58 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all successful; device testing pending (B-002) | PHASE-09-CUSTOMIZATION.md |
 | 2026-11-21 | **Phase 10 implemented & build verified:** Full-screen AI command interface redesign; full-screen `AICoreVisualization` (Canvas neural brain, nodes, pulses, rings, beam, platform, waveforms); 7 floating holographic panels; `AppDrawerGestureIndicator` with breathing chevrons; swipe-up gesture for app drawer; `AndroidSystemInfoRepository` for CPU/RAM/storage; 8 new JVM tests (66 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all passed with 0 errors; device testing pending (B-002) | PHASE-10-AI-CORE-VISUALIZATION.md |
+| 2026-11-22 | **Phase 11 implemented & build verified:** Application Organization; DataStore favorite apps persistence, long-press pin/unpin with cyan star badge, dedicated quick-launch drawer section, 4 sort modes (`AppSortOrder`: AZ, ZA, FavoritesFirst, InstallDate), 3/4/5 column grid layout selector, 13 new unit tests (79 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all passed with 0 errors; device testing pending (B-002) | PHASE-11-APP-ORGANIZATION.md |
+| 2026-11-22 | **Phase 12 implemented & build verified:** Developer Console; in-memory circular ring buffer (`AegisLogBuffer`), genuine runtime memory diagnostics (`Runtime.getRuntime()`), platform and hardware audit, live permission audit panel, formatted markdown export with clipboard copy, 8 new unit tests (87 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all passed with 0 errors; device testing pending (B-002) | PHASE-12-DEVELOPER-CONSOLE.md |
 
 ---
 
 ## I. Session Handoff
 
-**Session:** Phase 9 — Customization
+**Session:** Phase 12 — Developer Console
+**Date:** 2026-11-22
+
+1. **Completed:** Full Phase 12 Developer Console (F-014). Implemented `DeveloperConsoleScreen` cyber-tactical overlay, `AegisLogBuffer` in-memory circular buffer (capacity 100), `DiagnosticsRepository` and `AndroidDiagnosticsRepository` querying genuine JVM heap, hardware info, and permissions, `DeveloperConsoleViewModel` with log level filtering and clipboard copy, and wired into `SettingsSheet` and `HomeScreen`. Added 8 new JVM unit tests (87 total passing).
+2. **Changed files:**
+   - `app/src/main/kotlin/dev/ragnar/aegis/domain/diagnostics/DiagnosticsModels.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/diagnostics/AegisLogBuffer.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/diagnostics/DiagnosticsRepository.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/diagnostics/AndroidDiagnosticsRepository.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/console/DeveloperConsoleViewModel.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/console/DeveloperConsoleScreen.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/settings/SettingsSheet.kt`
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/HomeScreen.kt`
+   - `app/src/test/kotlin/dev/ragnar/aegis/data/diagnostics/AegisLogBufferTest.kt` (new)
+   - `app/src/test/kotlin/dev/ragnar/aegis/domain/diagnostics/DiagnosticsSnapshotTest.kt` (new)
+   - `app/src/test/kotlin/dev/ragnar/aegis/ui/console/DeveloperConsoleViewModelTest.kt` (new)
+   - `docs/phases/PHASE-12-DEVELOPER-CONSOLE.md` (new)
+   - `docs/PROGRESS_TRACKER.md`
+   - `docs/PHASE_LOG.md`
+   - `docs/NEXT_STEPS.md`
+   - `docs/CHANGELOG.md`
+   - `README.md`
+3. **Validated:**
+   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (22s)
+   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (17s, 87 tests passed)
+   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (1m 6s, 0 errors)
+   - APK produced: `app/build/outputs/apk/debug/app-debug.apk`
+4. **Unverified:** Device testing (real-time platform reporting on physical target hardware).
+5. **Blockers:** B-002 — No device available for on-device tests.
+6. **Next Task:** Phase 13 — Context-Aware HUD (F-013).
+7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-12-DEVELOPER-CONSOLE.md`.
+8. **Commands to run when resuming:**
+   ```bash
+   git status
+   ./gradlew --no-daemon testDebugUnitTest
+   cat docs/NEXT_STEPS.md
+   ```
 **Date:** 2026-11-21
 
 1. **Completed:** Full Phase 9 Customization (F-010). Integrated `androidx.datastore:datastore-preferences:1.1.1`. Implemented `UserPreferences`, `AccentColor` (Cyan, Amber, Matrix Green, Tactical Crimson), and `AnimationSpeed` models. Implemented `DataStorePreferencesRepository` with persistent state. Added dynamic `AegisColorScheme.withAccent`. Created `SettingsViewModel` and `SettingsSheet` modal. Integrated customizable theming, radar speed, panel visibility toggles, and clock 12H/24H into `HomeScreen` and `TopBar`. Added 11 JVM unit tests (58 total passing).

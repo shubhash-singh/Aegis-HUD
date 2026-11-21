@@ -51,6 +51,7 @@ fun SettingsSheet(
     onAppSortOrderChange: (AppSortOrder) -> Unit = {},
     onGridColumnsChange: (Int) -> Unit = {},
     onClearFavorites: () -> Unit = {},
+    onOpenDeveloperConsole: () -> Unit = {},
     onResetDefaults: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -341,6 +342,26 @@ fun SettingsSheet(
             }
 
             Spacer(modifier = Modifier.height(spacing.md))
+
+            // Developer Diagnostics Console
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colors.surfaceElevated, RoundedCornerShape(spacing.panelCornerRadius))
+                    .border(spacing.panelBorderWidth, colors.cyan, RoundedCornerShape(spacing.panelCornerRadius))
+                    .clickable(onClick = onOpenDeveloperConsole)
+                    .padding(vertical = spacing.sm),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "OPEN DEVELOPER CONSOLE [>]",
+                    style = typography.label,
+                    color = colors.cyan,
+                    textAlign = TextAlign.Center,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(spacing.sm))
 
             // Reset Defaults Button
             Box(

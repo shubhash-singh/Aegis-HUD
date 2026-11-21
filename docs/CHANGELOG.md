@@ -4,6 +4,24 @@
 
 ## [Unreleased] — Development
 
+### Phase 12 — Developer Console — 2026-11-22
+
+**Added:**
+- Real-time `DeveloperConsoleScreen` cyber-tactical HUD overlay accessible via `SettingsSheet` ("OPEN DEVELOPER CONSOLE [>]").
+- Genuine JVM runtime memory diagnostics (`Runtime.getRuntime()`) showing allocated heap, maximum heap, heap utilization percentage, and launchable/favorite app counts.
+- Real system hardware and OS platform audit panel displaying manufacturer, model, build ID, Android version, SDK API level, security patch level, and CPU ABI.
+- Permission audit panel inspecting manifest permissions (`ACCESS_NETWORK_STATE`, `CAMERA`, etc.) reporting live granted/denied statuses.
+- In-memory circular log ring buffer (`AegisLogBuffer`) capturing up to 100 recent launcher events across `DEBUG`, `INFO`, `WARN`, `ERROR` levels with zero disk I/O.
+- Log level filter tabs (`ALL`, `DEBUG`, `INFO`, `WARN`, `ERROR`) and log clear action in the console.
+- Formatted markdown report generation and one-tap clipboard copy (`COPY DIAGNOSTICS`) with visual confirmation toast.
+- 8 new unit tests across `AegisLogBufferTest`, `DiagnosticsSnapshotTest`, and `DeveloperConsoleViewModelTest` (87 total project tests passing).
+
+**Validation:**
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (22s).
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (17s, 87 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (1m 6s, 0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### Phase 11 — Application Organization — 2026-11-22
 
 **Added:**

@@ -38,11 +38,15 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.ragnar.aegis.data.diagnostics.AndroidDiagnosticsRepository
 import dev.ragnar.aegis.ui.apps.AppDrawer
 import dev.ragnar.aegis.ui.apps.AppDrawerViewModel
 import dev.ragnar.aegis.ui.apps.AppDrawerViewModelFactory
 import dev.ragnar.aegis.ui.components.HudCornerBrackets
 import dev.ragnar.aegis.ui.components.ScanLineOverlay
+import dev.ragnar.aegis.ui.console.DeveloperConsoleScreen
+import dev.ragnar.aegis.ui.console.DeveloperConsoleViewModel
+import dev.ragnar.aegis.ui.console.DeveloperConsoleViewModelFactory
 import dev.ragnar.aegis.ui.drawer.AppDrawerGestureIndicator
 import dev.ragnar.aegis.ui.home.panels.AiStatus
 import dev.ragnar.aegis.ui.home.panels.FloatingAiStatusPanel
@@ -90,11 +94,14 @@ fun HomeScreen(
 
     var isDrawerVisible by rememberSaveable { mutableStateOf(false) }
     var isSettingsVisible by rememberSaveable { mutableStateOf(false) }
+    var isConsoleVisible by rememberSaveable { mutableStateOf(false) }
     var launchError by remember { mutableStateOf<String?>(null) }
 
     // Launcher back press handling: closes overlays first, no-op on root home
     BackHandler {
-        if (isSettingsVisible) {
+        if (isConsoleVisible) {
+            isConsoleVisible = false
+        } else if (isSettingsVisible) {
             isSettingsVisible = false
         } else if (isDrawerVisible) {
             isDrawerVisible = false
@@ -121,10 +128,24 @@ fun HomeScreen(
     )
     val telemetryState by telemetryViewModel.uiState.collectAsStateWithLifecycle()
 
+    val developerConsoleViewModel: DeveloperConsoleViewModel = viewModel(
+        factory = remember(context.applicationContext) {
+            DeveloperConsoleViewModelFactory(
+                context = context.applicationContext,
+                diagnosticsRepository = AndroidDiagnosticsRepository(
+                    context = context.applicationContext,
+                    launchableAppsCountProvider = { appDrawerState.apps.size },
+                    favoriteAppsCountProvider = { preferences.favoriteApps.size },
+                ),
+            )
+        },
+    )
+    val consoleState by developerConsoleViewModel.uiState.collectAsStateWithLifecycle()
+
     // Determine current AI operational status based on real state
     val aiStatus = when {
         appDrawerState.isLoading -> AiStatus.PROCESSING
-        isDrawerVisible || isSettingsVisible -> AiStatus.ACTIVE
+        isDrawerVisible || isSettingsVisible || isConsoleVisible -> AiStatus.ACTIVE
         else -> AiStatus.IDLE
     }
 
@@ -347,8 +368,27 @@ fun HomeScreen(
                 onAppSortOrderChange = settingsViewModel::setAppSortOrder,
                 onGridColumnsChange = settingsViewModel::setDrawerGridColumns,
                 onClearFavorites = settingsViewModel::clearFavorites,
+                onOpenDeveloperConsole = {
+                    isSettingsVisible = false
+                    isConsoleVisible = true
+                    developerConsoleViewModel.refreshSnapshot()
+                },
                 onResetDefaults = settingsViewModel::resetToDefaults,
                 onDismiss = { isSettingsVisible = false },
+            )
+        }
+
+        // =====================================================================
+        // DEVELOPER DIAGNOSTICS CONSOLE MODAL (F-014)
+        // =====================================================================
+        if (isConsoleVisible) {
+            DeveloperConsoleScreen(
+                state = consoleState,
+                onDismiss = { isConsoleVisible = false },
+                onRefresh = developerConsoleViewModel::refreshSnapshot,
+                onCopyDiagnostics = developerConsoleViewModel::copyDiagnostics,
+                onSelectLogLevel = developerConsoleViewModel::setLogLevelFilter,
+                onClearLogs = developerConsoleViewModel::clearLogs,
             )
         }
     }
