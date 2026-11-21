@@ -176,7 +176,9 @@ fun HomeScreen(
         val filter = IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
         context.registerReceiver(receiver, filter)
         onDispose {
-            context.unregisterReceiver(receiver)
+            runCatching {
+                context.unregisterReceiver(receiver)
+            }
         }
     }
 

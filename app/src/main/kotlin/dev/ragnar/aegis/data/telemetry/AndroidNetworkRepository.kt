@@ -112,7 +112,9 @@ class AndroidNetworkRepository(
 
         awaitClose {
             tickerJob.cancel()
-            connectivityManager.unregisterNetworkCallback(callback)
+            runCatching {
+                connectivityManager.unregisterNetworkCallback(callback)
+            }
         }
     }
 

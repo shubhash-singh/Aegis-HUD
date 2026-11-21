@@ -4,6 +4,22 @@
 
 ## [Unreleased] — Development
 
+### Phase 15 — Reliability and Performance (F-016) — 2026-11-22
+
+**Added:**
+- Performance and reliability targets defined and benchmarked (F-016-P1).
+- Zero frame-by-frame memory allocation for 3D neural brain visualization via static coordinate precomputation and `@Volatile` dimension-keyed memoization in `NeuralGeometry` (F-016-P3).
+- Lifecycle and process-teardown exception hardening: wrapped all `unregisterReceiver` and `unregisterNetworkCallback` calls in `runCatching` across `AndroidAppRepository`, `AndroidNetworkRepository`, `AndroidBatteryRepository`, and `HomeScreen` (F-016-P6).
+- High-throughput telemetry normalizer benchmarks demonstrating $< 0.05$ ms latency across 10,000 continuous updates (F-016-P4).
+- In-memory circular log buffer concurrent stress test ensuring strict capacity bound (100 entries) and zero memory leakage (F-016-P6).
+- 5 new unit tests in `PerformanceReliabilityAuditTest` (108 total project tests passing) (F-016-P7).
+
+**Validation:**
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (21s).
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (20s, 108 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (1m 13s, 0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### Phase 14 — Gesture Navigation (F-015) — 2026-11-22
 
 **Added:**

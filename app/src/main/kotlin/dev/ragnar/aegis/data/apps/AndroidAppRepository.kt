@@ -56,7 +56,9 @@ class AndroidAppRepository(
         refresh()
 
         awaitClose {
-            appContext.unregisterReceiver(packageReceiver)
+            runCatching {
+                appContext.unregisterReceiver(packageReceiver)
+            }
         }
     }.flowOn(ioDispatcher)
 

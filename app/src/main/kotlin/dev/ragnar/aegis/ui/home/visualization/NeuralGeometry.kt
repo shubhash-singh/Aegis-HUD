@@ -39,7 +39,22 @@ data class NeuralGeometry(
     val center: Offset get() = Offset(centerX, centerY)
 
     companion object {
+        private val STATIC_NORMALIZED_NODES: List<Triple<Float, Float, Int>> by lazy { getAnatomicalBrainNodes() }
+        private val STATIC_EDGES: List<Pair<Int, Int>> by lazy { buildProximityEdges(STATIC_NORMALIZED_NODES, maxDistance = 0.32f) }
+
+        @Volatile
+        private var cachedWidth: Float = -1f
+        @Volatile
+        private var cachedHeight: Float = -1f
+        @Volatile
+        private var cachedGeometry: NeuralGeometry? = null
+
         fun build(width: Float, height: Float): NeuralGeometry {
+            val cached = cachedGeometry
+            if (cached != null && cachedWidth == width && cachedHeight == height) {
+                return cached
+            }
+
             val cx = width / 2f
             // Center brain slightly above the vertical middle so the platform and bottom status panel have room
             val cy = height * 0.44f
@@ -59,7 +74,7 @@ data class NeuralGeometry(
             val outerHudRadius = brainWidth * 0.82f
 
             // Normalized anatomical brain coordinates (-1.0 to 1.0)
-            val normalizedNodes = getAnatomicalBrainNodes()
+            val normalizedNodes = STATIC_NORMALIZED_NODES
             val nodes = normalizedNodes.map { (nx, ny, shell) ->
                 val px = cx + nx * (brainWidth / 2f)
                 val py = cy + ny * (brainHeight / 2f)
@@ -69,16 +84,13 @@ data class NeuralGeometry(
             // Stem emitter is near bottom of stem
             val stemEmitterOffset = Offset(cx + 0.12f * (brainWidth / 2f), cy + 0.95f * (brainHeight / 2f))
 
-            // Geodesic edges based on proximity and structural pathways
-            val edges = buildProximityEdges(normalizedNodes, maxDistance = 0.32f)
-
-            return NeuralGeometry(
+            val newGeometry = NeuralGeometry(
                 centerX = cx,
                 centerY = cy,
                 brainWidth = brainWidth,
                 brainHeight = brainHeight,
                 nodes = nodes,
-                edges = edges,
+                edges = STATIC_EDGES,
                 stemEmitterOffset = stemEmitterOffset,
                 platformCenter = Offset(cx, platformY),
                 platformRadiusX = platformRadiusX,
@@ -86,6 +98,11 @@ data class NeuralGeometry(
                 upperArcRadius = upperArcRadius,
                 outerHudRadius = outerHudRadius,
             )
+
+            cachedWidth = width
+            cachedHeight = height
+            cachedGeometry = newGeometry
+            return newGeometry
         }
 
         /**

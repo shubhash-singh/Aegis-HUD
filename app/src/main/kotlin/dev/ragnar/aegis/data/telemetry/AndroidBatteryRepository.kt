@@ -37,7 +37,9 @@ class AndroidBatteryRepository(
         }
 
         awaitClose {
-            context.unregisterReceiver(receiver)
+            runCatching {
+                context.unregisterReceiver(receiver)
+            }
         }
     }
 

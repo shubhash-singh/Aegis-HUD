@@ -43,6 +43,7 @@ This directory contains all project documentation for AEGIS HUD Launcher.
 | [phases/PHASE-12-DEVELOPER-CONSOLE.md](phases/PHASE-12-DEVELOPER-CONSOLE.md) | Phase 12: Developer Console — build verified (device validation pending) |
 | [phases/PHASE-13-CONTEXT-AWARE-HUD.md](phases/PHASE-13-CONTEXT-AWARE-HUD.md) | Phase 13: Context-Aware HUD — build verified (device validation pending) |
 | [phases/PHASE-14-GESTURE-NAVIGATION.md](phases/PHASE-14-GESTURE-NAVIGATION.md) | Phase 14: Gesture Navigation — build verified (device validation pending) |
+| [phases/PHASE-15-RELIABILITY-AND-PERFORMANCE.md](phases/PHASE-15-RELIABILITY-AND-PERFORMANCE.md) | Phase 15: Reliability & Performance — build verified (device validation pending) |
 
 ---
 
@@ -50,4 +51,4 @@ This directory contains all project documentation for AEGIS HUD Launcher.
 
 See [PROGRESS_TRACKER.md](PROGRESS_TRACKER.md) for authoritative project status.
 
-Current stage: **Phase 14 — Gesture Navigation implementation complete and build verified (103 unit tests passed, lint passed, APK built); device validation pending B-002.**
+Current stage: **Phase 15 — Reliability and Performance implementation complete and build verified (108 unit tests passed, lint passed, APK built); device validation pending B-002.**

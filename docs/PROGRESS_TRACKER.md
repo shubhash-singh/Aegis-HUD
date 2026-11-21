@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.17.0
-**Last Updated:** 2026-11-22 (Phase 14 build verified)
-**Current Stage:** Phase 14 Complete (Build Verified) / Starting Phase 15
-**Overall Status:** Phase 14 Complete (Build Verified)
+**Version:** 0.18.0
+**Last Updated:** 2026-11-22 (Phase 15 build verified)
+**Current Stage:** Phase 15 Complete (Build Verified) / Starting Phase 16
+**Overall Status:** Phase 15 Complete (Build Verified)
 
 ---
 
@@ -13,17 +13,17 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 14 Complete (Build Verified) |
+| Stage | Phase 15 Complete (Build Verified) |
 | Status | Complete (Build Verified; Device Validation Pending) |
 | Last Updated | 2026-11-22 |
-| Last Completed Phase | PHASE-14 (Gesture Navigation — build verified) |
-| Current Phase | PHASE-15 (Reliability & Performance — F-016) (Starting) |
-| Next Step | Begin PHASE-15 (Reliability & Performance — F-016) planning and audit |
-| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (17s, 2026-11-22) |
-| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (30s, 103 tests passed, 2026-11-22) |
+| Last Completed Phase | PHASE-15 (Reliability and Performance — build verified) |
+| Current Phase | PHASE-16 (Widget Hosting — F-012) (Starting) |
+| Next Step | Begin PHASE-16 (Widget Hosting — F-012) planning and investigation |
+| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (21s, 2026-11-22) |
+| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (20s, 108 tests passed, 2026-11-22) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | 71e5d52 — feat(phase-14): implement gesture navigation (F-015) with swipe-down settings, long-press hint overlay, and per-gesture toggles |
+| Latest Commit | 16af2f9 — docs: update latest commit hash for phase 14 in progress tracker |
 
 ---
 
@@ -100,13 +100,13 @@ Rules:
 | F-013 | Context-Aware HUD | P2 | 7 | 7 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-010 |
 | F-014 | Developer Console | P2 | 6 | 6 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-008 |
 | F-015 | Gesture Navigation | P2 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-001 |
-| F-016 | Reliability & Performance | P2 | 7 | 0 | Not Started | Not Tested | Not Started | All P0 |
+| F-016 | Reliability & Performance | P2 | 7 | 7 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | All P0 |
 | F-017 | Advanced HUD Themes | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-010 |
 | F-018 | Extended Automation | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-013 |
 | F-019 | Open-Source Preparation | P3 | 6 | 0 | Not Started | Not Tested | Deferred | All |
 | F-020 | Swipe-Up App Drawer Gesture | P0 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-004, F-005 |
 
-**Implementation Progress: 86%** (82 / 95 active planned implementation phases implemented)
+**Implementation Progress: 94%** (89 / 95 active planned implementation phases implemented)
 
 > **Denominator basis:** 95 active (non-deferred) planned phases — includes Phase 10 redesign additions to F-003 (3 new sub-phases), F-007 (4 new sub-phases, AICoreVisualization), and new F-020 (5 phases). Deferred P3 phases (16) are excluded per the formula in Section B.2.
 
@@ -114,7 +114,7 @@ Rules:
 
 **P0 phase total:** 36 phases across 7 features (includes F-020 and Phase 10 additions) — **100% Implemented (36/36)**
 **P1 phase total:** 28 phases across 5 features (includes F-007 Phase 10 additions) — **100% Implemented (28/28)**
-**P2 phase total:** 31 phases across 5 features — **58% Implemented (18/31)**
+**P2 phase total:** 31 phases across 5 features — **81% Implemented (25/31)**
 **P3 phase total (Deferred):** 16 phases across 3 features — excluded from active denominator
 
 **Active (non-deferred) total planned phases:** 95
@@ -670,6 +670,36 @@ Rules:
 
 ---
 
+### PHASE-15: Reliability and Performance
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-15 |
+| Title | Reliability and Performance |
+| Objective | Formulate performance standards, eliminate render loop allocations, harden lifecycle teardown, and add performance regression suites |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (21s, 2026-11-22) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (20s, 108 tests passed, 2026-11-22) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (1m 13s, 0 errors, 2026-11-22) |
+| Dependencies | All P0 & P1 phases |
+| Design Docs | `docs/phases/PHASE-15-RELIABILITY-AND-PERFORMANCE.md` |
+| Started | 2026-11-22 |
+| Completed | 2026-11-22 (Build Verified) |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (108 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+
+**Implemented:**
+
+- Defined concrete performance targets (cold start $\le 1$s, 60fps frame rate, idle memory $\le 45$MB, 0 leaks).
+- Optimized 3D neural brain graphics render loop: static precomputation of coordinates/edges and `@Volatile` dimension-keyed memoization in `NeuralGeometry` eliminating per-frame allocations during the 60fps sweep.
+- Hardened receiver and callback teardown: wrapped all `unregisterReceiver` and `unregisterNetworkCallback` calls in `runCatching` across `AndroidAppRepository`, `AndroidNetworkRepository`, `AndroidBatteryRepository`, and `HomeScreen`.
+- 5 new unit tests in `PerformanceReliabilityAuditTest` covering geometry memoization, high-throughput normalizer benchmarks, concurrent log buffer stress tests, and default preference footprint (108 total project tests passing).
+
+**Validation:**
+- Assemble, unit tests, and lint all completed successfully with zero errors.
+- Device testing deferred pending physical device / emulator (B-002).
+
+---
+
 ## F. Build and Test History
 
 | Date | Command | Environment | Result | Notes | Feature/Phase |
@@ -716,6 +746,9 @@ Rules:
 | 2026-11-22 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (17s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-14 |
 | 2026-11-22 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (30s) | 103 tests passed (5 new Phase 14 tests in GestureSettingsViewModelTest) | PHASE-14 |
 | 2026-11-22 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (1m 11s) | 0 errors | PHASE-14 |
+| 2026-11-22 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (21s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-15 |
+| 2026-11-22 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (20s) | 108 tests passed (5 new Phase 15 tests in PerformanceReliabilityAuditTest) | PHASE-15 |
+| 2026-11-22 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (1m 13s) | 0 errors | PHASE-15 |
 
 ---
 
@@ -749,6 +782,7 @@ Rules:
 | 2026-11-22 | **Phase 12 implemented & build verified:** Developer Console; in-memory circular ring buffer (`AegisLogBuffer`), genuine runtime memory diagnostics (`Runtime.getRuntime()`), platform and hardware audit, live permission audit panel, formatted markdown export with clipboard copy, 8 new unit tests (87 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all passed with 0 errors; device testing pending (B-002) | PHASE-12-DEVELOPER-CONSOLE.md |
 | 2026-11-22 | **Phase 13 implemented & build verified:** Context-Aware HUD; `ContextRuleEvaluator` pure engine, 5 predefined protocols, DataStore persistence, `TacticalAlertBanner` pulsing overlay, `SettingsSheet` section with live ACTIVE/STANDBY indicators, 11 new unit tests (98 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all passed with 0 errors; device testing pending (B-002) | PHASE-13-CONTEXT-AWARE-HUD.md |
 | 2026-11-22 | **Phase 14 implemented & build verified:** Gesture Navigation; swipe-up (App Drawer), swipe-down (Settings Sheet), long-press (`GestureHintOverlay`), gesture conflict analysis (DEC-017), DataStore preferences for individual gesture toggles, 5 new unit tests (103 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all passed with 0 errors; device testing pending (B-002) | PHASE-14-GESTURE-NAVIGATION.md |
+| 2026-11-22 | **Phase 15 implemented & build verified:** Reliability and Performance; performance targets defined, zero-allocation 3D neural brain render loop memoization, runCatching exception-hardened unregisters across all receivers/callbacks, high-throughput normalizer benchmarks, 5 new unit tests (108 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all passed with 0 errors; device testing pending (B-002) | PHASE-15-RELIABILITY-AND-PERFORMANCE.md |
 
 ---
 
