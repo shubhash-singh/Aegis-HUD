@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.15.0
-**Last Updated:** 2026-11-22 (Phase 12 build verified)
-**Current Stage:** Phase 12 Complete (Build Verified) / Starting Phase 13
-**Overall Status:** Phase 12 Complete (Build Verified)
+**Version:** 0.16.0
+**Last Updated:** 2026-11-22 (Phase 13 build verified)
+**Current Stage:** Phase 13 Complete (Build Verified) / Starting Phase 14
+**Overall Status:** Phase 13 Complete (Build Verified)
 
 ---
 
@@ -13,17 +13,17 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 12 Complete (Build Verified) |
+| Stage | Phase 13 Complete (Build Verified) |
 | Status | Complete (Build Verified; Device Validation Pending) |
 | Last Updated | 2026-11-22 |
-| Last Completed Phase | PHASE-12 (Developer Console — build verified) |
-| Current Phase | PHASE-13 (Context-Aware HUD — F-013) (Starting) |
-| Next Step | Begin PHASE-13 (Context-Aware HUD — F-013) planning and implementation |
-| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (22s, 2026-11-22) |
-| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (17s, 87 tests passed, 2026-11-22) |
+| Last Completed Phase | PHASE-13 (Context-Aware HUD — build verified) |
+| Current Phase | PHASE-14 (Gesture Navigation — F-015) (Starting) |
+| Next Step | Begin PHASE-14 (Gesture Navigation — F-015) planning and implementation |
+| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (2m 7s, 2026-11-22) |
+| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (31s, 98 tests passed, 2026-11-22) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | 7392c89 — feat(phase-12): implement developer console (F-014) with real-time runtime diagnostics and log viewer |
+| Latest Commit | 25f484d — docs: update docs for phase 13 context-aware HUD completion |
 
 ---
 
