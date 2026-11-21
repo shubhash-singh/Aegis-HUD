@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface PreferencesRepository {
     val userPreferences: Flow<UserPreferences>
 
+    suspend fun setOperatorName(name: String)
     suspend fun setAccentColor(accentColor: AccentColor)
     suspend fun setAnimationSpeed(speed: AnimationSpeed)
     suspend fun setShowRadar(show: Boolean)

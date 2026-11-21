@@ -329,6 +329,7 @@ fun HomeScreen(
                 Column {
                     TopBar(
                         clockState = clockState,
+                        operatorName = preferences.operatorName,
                         showSeconds = preferences.showClockSeconds,
                         onSettingsClick = { isSettingsVisible = true },
                         onWidgetDeckClick = { widgetHostViewModel.toggleDeck(true) },
@@ -394,7 +395,6 @@ fun HomeScreen(
                         FloatingTelemetryPanel(
                             batteryTemperatureLabel = telemetryState.batteryTemperatureLabel,
                             uptimeFormatted = telemetryState.uptimeFormatted,
-                            batteryVoltageMv = telemetryState.battery.voltageMv,
                         )
                     }
                 }
@@ -458,6 +458,7 @@ fun HomeScreen(
         if (isSettingsVisible) {
             SettingsSheet(
                 preferences = preferences,
+                onOperatorNameChange = settingsViewModel::setOperatorName,
                 onAccentColorChange = settingsViewModel::setAccentColor,
                 onAnimationSpeedChange = settingsViewModel::setAnimationSpeed,
                 onToggleRadar = settingsViewModel::setShowRadar,

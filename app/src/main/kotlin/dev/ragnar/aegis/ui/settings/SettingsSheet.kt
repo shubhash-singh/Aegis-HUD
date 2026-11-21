@@ -18,14 +18,23 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import dev.ragnar.aegis.domain.apps.AppSortOrder
 import dev.ragnar.aegis.domain.settings.AccentColor
@@ -40,6 +49,7 @@ import dev.ragnar.aegis.ui.theme.AegisTheme
 @Composable
 fun SettingsSheet(
     preferences: UserPreferences,
+    onOperatorNameChange: (String) -> Unit = {},
     onAccentColorChange: (AccentColor) -> Unit,
     onAnimationSpeedChange: (AnimationSpeed) -> Unit,
     onToggleRadar: (Boolean) -> Unit,
@@ -67,6 +77,7 @@ fun SettingsSheet(
     val colors = AegisTheme.colors
     val typography = AegisTheme.typography
     val spacing = AegisTheme.spacing
+    var callsignDraft by remember(preferences.operatorName) { mutableStateOf(preferences.operatorName) }
 
     Box(
         modifier = modifier
@@ -110,7 +121,52 @@ fun SettingsSheet(
 
             Spacer(modifier = Modifier.height(spacing.md))
 
-            // 1. Accent Color
+            // 1. Operator Identity
+            HudPanel(title = "Operator Identity") {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                    Text(
+                        text = "HUD CALLSIGN",
+                        style = typography.telemetryLabel,
+                        color = colors.cyanDim,
+                    )
+                    BasicTextField(
+                        value = callsignDraft,
+                        onValueChange = { callsignDraft = it.take(18) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(colors.surface, RoundedCornerShape(spacing.panelCornerRadius))
+                            .border(spacing.panelBorderWidth, colors.border, RoundedCornerShape(spacing.panelCornerRadius))
+                            .padding(horizontal = spacing.md, vertical = spacing.sm)
+                            .semantics { contentDescription = "HUD callsign" },
+                        singleLine = true,
+                        textStyle = typography.body.copy(color = colors.textPrimary),
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Characters,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(onDone = { onOperatorNameChange(callsignDraft) }),
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(colors.surfaceElevated, RoundedCornerShape(spacing.panelCornerRadius))
+                            .border(spacing.panelBorderWidth, colors.borderActive, RoundedCornerShape(spacing.panelCornerRadius))
+                            .clickable { onOperatorNameChange(callsignDraft) }
+                            .padding(vertical = spacing.sm),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "APPLY CALLSIGN",
+                            style = typography.telemetryLabel,
+                            color = colors.cyan,
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(spacing.sm))
+
+            // 2. Accent Color
             HudPanel(title = "HUD Theme Color") {
                 Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
                     AccentColor.entries.forEach { accent ->

@@ -1,12 +1,14 @@
 # BUG_TRACKER.md — AEGIS HUD Launcher
 
-**Last Updated:** 2026-11-21
+**Last Updated:** 2026-11-22
 
 ---
 
 ## Active Bugs
 
-*No active defects recorded.*
+| ID | Title | Severity | Status | Phase Discovered | Phase Resolved | Description / Resolution |
+|---|---|---|---|---|---|---|
+| B-004 | HUD telemetry values and callsign configuration | Medium | In Progress — validation pending | Maintenance | — | CPU could remain unavailable where `/proc/stat` is restricted; storage data was calculated but rendered as static `ONLINE`; voltage rendered an unavailable value; header callsign was hard-coded. Added process-CPU fallback, free/total storage display, removed voltage display, and persisted editable callsign. Build/device validation intentionally pending. |
 
 ---
 

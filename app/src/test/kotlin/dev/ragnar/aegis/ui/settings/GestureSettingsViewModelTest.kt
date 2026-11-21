@@ -41,6 +41,10 @@ class GestureSettingsViewModelTest {
         private val _flow = MutableStateFlow(initial)
         override val userPreferences: Flow<UserPreferences> = _flow.asStateFlow()
 
+        override suspend fun setOperatorName(name: String) {
+            _flow.value = _flow.value.copy(operatorName = dev.ragnar.aegis.domain.settings.normalizeOperatorName(name))
+        }
+
         override suspend fun setAccentColor(accentColor: AccentColor) {
             _flow.value = _flow.value.copy(accentColor = accentColor)
         }

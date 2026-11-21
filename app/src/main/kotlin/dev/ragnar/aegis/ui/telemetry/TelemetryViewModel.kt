@@ -39,7 +39,7 @@ data class TelemetryUiState(
     val networkLabel: String = "---",
     val networkStatusLevel: StatusLevel = StatusLevel.Unknown,
     val systemPerformance: SystemPerformanceState = SystemPerformanceState(),
-    val storageLabel: String = "ONLINE",
+    val storageLabel: String = "---",
     val intelligence: IntelligenceState = IntelligenceState(),
 )
 
@@ -77,7 +77,7 @@ class TelemetryViewModel(
             networkLabel = formatNetworkLabel(network),
             networkStatusLevel = determineNetworkStatusLevel(network),
             systemPerformance = sysPerf,
-            storageLabel = formatStorage(sysPerf.storageUsedBytes, sysPerf.storageTotalBytes, sysPerf.storagePercent),
+            storageLabel = formatStorage(sysPerf.storageUsedBytes, sysPerf.storageTotalBytes),
             intelligence = intelligence,
         )
     }.stateIn(
@@ -141,11 +141,11 @@ class TelemetryViewModel(
             return if (network.isConnected) StatusLevel.Ok else StatusLevel.Offline
         }
 
-        fun formatStorage(usedBytes: Long, totalBytes: Long, percent: Int): String {
-            if (totalBytes <= 0L) return "ONLINE"
-            val usedGb = usedBytes / (1024.0 * 1024.0 * 1024.0)
+        fun formatStorage(usedBytes: Long, totalBytes: Long): String {
+            if (totalBytes <= 0L) return "---"
+            val freeGb = (totalBytes - usedBytes).coerceAtLeast(0L) / (1024.0 * 1024.0 * 1024.0)
             val totalGb = totalBytes / (1024.0 * 1024.0 * 1024.0)
-            return "%.1f/%.0fGB (%d%%)".format(usedGb, totalGb, percent)
+            return "%.1f/%.0f GB".format(freeGb, totalGb)
         }
     }
 }

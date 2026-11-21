@@ -29,7 +29,7 @@ import dev.ragnar.aegis.ui.theme.AegisTheme
  * [StackIcon] SYSTEM STATUS
  * ───────────────────────────────────────
  * ● NETWORK           │ ● STORAGE
- * WIFI                │ ONLINE
+ * WIFI                │ 42.3/128 GB
  * 0kb/s↓ 0kb/s↑       │
  */
 @Composable
@@ -112,9 +112,9 @@ fun FloatingSystemStatusPanel(
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "ONLINE",
+                    text = storageStatusLabel,
                     style = typography.telemetry.copy(fontSize = 12.sp),
-                    color = green,
+                    color = if (storageStatusLabel == "---") colors.textMuted else green,
                 )
             }
         }

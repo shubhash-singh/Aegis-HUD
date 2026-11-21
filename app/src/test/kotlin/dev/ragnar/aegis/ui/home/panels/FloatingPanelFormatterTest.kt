@@ -15,17 +15,14 @@ class FloatingPanelFormatterTest {
     fun formatStorage_validValues_formatsGbAndPercentage() {
         val used = 64L * 1024L * 1024L * 1024L
         val total = 128L * 1024L * 1024L * 1024L
-        val percent = 50
-
-        val formatted = TelemetryViewModel.formatStorage(used, total, percent)
-        assertTrue("Must contain formatted GB: $formatted", formatted.contains("64.0/128GB"))
-        assertTrue("Must contain percentage: $formatted", formatted.contains("50%"))
+        val formatted = TelemetryViewModel.formatStorage(used, total)
+        assertTrue("Must contain free and total GB: $formatted", formatted.contains("64.0/128 GB"))
     }
 
     @Test
-    fun formatStorage_zeroTotal_returnsOnline() {
-        val formatted = TelemetryViewModel.formatStorage(0L, 0L, 0)
-        assertEquals("ONLINE", formatted)
+    fun formatStorage_zeroTotal_returnsUnavailableMarker() {
+        val formatted = TelemetryViewModel.formatStorage(0L, 0L)
+        assertEquals("---", formatted)
     }
 
     @Test

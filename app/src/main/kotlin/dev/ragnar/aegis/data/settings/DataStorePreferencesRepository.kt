@@ -14,6 +14,7 @@ import dev.ragnar.aegis.domain.apps.AppSortOrder
 import dev.ragnar.aegis.domain.settings.AccentColor
 import dev.ragnar.aegis.domain.settings.AnimationSpeed
 import dev.ragnar.aegis.domain.settings.UserPreferences
+import dev.ragnar.aegis.domain.settings.normalizeOperatorName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -29,6 +30,7 @@ class DataStorePreferencesRepository(
 ) : PreferencesRepository {
 
     private object PreferencesKeys {
+        val OPERATOR_NAME = stringPreferencesKey("operator_name")
         val ACCENT_COLOR = stringPreferencesKey("accent_color")
         val ANIMATION_SPEED = stringPreferencesKey("animation_speed")
         val SHOW_RADAR = booleanPreferencesKey("show_radar")
@@ -58,6 +60,12 @@ class DataStorePreferencesRepository(
         .map { preferences ->
             mapUserPreferences(preferences)
         }
+
+    override suspend fun setOperatorName(name: String) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.OPERATOR_NAME] = normalizeOperatorName(name)
+        }
+    }
 
     override suspend fun setAccentColor(accentColor: AccentColor) {
         context.dataStore.edit { preferences ->
@@ -201,6 +209,7 @@ class DataStorePreferencesRepository(
         val enabledRules = preferences[PreferencesKeys.ENABLED_CONTEXT_RULES]
             ?: dev.ragnar.aegis.domain.context.StandardContextRules.DEFAULT_ENABLED_IDS
         return UserPreferences(
+            operatorName = normalizeOperatorName(preferences[PreferencesKeys.OPERATOR_NAME].orEmpty()),
             accentColor = AccentColor.fromId(accentId),
             animationSpeed = AnimationSpeed.fromId(speedId),
             showRadar = preferences[PreferencesKeys.SHOW_RADAR] ?: true,

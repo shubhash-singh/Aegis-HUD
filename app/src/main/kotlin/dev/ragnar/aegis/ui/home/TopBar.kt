@@ -30,13 +30,14 @@ import dev.ragnar.aegis.ui.theme.AegisTheme
 /**
  * Top bar header zone matching the reference design:
  *
- * Line 1: RAGNAR // AEGIS (left)          ● ONLINE (right)
+ * Line 1: [callsign] // AEGIS (left)      ● ONLINE (right)
  * Line 2: SATURDAY, 21 NOV 2026 (left)
  * Line 3:               22:20:18 (centered prominent digital clock)
  */
 @Composable
 fun TopBar(
     clockState: ClockState,
+    operatorName: String = "RAGNAR",
     modifier: Modifier = Modifier,
     showSeconds: Boolean = true,
     onSettingsClick: (() -> Unit)? = null,
@@ -52,7 +53,7 @@ fun TopBar(
             .fillMaxWidth()
             .semantics { contentDescription = "HUD Top Bar" },
     ) {
-        // Line 1: RAGNAR // AEGIS on left, ● ONLINE on right
+        // Line 1: configurable callsign on left, ● ONLINE on right
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -67,7 +68,7 @@ fun TopBar(
                 } else Modifier,
             ) {
                 Text(
-                    text = "RAGNAR // AEGIS",
+                    text = "$operatorName // AEGIS",
                     style = typography.telemetry.copy(fontSize = 13.sp, letterSpacing = 1.sp),
                     color = colors.cyan,
                 )

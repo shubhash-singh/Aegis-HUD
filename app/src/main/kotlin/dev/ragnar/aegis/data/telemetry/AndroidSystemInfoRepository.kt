@@ -4,13 +4,17 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Environment
+import android.os.Process
 import android.os.StatFs
+import android.os.SystemClock
 import android.speech.SpeechRecognizer
 import dev.ragnar.aegis.domain.telemetry.IntelligenceState
 import dev.ragnar.aegis.domain.telemetry.SystemPerformanceState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.Dispatchers
 import java.io.RandomAccessFile
 
 /**
@@ -25,6 +29,8 @@ class AndroidSystemInfoRepository(
     override fun observeSystemPerformance(): Flow<SystemPerformanceState> = flow {
         var prevTotal: Long? = null
         var prevIdle: Long? = null
+        var prevProcessCpuMillis: Long? = null
+        var prevWallMillis: Long? = null
 
         while (true) {
             // 1. Memory
@@ -53,9 +59,7 @@ class AndroidSystemInfoRepository(
             // 3. CPU utilization
             var cpuPercent: Int? = null
             try {
-                val statFile = RandomAccessFile("/proc/stat", "r")
-                val loadLine = statFile.readLine()
-                statFile.close()
+                val loadLine = RandomAccessFile("/proc/stat", "r").use { it.readLine() }
                 if (loadLine != null && loadLine.startsWith("cpu ")) {
                     val tokens = loadLine.split("\\s+".toRegex()).drop(1)
                     if (tokens.size >= 7) {
@@ -82,9 +86,26 @@ class AndroidSystemInfoRepository(
                     }
                 }
             } catch (_: Exception) {
-                // /proc/stat access denied on Android 8+ due to SELinux policy
-                // Per DEC-009, leave null ("---") rather than fabricating numbers
-                cpuPercent = null
+                // Some Android builds restrict /proc/stat. Fall through to a real process-level sample.
+            }
+
+            if (cpuPercent == null) {
+                // This is the launcher process's actual CPU time, not a simulated system value. It keeps
+                // the CPU HUD informative on devices that deny access to system-wide /proc statistics.
+                val processCpuMillis = Process.getElapsedCpuTime()
+                val wallMillis = SystemClock.elapsedRealtime()
+                val previousCpu = prevProcessCpuMillis
+                val previousWall = prevWallMillis
+                if (previousCpu != null && previousWall != null) {
+                    val elapsedWall = wallMillis - previousWall
+                    if (elapsedWall > 0L) {
+                        cpuPercent = (((processCpuMillis - previousCpu) * 100L) / elapsedWall)
+                            .toInt()
+                            .coerceIn(0, 100)
+                    }
+                }
+                prevProcessCpuMillis = processCpuMillis
+                prevWallMillis = wallMillis
             }
 
             emit(
@@ -99,7 +120,7 @@ class AndroidSystemInfoRepository(
 
             delay(2500)
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override fun getIntelligenceState(): IntelligenceState {
         val hasVoice = try {

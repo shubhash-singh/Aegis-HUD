@@ -16,6 +16,7 @@ class UserPreferencesTest {
     @Test
     fun `UT-010-01 default user preferences match system defaults`() {
         val prefs = UserPreferences()
+        assertEquals("RAGNAR", prefs.operatorName)
         assertEquals(AccentColor.Cyan, prefs.accentColor)
         assertEquals(AnimationSpeed.Normal, prefs.animationSpeed)
         assertTrue(prefs.showRadar)
@@ -57,6 +58,13 @@ class UserPreferencesTest {
         assertEquals(AnimationSpeed.Disabled, AnimationSpeed.fromId("off"))
         assertEquals(AnimationSpeed.Normal, AnimationSpeed.fromId("unknown"))
         assertEquals(AnimationSpeed.Normal, AnimationSpeed.fromId(null))
+    }
+
+    @Test
+    fun `operator name normalization preserves a readable compact callsign`() {
+        assertEquals("NOVA-7", normalizeOperatorName(" nova-7 "))
+        assertEquals("RAGNAR", normalizeOperatorName("///"))
+        assertEquals("ABCDEFGHIJKLMNOPQR", normalizeOperatorName("abcdefghijklmnopqrs"))
     }
 
     @Test

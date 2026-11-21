@@ -63,6 +63,7 @@ class AppDrawerViewModelTest {
         val flow = MutableStateFlow(initial)
         override val userPreferences: Flow<UserPreferences> = flow.asStateFlow()
 
+        override suspend fun setOperatorName(name: String) {}
         override suspend fun setAccentColor(accentColor: AccentColor) {}
         override suspend fun setAnimationSpeed(speed: AnimationSpeed) {}
         override suspend fun setShowRadar(show: Boolean) {}

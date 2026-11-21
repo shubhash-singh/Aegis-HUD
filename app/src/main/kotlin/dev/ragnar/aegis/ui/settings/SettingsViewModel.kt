@@ -28,6 +28,12 @@ class SettingsViewModel(
         initialValue = UserPreferences(),
     )
 
+    fun setOperatorName(name: String) {
+        viewModelScope.launch {
+            preferencesRepository.setOperatorName(name)
+        }
+    }
+
     fun setAccentColor(accentColor: AccentColor) {
         viewModelScope.launch {
             preferencesRepository.setAccentColor(accentColor)

@@ -44,6 +44,10 @@ class SettingsViewModelTest {
         private val _flow = MutableStateFlow(initial)
         override val userPreferences: Flow<UserPreferences> = _flow.asStateFlow()
 
+        override suspend fun setOperatorName(name: String) {
+            _flow.value = _flow.value.copy(operatorName = dev.ragnar.aegis.domain.settings.normalizeOperatorName(name))
+        }
+
         override suspend fun setAccentColor(accentColor: AccentColor) {
             _flow.value = _flow.value.copy(accentColor = accentColor)
         }
@@ -148,6 +152,15 @@ class SettingsViewModelTest {
 
         vm.setAccentColor(AccentColor.Amber)
         assertEquals(AccentColor.Amber, vm.uiState.value.accentColor)
+    }
+
+    @Test
+    fun `setOperatorName updates persisted callsign state`() = runTest {
+        val repo = FakePreferencesRepository()
+        val vm = SettingsViewModel(repo)
+
+        vm.setOperatorName("nova-7")
+        assertEquals("NOVA-7", vm.uiState.value.operatorName)
     }
 
     @Test

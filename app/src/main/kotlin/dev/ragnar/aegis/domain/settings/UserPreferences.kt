@@ -68,6 +68,7 @@ enum class AnimationSpeed(
  * Immutable user configuration snapshot for the AEGIS HUD launcher.
  */
 data class UserPreferences(
+    val operatorName: String = DEFAULT_OPERATOR_NAME,
     val accentColor: AccentColor = AccentColor.Cyan,
     val animationSpeed: AnimationSpeed = AnimationSpeed.Normal,
     val showRadar: Boolean = true,
@@ -85,3 +86,15 @@ data class UserPreferences(
     val swipeDownEnabled: Boolean = true,
     val longPressEnabled: Boolean = true,
 )
+
+const val DEFAULT_OPERATOR_NAME = "RAGNAR"
+
+/** Keeps the callsign legible in the compact HUD and makes an empty name safely recoverable. */
+fun normalizeOperatorName(value: String): String {
+    return value
+        .trim()
+        .filter { it.isLetterOrDigit() || it == ' ' || it == '-' || it == '_' }
+        .take(18)
+        .uppercase()
+        .ifBlank { DEFAULT_OPERATOR_NAME }
+}

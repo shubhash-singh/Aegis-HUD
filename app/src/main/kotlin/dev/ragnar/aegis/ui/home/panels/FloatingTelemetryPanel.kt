@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.sp
 import dev.ragnar.aegis.ui.components.HudBatteryIcon
 import dev.ragnar.aegis.ui.components.HudClockIcon
 import dev.ragnar.aegis.ui.components.HudTelemetryIcon
-import dev.ragnar.aegis.ui.components.HudVoltageIcon
 import dev.ragnar.aegis.ui.theme.AegisTheme
 
 /**
@@ -25,13 +24,11 @@ import dev.ragnar.aegis.ui.theme.AegisTheme
  * [WaveIcon] TELEMETRY
  * [BattIcon]  BATT TEMP   37.0°C
  * [ClockIcon] UPTIME      2H 49M
- * [VoltIcon]  VOLTAGE     3.88V
  */
 @Composable
 fun FloatingTelemetryPanel(
     batteryTemperatureLabel: String,
     uptimeFormatted: String,
-    batteryVoltageMv: Int?,
     modifier: Modifier = Modifier,
 ) {
     val panelWidth = 125.dp
@@ -55,14 +52,6 @@ fun FloatingTelemetryPanel(
                 icon = { HudClockIcon(modifier = Modifier.width(12.dp)) },
                 label = "UPTIME",
                 value = uptimeFormatted,
-            )
-            val voltStr = batteryVoltageMv?.let {
-                "%.2fV".format(it / 1000f)
-            } ?: "---"
-            TelemetryItem(
-                icon = { HudVoltageIcon(modifier = Modifier.width(12.dp)) },
-                label = "VOLTAGE",
-                value = voltStr,
             )
         }
     }
