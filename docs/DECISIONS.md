@@ -319,3 +319,25 @@ The home screen should not appear as a card in the Android Overview (Recents) sc
 - Only 3 gesture types are implemented: Swipe Up (App Drawer), Swipe Down (Settings Sheet), Long Press (Gesture Hint Overlay).
 - All 3 are individually toggleable and persist in DataStore Preferences.
 
+---
+
+### DEC-018: AppWidgetHost Architecture, Permission Model, and Cybernetic Containment
+
+**Date:** 2026-11-22
+**Phase:** PHASE-16
+**Status:** Accepted
+
+**Decision:** Host third-party Android application widgets using a dedicated `AegisAppWidgetHost` with persistent launcher host ID `2048`. Declare `<uses-permission android:name="android.permission.BIND_APPWIDGET" />` in `AndroidManifest.xml` and invoke the system binding authorization prompt (`AppWidgetManager.ACTION_APPWIDGET_BIND`) via `ActivityResultLauncher` when automatic binding is not pre-approved. Frame hosted widgets inside cybernetic HUD containers (`HudWidgetContainer`) with modular height cycling (140dp, 200dp, 280dp) within a `TacticalWidgetDeck` modal stack.
+
+**Alternatives Considered:**
+- Sideloading external widget layouts: Incompatible with third-party app widgets; breaks Android security model.
+- Free-form desktop drag-and-drop resizing: Clutters the full-screen 3D holographic neural brain visualization and leads to pixel distortion.
+- Silently failing if `bindAppWidgetIdIfAllowed` returns false: Prevents users from adding widgets on standard Android devices where `BIND_APPWIDGET` requires user permission approval.
+
+**Reasoning:** Modern Android requires launchers without system-signature privileges to obtain user authorization via `ACTION_APPWIDGET_BIND`. Pinned host ID `2048` prevents collision with default launcher hosts. Encapsulating third-party `RemoteViews` within `runCatching` blocks prevents external widget rendering exceptions from crashing the AEGIS launcher process. Storing serialized widget configurations in DataStore ensures persistence across launcher restarts without external JSON libraries.
+
+**Consequences:**
+- `appWidgetHost.startListening()` and `stopListening()` must be tied to `MainActivity.onStart()` and `onStop()`.
+- Uninstalled widget providers must be handled gracefully as orphans with user purge options.
+- Any crash inside third-party `AppWidgetHostView` is safely isolated.
+

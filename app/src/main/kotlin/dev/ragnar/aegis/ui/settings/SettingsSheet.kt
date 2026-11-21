@@ -57,6 +57,8 @@ fun SettingsSheet(
     onToggleSwipeUp: (Boolean) -> Unit = {},
     onToggleSwipeDown: (Boolean) -> Unit = {},
     onToggleLongPress: (Boolean) -> Unit = {},
+    onOpenWidgetDeck: () -> Unit = {},
+    onOpenWidgetPicker: () -> Unit = {},
     onOpenDeveloperConsole: () -> Unit = {},
     onResetDefaults: () -> Unit,
     onDismiss: () -> Unit,
@@ -438,6 +440,64 @@ fun SettingsSheet(
                         isChecked = preferences.longPressEnabled,
                         onToggle = onToggleLongPress,
                     )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(spacing.md))
+
+            // Tactical Widgets (F-012)
+            HudPanel(title = "Tactical Widgets") {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(colors.surfaceElevated, RoundedCornerShape(spacing.panelCornerRadius))
+                            .border(spacing.panelBorderWidth, colors.borderActive, RoundedCornerShape(spacing.panelCornerRadius))
+                            .clickable(onClick = onOpenWidgetDeck)
+                            .padding(horizontal = spacing.md, vertical = spacing.sm),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Column {
+                            Text(
+                                text = "TACTICAL WIDGET DECK",
+                                style = typography.body,
+                                color = colors.textPrimary,
+                            )
+                            Text(
+                                text = "VIEW & MANAGE DOCKED MODULES",
+                                style = typography.telemetryLabel,
+                                color = colors.cyanDim,
+                            )
+                        }
+                        Text(
+                            text = "OPEN [>]",
+                            style = typography.telemetryLabel,
+                            color = colors.cyan,
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(colors.surface, RoundedCornerShape(spacing.panelCornerRadius))
+                            .border(spacing.panelBorderWidth, colors.border, RoundedCornerShape(spacing.panelCornerRadius))
+                            .clickable(onClick = onOpenWidgetPicker)
+                            .padding(horizontal = spacing.md, vertical = spacing.sm),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(
+                            text = "+ DOCK NEW WIDGET MODULE",
+                            style = typography.body,
+                            color = colors.cyan,
+                        )
+                        Text(
+                            text = "[BROWSE]",
+                            style = typography.telemetryLabel,
+                            color = colors.cyan,
+                        )
+                    }
                 }
             }
 

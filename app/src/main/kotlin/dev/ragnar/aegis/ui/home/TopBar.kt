@@ -1,6 +1,10 @@
 package dev.ragnar.aegis.ui.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +40,8 @@ fun TopBar(
     modifier: Modifier = Modifier,
     showSeconds: Boolean = true,
     onSettingsClick: (() -> Unit)? = null,
+    onWidgetDeckClick: (() -> Unit)? = null,
+    dockedWidgetCount: Int = 0,
 ) {
     val colors = AegisTheme.colors
     val typography = AegisTheme.typography
@@ -74,17 +81,40 @@ fun TopBar(
                 }
             }
 
-            // Right: ● ONLINE
+            // Right: Optional Widget Deck pill + ● ONLINE
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                StatusIndicator(status = StatusLevel.Ok, animate = false)
-                Text(
-                    text = "ONLINE",
-                    style = typography.telemetryLabel.copy(fontSize = 10.sp, letterSpacing = 1.sp),
-                    color = green,
-                )
+                if (onWidgetDeckClick != null) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(colors.cyan.copy(alpha = 0.12f))
+                            .border(0.5.dp, colors.cyan.copy(alpha = 0.4f), RoundedCornerShape(4.dp))
+                            .clickable(onClick = onWidgetDeckClick)
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .semantics { contentDescription = "Open Tactical Widget Deck" },
+                    ) {
+                        Text(
+                            text = if (dockedWidgetCount > 0) "WIDGETS ($dockedWidgetCount)" else "WIDGETS",
+                            style = typography.telemetryLabel.copy(fontSize = 9.sp),
+                            color = colors.cyan,
+                        )
+                    }
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                ) {
+                    StatusIndicator(status = StatusLevel.Ok, animate = false)
+                    Text(
+                        text = "ONLINE",
+                        style = typography.telemetryLabel.copy(fontSize = 10.sp, letterSpacing = 1.sp),
+                        color = green,
+                    )
+                }
             }
         }
 

@@ -4,6 +4,24 @@
 
 ## [Unreleased] — Development
 
+### Phase 16 — Widget Hosting (F-012) — 2026-11-22
+
+**Added:**
+- **AppWidgetHost Integration:** Pinned host ID `2048` in `AegisAppWidgetHost`; integrated lifecycle listeners with exception-hardened `runCatching` blocks into `MainActivity` (F-012-P2).
+- **Permission & Bind Contract:** Declared `BIND_APPWIDGET` in `AndroidManifest.xml` with `tools:ignore="ProtectedPermissions"` and implemented user binding prompt fallback (`ACTION_APPWIDGET_BIND`) via `ActivityResultLauncher` (F-012-P1, DEC-018).
+- **Configuration Contract:** Handled `ACTION_APPWIDGET_CONFIGURE` with automatic widget ID deletion on cancellation (F-012-P5).
+- **Widget Registry Picker:** Built `WidgetPickerSheet` bottom sheet modal listing installed widget providers queried via `AppWidgetManager.installedProviders`, filterable in real-time via `HudSearchBar` (F-012-P3).
+- **Cyber-HUD Container:** Built `HudWidgetContainer` framing third-party `RemoteViews` in frosted glassmorphism cyber-cards with glowing neon borders, height cycling (140, 200, 280 DP), and orphan recovery (F-012-P4, F-012-P6).
+- **Tactical Widget Deck:** Built `TacticalWidgetDeck` modal stack displaying docked widgets, accessible via `TopBar` pill (`[WIDGETS]`) and `SettingsSheet` (F-012-P4).
+- **Persistence & Serialization:** Built `WidgetRepository` and `DataStoreWidgetRepository` using URL-encoded deterministic `WidgetSerializer` (F-012-P5).
+- **13 New Unit Tests:** Added 6 tests in `WidgetSerializerTest` and 7 tests in `WidgetHostViewModelTest` (122 total project tests passing).
+
+**Validation:**
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL.
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (122 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### Visual Polish & Drawer Scroll Optimization — 2026-11-22
 
 **Changed & Enhanced:**

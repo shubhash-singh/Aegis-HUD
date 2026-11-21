@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.ragnar.aegis.data.diagnostics.AndroidDiagnosticsRepository
+import dev.ragnar.aegis.data.widget.DataStoreWidgetRepository
 import dev.ragnar.aegis.domain.context.ContextRuleEvaluator
 import dev.ragnar.aegis.domain.context.ContextSnapshot
 import dev.ragnar.aegis.domain.context.StandardContextRules
@@ -71,6 +72,11 @@ import dev.ragnar.aegis.ui.telemetry.TelemetryViewModel
 import dev.ragnar.aegis.ui.telemetry.TelemetryViewModelFactory
 import dev.ragnar.aegis.ui.theme.AegisColorScheme
 import dev.ragnar.aegis.ui.theme.AegisTheme
+import dev.ragnar.aegis.ui.widget.LocalWidgetHostController
+import dev.ragnar.aegis.ui.widget.TacticalWidgetDeck
+import dev.ragnar.aegis.ui.widget.WidgetHostViewModel
+import dev.ragnar.aegis.ui.widget.WidgetHostViewModelFactory
+import dev.ragnar.aegis.ui.widget.WidgetPickerSheet
 
 /**
  * AEGIS Full-Screen AI Command Interface Home Screen.
@@ -105,9 +111,28 @@ fun HomeScreen(
     var isGestureHintVisible by rememberSaveable { mutableStateOf(false) }
     var launchError by remember { mutableStateOf<String?>(null) }
 
+    val widgetController = LocalWidgetHostController.current
+    val widgetRepository = remember(context.applicationContext) {
+        DataStoreWidgetRepository(context.applicationContext)
+    }
+    val widgetHostViewModel: WidgetHostViewModel = viewModel(
+        factory = remember(widgetRepository) {
+            WidgetHostViewModelFactory(widgetRepository)
+        },
+    )
+    val widgetState by widgetHostViewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        widgetHostViewModel.loadAvailableProviders(context)
+    }
+
     // Launcher back press handling: closes overlays first, no-op on root home
     BackHandler {
-        if (isGestureHintVisible) {
+        if (widgetState.isPickerVisible) {
+            widgetHostViewModel.togglePicker(false)
+        } else if (widgetState.isDeckVisible) {
+            widgetHostViewModel.toggleDeck(false)
+        } else if (isGestureHintVisible) {
             isGestureHintVisible = false
         } else if (isConsoleVisible) {
             isConsoleVisible = false
@@ -155,7 +180,7 @@ fun HomeScreen(
     // Determine current AI operational status based on real state
     val aiStatus = when {
         appDrawerState.isLoading -> AiStatus.PROCESSING
-        isDrawerVisible || isSettingsVisible || isConsoleVisible -> AiStatus.ACTIVE
+        isDrawerVisible || isSettingsVisible || isConsoleVisible || widgetState.isDeckVisible || widgetState.isPickerVisible -> AiStatus.ACTIVE
         else -> AiStatus.IDLE
     }
 
@@ -242,11 +267,11 @@ fun HomeScreen(
                     detectVerticalDragGestures { _, dragAmount ->
                         when {
                             // Upward swipe opens the application drawer (threshold: -40f)
-                            dragAmount < -40f && preferences.swipeUpEnabled && !isDrawerVisible && !isSettingsVisible && !isConsoleVisible && !isGestureHintVisible -> {
+                            dragAmount < -40f && preferences.swipeUpEnabled && !isDrawerVisible && !isSettingsVisible && !isConsoleVisible && !isGestureHintVisible && !widgetState.isDeckVisible && !widgetState.isPickerVisible -> {
                                 isDrawerVisible = true
                             }
                             // Downward swipe opens the settings sheet (threshold: 40f)
-                            dragAmount > 40f && preferences.swipeDownEnabled && !isDrawerVisible && !isSettingsVisible && !isConsoleVisible && !isGestureHintVisible -> {
+                            dragAmount > 40f && preferences.swipeDownEnabled && !isDrawerVisible && !isSettingsVisible && !isConsoleVisible && !isGestureHintVisible && !widgetState.isDeckVisible && !widgetState.isPickerVisible -> {
                                 isSettingsVisible = true
                             }
                         }
@@ -255,7 +280,7 @@ fun HomeScreen(
                 .pointerInput(preferences.longPressEnabled) {
                     detectTapGestures(
                         onLongPress = {
-                            if (preferences.longPressEnabled && !isDrawerVisible && !isSettingsVisible && !isConsoleVisible && !isGestureHintVisible) {
+                            if (preferences.longPressEnabled && !isDrawerVisible && !isSettingsVisible && !isConsoleVisible && !isGestureHintVisible && !widgetState.isDeckVisible && !widgetState.isPickerVisible) {
                                 isGestureHintVisible = true
                             }
                         },
@@ -303,6 +328,8 @@ fun HomeScreen(
                         clockState = clockState,
                         showSeconds = preferences.showClockSeconds,
                         onSettingsClick = { isSettingsVisible = true },
+                        onWidgetDeckClick = { widgetHostViewModel.toggleDeck(true) },
+                        dockedWidgetCount = widgetState.hostedWidgets.size,
                     )
 
                     if (contextEvaluation.activeAlerts.isNotEmpty()) {
@@ -450,6 +477,14 @@ fun HomeScreen(
                 onToggleSwipeUp = settingsViewModel::setSwipeUpEnabled,
                 onToggleSwipeDown = settingsViewModel::setSwipeDownEnabled,
                 onToggleLongPress = settingsViewModel::setLongPressEnabled,
+                onOpenWidgetDeck = {
+                    isSettingsVisible = false
+                    widgetHostViewModel.toggleDeck(true)
+                },
+                onOpenWidgetPicker = {
+                    isSettingsVisible = false
+                    widgetHostViewModel.togglePicker(true)
+                },
                 onOpenDeveloperConsole = {
                     isSettingsVisible = false
                     isConsoleVisible = true
@@ -486,6 +521,54 @@ fun HomeScreen(
             GestureHintOverlay(
                 hints = availableHints,
                 onDismiss = { isGestureHintVisible = false },
+            )
+        }
+
+        // =====================================================================
+        // TACTICAL WIDGET DECK OVERLAY (F-012)
+        // =====================================================================
+        if (widgetState.isDeckVisible) {
+            TacticalWidgetDeck(
+                widgets = widgetState.hostedWidgets,
+                onAddWidgetClick = { widgetHostViewModel.togglePicker(true) },
+                onCycleHeight = widgetHostViewModel::cycleWidgetHeight,
+                onRemoveWidget = { widget ->
+                    widgetHostViewModel.onWidgetRemoved(widget, widgetController)
+                },
+                onDismiss = { widgetHostViewModel.toggleDeck(false) },
+            )
+        }
+
+        // =====================================================================
+        // SYSTEM WIDGET REGISTRY PICKER MODAL (F-012)
+        // =====================================================================
+        if (widgetState.isPickerVisible) {
+            WidgetPickerSheet(
+                providers = widgetState.filteredProviders,
+                searchQuery = widgetState.searchQuery,
+                onSearchQueryChange = widgetHostViewModel::onSearchQueryChanged,
+                onClearSearch = widgetHostViewModel::clearSearch,
+                onSelectProvider = { summary ->
+                    val controller = widgetController
+                    if (controller != null) {
+                        val providerInfo = controller.appWidgetManager.installedProviders.firstOrNull {
+                            it.provider.packageName == summary.providerPackage &&
+                                it.provider.className == summary.providerClass
+                        }
+                        if (providerInfo != null) {
+                            controller.requestAddWidget(
+                                provider = providerInfo,
+                                onSuccess = { hosted ->
+                                    widgetHostViewModel.onWidgetAdded(hosted)
+                                },
+                                onError = { error ->
+                                    launchError = error
+                                },
+                            )
+                        }
+                    }
+                },
+                onDismiss = { widgetHostViewModel.togglePicker(false) },
             )
         }
     }

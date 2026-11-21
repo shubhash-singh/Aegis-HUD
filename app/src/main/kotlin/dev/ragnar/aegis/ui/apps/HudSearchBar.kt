@@ -72,7 +72,7 @@ fun HudSearchBar(
     ) {
         // Monospaced search prefix indicator
         Text(
-            text = "⌕ ",
+            text = "\uD83D\uDD0E",
             style = typography.telemetry,
             color = colors.cyanDim,
         )

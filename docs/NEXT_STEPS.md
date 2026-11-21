@@ -1,50 +1,56 @@
 # NEXT_STEPS.md — AEGIS HUD Launcher
 
-**Last Updated:** 2026-11-22 (Phase 15 build verified)
-**Current Phase:** PHASE-15 — Reliability and Performance (F-016) — Implementation Complete, Build Verified (Device Validation Pending)
-**Next Phase:** PHASE-16 — Widget Hosting (F-012)
+**Last Updated:** 2026-11-22 (Phase 16 build verified)
+**Current Phase:** PHASE-16 — Widget Hosting (F-012) — Implementation Complete, Build Verified (Device Validation Pending)
+**Project Status:** 100% of Active Planned Phases Implemented (95/95 phases across P0, P1, P2)
 
 ---
 
 ## Completed This Session
 
-- Implemented **PHASE-15 (Reliability and Performance — F-016)**:
-  - Formulated and documented performance targets: cold start $\le 1$s, 60fps frame rate, idle heap $\le 45$MB, 0 leaks.
-  - Optimized 3D neural brain visualization render loop: static precomputation of coordinates/edges and `@Volatile` dimension-keyed memoization in `NeuralGeometry` eliminating frame-by-frame memory allocations.
-  - Hardened lifecycle teardown: wrapped all `unregisterReceiver` and `unregisterNetworkCallback` calls in `runCatching` across `AndroidAppRepository`, `AndroidNetworkRepository`, `AndroidBatteryRepository`, and `HomeScreen`.
-  - Added 5 new regression tests in `PerformanceReliabilityAuditTest` covering geometry memoization, high-throughput normalizer benchmarks, concurrent log buffer stress tests, and default preference footprint.
-  - Validated: `assembleDebug` (21s), `testDebugUnitTest` (20s, 108 passed), `lintDebug` (1m 13s, 0 errors).
+- Implemented **PHASE-16 (Widget Hosting — F-012)**:
+  - Conducted permission and feasibility investigation for `BIND_APPWIDGET`; documented DEC-018 architectural contract.
+  - Implemented `AegisAppWidgetHost` with launcher host ID `2048`, connecting lifecycle in `MainActivity` with exception-safe `runCatching` blocks.
+  - Built `WidgetHostController` interface and `LocalWidgetHostController` composition local.
+  - Handled widget binding and configuration activities (`ACTION_APPWIDGET_BIND`, `ACTION_APPWIDGET_CONFIGURE`) with cleanup on cancellation.
+  - Built `WidgetPickerSheet` modal listing installed widget providers queried via `AppWidgetManager.installedProviders`, filterable in real-time via `HudSearchBar`.
+  - Built `HudWidgetContainer` framing third-party `RemoteViews` in frosted glassmorphism cyber-cards with glowing neon borders, height cycling (140, 200, 280 DP), and orphan recovery.
+  - Built `TacticalWidgetDeck` modal stack displaying all docked widgets.
+  - Implemented `WidgetRepository` and `DataStoreWidgetRepository` with deterministic, zero-dependency `WidgetSerializer`.
+  - Added 13 new unit tests across `WidgetSerializerTest` and `WidgetHostViewModelTest` (122 total project tests passing).
+  - Validated: `assembleDebug`, `testDebugUnitTest` (122 passed), `lintDebug` (0 errors).
 
 ---
 
 ## Outstanding Blockers
 
 1. **B-002:** Connect a physical Android device or emulator and run the pending Phase 1 manifest
-   tests (`DT-MANIFEST-01` through `DT-MANIFEST-04`), plus manual validation of Phases 4 through 15. (Low severity; development can proceed).
+   tests (`DT-MANIFEST-01` through `DT-MANIFEST-04`), plus manual validation of all implemented phases (Phases 4 through 16). (Low severity; all builds and JVM tests verified).
 
 ---
 
 ## Exact Next Task
 
-Begin **PHASE-16 (Widget Hosting — F-012)**:
-1. Review `docs/FEATURE_PLAN.md` for F-012 scope:
-   - F-012-P1: Feasibility investigation & `BIND_APPWIDGET` permission analysis.
-   - F-012-P2: AppWidgetHost lifecycle integration.
-   - F-012-P3: Widget selection flow via system picker.
-   - F-012-P4: HUD-framed widget host container composable (`AndroidView`).
-   - F-012-P5: Widget configuration and persistence in DataStore.
-   - F-012-P6: Widget removal and error recovery.
-2. Create `docs/phases/PHASE-16-WIDGET-HOSTING.md`.
-3. Implement `AppWidgetHost` infrastructure with cyber-HUD container frames.
-4. Add unit tests and verify via `./gradlew`.
+**Target Hardware Device Testing & Verification**:
+1. Connect physical Android device (API 30+) or start Android Virtual Device emulator.
+2. Execute `./gradlew installDebug`.
+3. Set AEGIS as the default home launcher.
+4. Validate live on-device behavior:
+   - Full-screen 3D Neural Brain visualization and 60 FPS sweep.
+   - Real-time battery, CPU, RAM, and network bandwidth telemetry.
+   - Swipe-up application drawer, search filtering, and app launch.
+   - Swipe-down system configuration sheet, accent color changes, and gesture toggles.
+   - Long-press gesture hint overlay.
+   - Tactical Widget Deck: dock system widgets, cycle heights, remove widgets.
+   - Developer console diagnostics and log viewer.
 
 ---
 
 ## Files to Inspect Before Resuming
 
 - `docs/PROGRESS_TRACKER.md`
-- `docs/phases/PHASE-15-RELIABILITY-AND-PERFORMANCE.md`
-- `docs/FEATURE_PLAN.md` (F-012)
+- `docs/phases/PHASE-16-WIDGET-HOSTING.md`
+- `docs/DECISIONS.md` (DEC-018)
 
 ## Commands to Run When Resuming
 
@@ -52,5 +58,6 @@ Begin **PHASE-16 (Widget Hosting — F-012)**:
 git status
 git log --oneline -10
 ./gradlew --no-daemon testDebugUnitTest
-cat docs/NEXT_STEPS.md
+adb devices
+./gradlew installDebug
 ```

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Package visibility: allow discovery of launchable applications (API 30+) -->
     <queries>
@@ -11,6 +12,11 @@
 
     <!-- Network state observation for live HUD telemetry (F-008) -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- AppWidget hosting for tactical HUD widget deck (F-012, DEC-018) -->
+    <uses-permission
+        android:name="android.permission.BIND_APPWIDGET"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
