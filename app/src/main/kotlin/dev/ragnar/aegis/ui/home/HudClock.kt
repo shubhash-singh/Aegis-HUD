@@ -1,25 +1,21 @@
 package dev.ragnar.aegis.ui.home
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.ragnar.aegis.ui.theme.AegisTheme
 
 /**
  * HUD Clock display composable.
  *
- * Renders time as HH:MM:SS with seconds in dimmed cyan.
- * Design from UI_UX_SPECIFICATION.md Section 6 "Clock Display":
- * - Font: JetBrains Mono, `aegis.type.clock`
- * - Color: `aegis.cyan` (hours/minutes), `aegis.cyan.dim` (seconds)
- *
- * @param hours Formatted hours string (e.g. "14")
- * @param minutes Formatted minutes string (e.g. "07")
- * @param seconds Formatted seconds string (e.g. "32")
+ * Renders time as prominent bold HH:MM with attached :SS seconds.
  */
 @Composable
 fun HudClock(
@@ -38,18 +34,19 @@ fun HudClock(
         },
         verticalAlignment = Alignment.Bottom,
     ) {
-        // Hours and minutes in bright cyan
+        // Hours and minutes in large bold cyan
         Text(
             text = "$hours:$minutes",
-            style = typography.clock,
+            style = typography.clock.copy(fontSize = 44.sp, letterSpacing = 2.sp),
             color = colors.cyan,
         )
         if (showSeconds) {
-            // Seconds in dimmed cyan, smaller size
+            // Attached seconds
             Text(
                 text = ":$seconds",
-                style = typography.clockSmall,
+                style = typography.clockSmall.copy(fontSize = 22.sp, letterSpacing = 1.sp),
                 color = colors.cyanDim,
+                modifier = Modifier.padding(bottom = 4.dp),
             )
         }
     }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.PowerManager
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,15 +16,13 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,20 +31,28 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.ragnar.aegis.ui.apps.AppDrawer
 import dev.ragnar.aegis.ui.apps.AppDrawerViewModel
 import dev.ragnar.aegis.ui.apps.AppDrawerViewModelFactory
-import dev.ragnar.aegis.ui.components.HudPanel
-import dev.ragnar.aegis.ui.components.RadarDisplay
+import dev.ragnar.aegis.ui.components.HudCornerBrackets
 import dev.ragnar.aegis.ui.components.ScanLineOverlay
-import dev.ragnar.aegis.ui.components.StatusIndicator
-import dev.ragnar.aegis.ui.components.StatusLevel
-import dev.ragnar.aegis.ui.quickactions.QuickActionsPanel
+import dev.ragnar.aegis.ui.drawer.AppDrawerGestureIndicator
+import dev.ragnar.aegis.ui.home.panels.AiStatus
+import dev.ragnar.aegis.ui.home.panels.FloatingAiStatusPanel
+import dev.ragnar.aegis.ui.home.panels.FloatingCorePanel
+import dev.ragnar.aegis.ui.home.panels.FloatingDevicePanel
+import dev.ragnar.aegis.ui.home.panels.FloatingIntelligencePanel
+import dev.ragnar.aegis.ui.home.panels.FloatingPerformancePanel
+import dev.ragnar.aegis.ui.home.panels.FloatingSystemStatusPanel
+import dev.ragnar.aegis.ui.home.panels.FloatingTelemetryPanel
+import dev.ragnar.aegis.ui.home.visualization.AICoreVisualization
 import dev.ragnar.aegis.ui.settings.SettingsSheet
 import dev.ragnar.aegis.ui.settings.SettingsViewModel
 import dev.ragnar.aegis.ui.settings.SettingsViewModelFactory
@@ -55,21 +62,18 @@ import dev.ragnar.aegis.ui.theme.AegisColorScheme
 import dev.ragnar.aegis.ui.theme.AegisTheme
 
 /**
- * HUD Home Screen — full dashboard layout.
+ * AEGIS Full-Screen AI Command Interface Home Screen.
  *
- * Implements the screen structure from UI_UX_SPECIFICATION.md Section 5:
- * - TopBar zone: system label, live clock, date, status
- * - Center HUD zone: animated radar graphic, live telemetry panels (battery, network, uptime)
- * - Quick launch zone: app shortcut slots
- * - Bottom nav zone: search bar + drawer button
- * - Overlay: subtle CRT scan-line
- *
- * BackHandler prevents the launcher from finishing on back press (ARCHITECTURE.md Section 6).
- * System insets handled per UI_UX_SPECIFICATION.md Section 8.
- * Automatically throttles/pauses animations in battery-saver mode (F-007-P5).
- * Genuine telemetry only; no simulated sensor readings (DEC-009).
- *
- * @param clockViewModel ViewModel providing live clock state.
+ * Implements the reference design:
+ * - Dominant 3D holographic neural brain visualization extending across the entire screen
+ * - Downward vertical holographic projection cone and perspective emitter platform
+ * - Tactical HUD corner brackets framing the display
+ * - Header with live date, online indicator, and prominent centered digital clock
+ * - Top floating panels: AEGIS AI CORE and AI STATUS
+ * - Mid floating panels: CPU, RAM, TEMP, BATT with 8-segment progress bars
+ * - Lower floating panels: INTELLIGENCE and TELEMETRY
+ * - Bottom floating panel: SYSTEM STATUS (network bandwidth + storage)
+ * - Bottom gesture indicator: double chevron SWIPE UP TO OPEN APP DRAWER
  */
 @Composable
 fun HomeScreen(
@@ -86,7 +90,6 @@ fun HomeScreen(
 
     var isDrawerVisible by rememberSaveable { mutableStateOf(false) }
     var isSettingsVisible by rememberSaveable { mutableStateOf(false) }
-    var openWithSearchFocus by rememberSaveable { mutableStateOf(false) }
     var launchError by remember { mutableStateOf<String?>(null) }
 
     // Launcher back press handling: closes overlays first, no-op on root home
@@ -95,11 +98,10 @@ fun HomeScreen(
             isSettingsVisible = false
         } else if (isDrawerVisible) {
             isDrawerVisible = false
-            openWithSearchFocus = false
         }
     }
 
-    androidx.compose.runtime.LaunchedEffect(preferences.is24HourClock) {
+    LaunchedEffect(preferences.is24HourClock) {
         clockViewModel.set24Hour(preferences.is24HourClock)
     }
 
@@ -119,13 +121,16 @@ fun HomeScreen(
     )
     val telemetryState by telemetryViewModel.uiState.collectAsStateWithLifecycle()
 
-    AegisTheme(
-        colors = AegisColorScheme.default().withAccent(preferences.accentColor),
-    ) {
-        val colors = AegisTheme.colors
-        val typography = AegisTheme.typography
-        val spacing = AegisTheme.spacing
+    // Determine current AI operational status based on real state
+    val aiStatus = when {
+        appDrawerState.isLoading -> AiStatus.PROCESSING
+        isDrawerVisible || isSettingsVisible -> AiStatus.ACTIVE
+        else -> AiStatus.IDLE
+    }
 
+    val colors = AegisColorScheme.default().withAccent(preferences.accentColor)
+
+    AegisTheme(colors = colors) {
         // Observe battery-saver mode dynamically (F-007-P5)
         var isPowerSaveMode by remember {
             val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
@@ -146,146 +151,164 @@ fun HomeScreen(
             }
         }
 
-        Box(modifier = Modifier.fillMaxSize()) {
+        val isAnimationPaused = isPowerSaveMode || !preferences.animationSpeed.isEnabled
+        val animationSpeedMultiplier = if (preferences.animationSpeed.isEnabled) {
+            when (preferences.animationSpeed.durationMillis) {
+                2000 -> 2.0f
+                8000 -> 0.5f
+                else -> 1.0f
+            }
+        } else {
+            0f
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectVerticalDragGestures { _, dragAmount ->
+                        // Upward swipe opens the application drawer
+                        if (dragAmount < -25f && !isDrawerVisible && !isSettingsVisible) {
+                            isDrawerVisible = true
+                        }
+                    }
+                }
+                .semantics { contentDescription = "AEGIS AI Command Interface" },
+        ) {
+            // =================================================================
+            // LAYER 0: FULL-SCREEN HOLOGRAPHIC NEURAL AI CORE VISUALIZATION
+            // =================================================================
+            if (preferences.showRadar) {
+                AICoreVisualization(
+                    modifier = Modifier.fillMaxSize(),
+                    isPaused = isAnimationPaused,
+                    speedMultiplier = animationSpeedMultiplier,
+                    colors = colors,
+                )
+            }
+
+            // =================================================================
+            // LAYER 1: TACTICAL HUD CORNER BRACKETS
+            // =================================================================
+            HudCornerBrackets(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(8.dp),
+            )
+
+            // =================================================================
+            // LAYER 2: FLOATING HOLOGRAPHIC INFORMATION PANELS & CONTROLS
+            // =================================================================
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .windowInsetsPadding(WindowInsets.systemBars)
-                    .padding(horizontal = spacing.md)
-                    .semantics { contentDescription = "AEGIS Home Screen" },
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(horizontal = 14.dp, vertical = 6.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
-                Spacer(modifier = Modifier.height(spacing.sm))
+                // --- TOP SECTION: Header & Top Floating Panels ---
+                Column {
+                    TopBar(
+                        clockState = clockState,
+                        showSeconds = preferences.showClockSeconds,
+                        onSettingsClick = { isSettingsVisible = true },
+                    )
 
-                // === TOP BAR ZONE ===
-                TopBar(
-                    clockState = clockState,
-                    showSeconds = preferences.showClockSeconds,
-                    onSettingsClick = { isSettingsVisible = true },
-                )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(spacing.md))
-
-                // === CENTER HUD ZONE ===
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.Top,
-                ) {
-                    // Animated technical radar graphic (F-007)
-                    if (preferences.showRadar) {
-                        RadarDisplay(
-                            isPaused = isPowerSaveMode || !preferences.animationSpeed.isEnabled,
-                            rotationDurationMillis = if (preferences.animationSpeed.isEnabled) {
-                                preferences.animationSpeed.durationMillis
-                            } else {
-                                4000
-                            },
-                            modifier = Modifier.padding(bottom = spacing.sm),
-                        )
-                    }
-
-                    // Live system status panel (F-006 & F-008)
-                    if (preferences.showSystemStatus) {
-                        HudPanel(title = "System Status") {
-                            Column(modifier = Modifier.padding(top = spacing.xs)) {
-                                StatusRow(
-                                    label = "NETWORK",
-                                    status = telemetryState.networkStatusLevel,
-                                    value = telemetryState.networkLabel,
-                                )
-                                Spacer(modifier = Modifier.height(spacing.xs))
-                                StatusRow(
-                                    label = "BATTERY",
-                                    status = telemetryState.batteryStatusLevel,
-                                    value = telemetryState.batteryLabel,
-                                )
-                                Spacer(modifier = Modifier.height(spacing.xs))
-                                StatusRow(
-                                    label = "STORAGE",
-                                    status = StatusLevel.Ok,
-                                    value = "ONLINE",
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(spacing.sm))
-                    }
-
-                    // Live telemetry panel (F-006 & F-008)
-                    if (preferences.showTelemetry) {
-                        HudPanel(title = "Telemetry") {
-                            Column(modifier = Modifier.padding(top = spacing.xs)) {
-                                TelemetryRow(
-                                    label = "BATTERY TEMP",
-                                    value = telemetryState.batteryTemperatureLabel,
-                                )
-                                Spacer(modifier = Modifier.height(spacing.xs))
-                                TelemetryRow(
-                                    label = "UPTIME",
-                                    value = telemetryState.uptimeFormatted,
-                                )
-                                Spacer(modifier = Modifier.height(spacing.xs))
-                                TelemetryRow(
-                                    label = "VOLTAGE",
-                                    value = telemetryState.battery.voltageMv?.let { "${it}mV" } ?: "---",
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(spacing.sm))
-                    }
-
-                    // Quick Actions panel (F-009)
-                    if (preferences.showQuickActions) {
-                        QuickActionsPanel()
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top,
+                    ) {
+                        FloatingCorePanel()
+                        FloatingAiStatusPanel(status = aiStatus)
                     }
                 }
 
-                Spacer(modifier = Modifier.height(spacing.sm))
+                // --- MIDDLE SECTION: Performance (CPU/RAM) & Device Status (TEMP/BATT) ---
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    FloatingPerformancePanel(
+                        cpuPercent = telemetryState.systemPerformance.cpuUtilizationPercent,
+                        ramPercent = telemetryState.systemPerformance.ramPercent,
+                    )
 
-                // === QUICK LAUNCH ZONE ===
-                QuickLaunchRow(
-                    apps = appDrawerState.apps,
-                    onAppClick = { app ->
-                        launchError = appDrawerViewModel.launch(app)
-                    },
-                )
+                    FloatingDevicePanel(
+                        batteryTemperatureLabel = telemetryState.batteryTemperatureLabel,
+                        batteryPercentage = telemetryState.battery.percentage,
+                        chargingStatus = telemetryState.battery.chargingStatus,
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(spacing.sm))
+                // --- LOWER SECTION: Intelligence & Telemetry Panels ---
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    FloatingIntelligencePanel(
+                        contextAvailable = telemetryState.intelligence.contextAvailable,
+                        voiceAvailable = telemetryState.intelligence.voiceAvailable,
+                        visionAvailable = telemetryState.intelligence.visionAvailable,
+                        automationAvailable = telemetryState.intelligence.automationAvailable,
+                    )
 
-                // === BOTTOM NAV ZONE ===
-                BottomNavBar(
-                    onDrawerClick = {
-                        launchError = null
-                        openWithSearchFocus = false
-                        isDrawerVisible = true
-                    },
-                    onSearchClick = {
-                        launchError = null
-                        openWithSearchFocus = true
-                        isDrawerVisible = true
-                    },
-                )
+                    if (preferences.showTelemetry) {
+                        FloatingTelemetryPanel(
+                            batteryTemperatureLabel = telemetryState.batteryTemperatureLabel,
+                            uptimeFormatted = telemetryState.uptimeFormatted,
+                            batteryVoltageMv = telemetryState.battery.voltageMv,
+                        )
+                    }
+                }
 
-                Spacer(modifier = Modifier.height(spacing.sm))
+                // --- BOTTOM SECTION: System Status Panel & Swipe-Up Indicator ---
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    if (preferences.showSystemStatus) {
+                        FloatingSystemStatusPanel(
+                            networkLabel = telemetryState.networkLabel,
+                            networkStatusLevel = telemetryState.networkStatusLevel,
+                            storageStatusLabel = telemetryState.storageLabel,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+
+                    // Gesture indicator at bottom
+                    AppDrawerGestureIndicator(
+                        onClick = { isDrawerVisible = true },
+                    )
+                }
             }
 
-            // CRT scan-line overlay (F-007-P3)
+            // CRT Scanline Overlay
             ScanLineOverlay(isPaused = isPowerSaveMode)
         }
 
+        // =====================================================================
+        // APPLICATION DRAWER (Modal Bottom Sheet)
+        // =====================================================================
         if (isDrawerVisible) {
             AppDrawer(
                 state = appDrawerState.copy(errorMessage = launchError ?: appDrawerState.errorMessage),
                 onDismiss = {
                     isDrawerVisible = false
-                    openWithSearchFocus = false
                     appDrawerViewModel.clearSearch()
                 },
                 onAppClick = { app ->
                     launchError = appDrawerViewModel.launch(app)
                     if (launchError == null) {
                         isDrawerVisible = false
-                        openWithSearchFocus = false
                         appDrawerViewModel.clearSearch()
                     }
                 },
@@ -297,14 +320,16 @@ fun HomeScreen(
                         launchError = error
                     } else if (appDrawerState.filteredApps.isNotEmpty()) {
                         isDrawerVisible = false
-                        openWithSearchFocus = false
                         appDrawerViewModel.clearSearch()
                     }
                 },
-                initialSearchFocus = openWithSearchFocus,
+                initialSearchFocus = false,
             )
         }
 
+        // =====================================================================
+        // CUSTOMIZATION SETTINGS MODAL
+        // =====================================================================
         if (isSettingsVisible) {
             SettingsSheet(
                 preferences = preferences,
@@ -320,76 +345,5 @@ fun HomeScreen(
                 onDismiss = { isSettingsVisible = false },
             )
         }
-    }
-}
-
-/**
- * A row displaying a status label with its indicator dot.
- */
-@Composable
-internal fun StatusRow(
-    label: String,
-    status: StatusLevel,
-    value: String? = null,
-    modifier: Modifier = Modifier,
-) {
-    val colors = AegisTheme.colors
-    val typography = AegisTheme.typography
-    val spacing = AegisTheme.spacing
-
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        StatusIndicator(status = status)
-        Spacer(modifier = Modifier.width(spacing.sm))
-        Text(
-            text = label,
-            style = typography.telemetryLabel,
-            color = colors.textSecondary,
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = value ?: status.label.uppercase(),
-            style = typography.telemetry,
-            color = when (status) {
-                StatusLevel.Ok -> colors.statusOk
-                StatusLevel.Warning -> colors.statusWarning
-                StatusLevel.Critical -> colors.statusCritical
-                StatusLevel.Offline -> colors.statusOffline
-                StatusLevel.Unknown -> colors.statusUnknown
-            },
-        )
-    }
-}
-
-/**
- * A row displaying a telemetry label with its value.
- * Values show "---" as placeholder when unavailable (no fake data per DEC-009).
- */
-@Composable
-internal fun TelemetryRow(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier,
-) {
-    val colors = AegisTheme.colors
-    val typography = AegisTheme.typography
-
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = label,
-            style = typography.telemetryLabel,
-            color = colors.textSecondary,
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = value,
-            style = typography.telemetry,
-            color = colors.textPrimary,
-        )
     }
 }

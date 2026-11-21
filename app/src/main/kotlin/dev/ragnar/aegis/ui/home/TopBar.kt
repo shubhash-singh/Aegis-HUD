@@ -2,6 +2,7 @@ package dev.ragnar.aegis.ui.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,25 +13,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.ragnar.aegis.ui.components.StatusIndicator
 import dev.ragnar.aegis.ui.components.StatusLevel
 import dev.ragnar.aegis.ui.theme.AegisTheme
 
 /**
- * Top bar zone of the HUD dashboard.
+ * Top bar header zone matching the reference design:
  *
- * Layout from UI_UX_SPECIFICATION.md Section 5:
- * ```
- * [SYSTEM LABEL]    [CLOCK]
- * RAGNAR // AEGIS   HH:MM:SS
- * [DATE]            [STATUS]
- * ```
- *
- * @param clockState Current clock state with time and date.
- * @param showSeconds Whether to display seconds in the clock.
- * @param onSettingsClick Optional callback when clicking the system title to open HUD settings.
+ * Line 1: RAGNAR // AEGIS (left)          ● ONLINE (right)
+ * Line 2: SATURDAY, 21 NOV 2026 (left)
+ * Line 3:               22:20:18 (centered prominent digital clock)
  */
 @Composable
 fun TopBar(
@@ -41,20 +38,19 @@ fun TopBar(
 ) {
     val colors = AegisTheme.colors
     val typography = AegisTheme.typography
-    val spacing = AegisTheme.spacing
+    val green = Color(0xFF00FF88)
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .semantics { contentDescription = "Top bar" },
+            .semantics { contentDescription = "HUD Top Bar" },
     ) {
-        // Row 1: System label + Clock
+        // Line 1: RAGNAR // AEGIS on left, ● ONLINE on right
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            // System label with optional customization launcher
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = if (onSettingsClick != null) {
@@ -65,11 +61,11 @@ fun TopBar(
             ) {
                 Text(
                     text = "RAGNAR // AEGIS",
-                    style = typography.telemetry,
+                    style = typography.telemetry.copy(fontSize = 13.sp, letterSpacing = 1.sp),
                     color = colors.cyan,
                 )
                 if (onSettingsClick != null) {
-                    Spacer(modifier = Modifier.width(spacing.xs))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "⚙",
                         style = typography.telemetryLabel,
@@ -77,39 +73,43 @@ fun TopBar(
                     )
                 }
             }
-            // Live clock
+
+            // Right: ● ONLINE
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+            ) {
+                StatusIndicator(status = StatusLevel.Ok, animate = false)
+                Text(
+                    text = "ONLINE",
+                    style = typography.telemetryLabel.copy(fontSize = 10.sp, letterSpacing = 1.sp),
+                    color = green,
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        // Line 2: Date (e.g. SATURDAY, 21 NOV 2026)
+        Text(
+            text = "${clockState.dayOfWeek.uppercase()}, ${clockState.dateFormatted.uppercase()}",
+            style = typography.telemetryLabel.copy(fontSize = 10.sp, letterSpacing = 0.5.sp),
+            color = colors.textSecondary,
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // Line 3: Prominent Centered Clock (e.g. 22:20:18)
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
             HudClock(
                 hours = clockState.hours,
                 minutes = clockState.minutes,
                 seconds = clockState.seconds,
                 showSeconds = showSeconds,
             )
-        }
-
-        Spacer(modifier = Modifier.height(spacing.xs))
-
-        // Row 2: Date + Status indicator
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = "${clockState.dayOfWeek}  ${clockState.dateFormatted}",
-                style = typography.telemetryLabel,
-                color = colors.textSecondary,
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(spacing.xs),
-            ) {
-                StatusIndicator(status = StatusLevel.Ok, animate = false)
-                Text(
-                    text = "ONLINE",
-                    style = typography.telemetryLabel,
-                    color = colors.statusOk,
-                )
-            }
         }
     }
 }
