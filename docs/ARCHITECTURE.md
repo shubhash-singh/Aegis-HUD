@@ -1,7 +1,7 @@
 # ARCHITECTURE.md — AEGIS HUD Launcher
 
-**Version:** 0.1.1-planning
-**Last Updated:** 2026-10-25 (Correction Task)
+**Version:** 0.2.0-redesign
+**Last Updated:** 2026-11-21 (Phase 10 — Full-Screen AI Command Interface Redesign)
 
 ---
 
@@ -75,15 +75,30 @@ dev.ragnar.aegis/
 │
 ├── launcher/
 │   ├── home/
-│   │   ├── HomeScreen.kt                  # Main HUD home screen composable
-│   │   ├── HomeViewModel.kt               # Home screen ViewModel
+│   │   ├── HomeScreen.kt                  # Full-screen AI command interface root composable
+│   │   ├── HomeViewModel.kt               # Home screen ViewModel (AI status + gesture state)
 │   │   ├── ClockDisplay.kt                # Live clock composable
-│   │   └── QuickLaunchRow.kt              # Quick-launch app slots
+│   │   │
+│   │   ├── visualization/
+│   │   │   ├── AICoreVisualization.kt     # Full-screen holographic neural brain (Canvas)
+│   │   │   ├── NeuralGeometry.kt          # Static geometry cache: node positions, ring radii
+│   │   │   └── NeuralAnimationState.kt    # Encapsulated animation state (InfiniteTransition)
+│   │   │
+│   │   └── panels/
+│   │       ├── FloatingCorePanel.kt        # Top-left: AEGIS AT CORE + version
+│   │       ├── FloatingAiStatusPanel.kt    # Top-right: AI STATUS (IDLE/PROCESSING/ACTIVE)
+│   │       ├── FloatingPerformancePanel.kt # Left: CPU + RAM utilization bars
+│   │       ├── FloatingDevicePanel.kt      # Right: Temperature + Battery
+│   │       ├── FloatingIntelligencePanel.kt# Lower-left: CONTEXT/VOICE/VISION/AUTOMATION
+│   │       ├── FloatingTelemetryPanel.kt   # Lower-right: Batt temp, uptime, voltage
+│   │       └── FloatingSystemStatusPanel.kt# Bottom: Network + storage
+│   │
 │   ├── drawer/
-│   │   ├── AppDrawerScreen.kt             # Full app drawer composable
-│   │   └── AppDrawerViewModel.kt          # Drawer ViewModel
+│   │   ├── AppDrawerScreen.kt             # Full app drawer composable (swipe-up)
+│   │   ├── AppDrawerViewModel.kt          # Drawer ViewModel
+│   │   └── AppDrawerGestureIndicator.kt   # Bottom chevron + "SWIPE UP" indicator
 │   ├── search/
-│   │   ├── SearchBar.kt                   # Search input composable
+│   │   ├── SearchBar.kt                   # Search input composable (drawer-only)
 │   │   └── SearchViewModel.kt             # Search ViewModel (or merged into drawer)
 │   └── shortcuts/
 │       └── QuickActions.kt                # Quick-action buttons composable
@@ -96,7 +111,8 @@ dev.ragnar.aegis/
 │   │   ├── NetworkRepository.kt           # ConnectivityManager observer
 │   │   └── NetworkDisplay.kt              # Network HUD panel composable
 │   └── system/
-│       └── SystemInfoRepository.kt        # Future: additional system info
+│       ├── SystemInfoRepository.kt        # CPU + RAM + uptime + storage telemetry
+│       └── SystemTelemetryState.kt        # Data models for system stats
 │
 ├── settings/
 │   ├── SettingsScreen.kt                  # Customization screen composable
@@ -108,6 +124,9 @@ dev.ragnar.aegis/
 └── diagnostics/
     └── DevConsoleScreen.kt                # Phase 12 — developer console
 ```
+
+> [!NOTE]
+> `visualization/` and `panels/` are new sub-packages introduced in Phase 10 (Full-Screen AI Command Interface). The old `RadarDisplay.kt` composable is superseded by `AICoreVisualization.kt`.
 
 ---
 

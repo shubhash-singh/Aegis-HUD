@@ -1,7 +1,7 @@
 # FEATURE_PLAN.md — AEGIS HUD Launcher
 
-**Version:** 0.1.1-planning
-**Last Updated:** 2026-10-25 (Correction Task)
+**Version:** 0.2.0-redesign
+**Last Updated:** 2026-11-21 (Phase 10 — Full-Screen AI Command Interface Redesign)
 
 > **Source of truth:** This file is the authoritative feature inventory for AEGIS HUD Launcher.
 > Feature scope additions or removals must be made here first, then reflected in PROGRESS_TRACKER.md.
@@ -83,35 +83,48 @@ Define the complete visual design system: color palette, typography, spacing, HU
 
 ---
 
-#### F-003: HUD Home Screen
+#### F-003: HUD Home Screen — Full-Screen AI Command Interface
 
 **Priority:** P0
 **Dependencies:** F-002
-**Implementation Phase:** Phase 2 / 3
-**Status:** Not Started
+**Implementation Phase:** Phase 2 / 3 (original) → **Major redesign in Phase 10**
+**Status:** Implementation Complete (Phases 1–6) — **Phase 10 redesign supersedes layout**
 
 **Description:**
-Create the main dashboard. Display a live digital clock, date, system status, quick-launch slots, and a path to the application drawer.
+The main home screen. Full-screen AI command interface with a holographic neural brain visualization as the dominant element. Live clock, date, branding, and system status float as overlays. All telemetry displayed via floating transparent HUD panels. App drawer accessed via swipe-up gesture.
+
+> [!IMPORTANT]
+> The original stacked-card layout (clock → radar → telemetry cards → dock row) is superseded by the Phase 10 full-screen redesign. See `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md` and `docs/UI_UX_SPECIFICATION.md`.
 
 **Phases:**
 
 | Phase | ID | Title | Status |
 |---|---|---|---|
-| 1 | F-003-P1 | Static dashboard layout | Not Started |
-| 2 | F-003-P2 | Live digital clock composable | Not Started |
-| 3 | F-003-P3 | Date and formatted system label | Not Started |
-| 4 | F-003-P4 | Quick-launch application slots (static, then dynamic) | Not Started |
-| 5 | F-003-P5 | Drawer access button/gesture area | Not Started |
-| 6 | F-003-P6 | Configurable panel visibility | Not Started |
+| 1 | F-003-P1 | Static dashboard layout | Implemented — Build Verified |
+| 2 | F-003-P2 | Live digital clock composable | Implemented — Build Verified |
+| 3 | F-003-P3 | Date and formatted system label | Implemented — Build Verified |
+| 4 | F-003-P4 | Quick-launch application slots (moved to drawer in Phase 10) | Implemented — Superseded |
+| 5 | F-003-P5 | Drawer access button/gesture area → swipe-up gesture in Phase 10 | Implemented — Redesigned |
+| 6 | F-003-P6 | Configurable panel visibility | Implemented — Build Verified |
+
+**Phase 10 additions (new sub-phases):**
+
+| Phase | ID | Title | Status |
+|---|---|---|---|
+| 7 | F-003-P7 | Full-screen `Box` layout with neural visualization + floating panels | Not Started |
+| 8 | F-003-P8 | Responsive panel positioning (`BoxWithConstraints`) | Not Started |
+| 9 | F-003-P9 | Remove dock row, search bar, APPS button from home screen | Not Started |
 
 **Acceptance Criteria:**
-- Clock updates every second without recomposing unnecessary UI.
-- Date displays correctly in target locale.
-- Quick-launch slots show real apps or graceful empty states.
-- Drawer button is reachable and functional.
+- Clock updates every second without recomposing the neural visualization.
+- Full-screen neural visualization fills the screen with no card container.
+- All 7 floating panels show live data without overlapping.
+- No stacked card layout below the neural visualization.
+- Swipe-up opens the drawer; swipe-down or back dismisses it.
+- Responsive on 360dp–480dp screen widths.
 
 **Testing Requirements:**
-- Unit: Clock format function; clock updates after 1 second (ViewModel with test dispatcher); date label string; home screen renders without crash.
+- Unit: Clock format; date label; home screen renders without crash; floating panel data formatting.
 
 ---
 
@@ -221,8 +234,11 @@ Display live battery level, charge state, and temperature. No polling; use stick
 
 **Priority:** P1
 **Dependencies:** F-002
-**Implementation Phase:** Phase 6
-**Status:** Implementation Complete — Build Verified (Device Validation Pending)
+**Implementation Phase:** Phase 6 (original) → **superseded by `AICoreVisualization` in Phase 10**
+**Status:** Implementation Complete — Build Verified (Device Validation Pending) — **Superseded by Phase 10**
+
+> [!NOTE]
+> `RadarDisplay` composable implemented in Phase 6 is superseded by the full-screen `AICoreVisualization` composable in Phase 10. `RadarMath.kt` geometry utilities remain valid and may be referenced. `RadarDisplay.kt` is archived (not deleted).
 
 **Phases:**
 
@@ -234,13 +250,25 @@ Display live battery level, charge state, and temperature. No polling; use stick
 | 4 | F-007-P4 | Configurable animation speed | Implemented — Build Verified |
 | 5 | F-007-P5 | Pause/reduce on low-power or battery-saver mode | Implemented — Build Verified |
 
+**Phase 10 additions (AICoreVisualization — supersedes radar):**
+
+| Phase | ID | Title | Status |
+|---|---|---|---|
+| 6 | F-007-P6 | `NeuralGeometry` static cache (node positions, ring radii, edge list) | Not Started |
+| 7 | F-007-P7 | `NeuralAnimationState` isolated InfiniteTransition container | Not Started |
+| 8 | F-007-P8 | `AICoreVisualization` Canvas: brain, nodes, connections, particles, rings, beam, platform, waveforms | Not Started |
+| 9 | F-007-P9 | Battery-saver pause + animation speed multiplier | Not Started |
+
 **Acceptance Criteria:**
-- Radar renders at consistent frame rate without jank.
-- Animation can be slowed or paused.
-- No perceptible battery drain from animation alone in testing.
+- Neural visualization fills full screen; no card container.
+- Animation renders at consistent frame rate without jank.
+- Animation speed configurable; pauses in battery-saver mode.
+- Static geometry cached; no per-frame object allocation.
+- `AICoreVisualization` does not recompose when floating panel data changes.
 
 **Testing Requirements:**
-- Compose: Radar composable renders without crash; animation does not throw exceptions.
+- Unit: `NeuralGeometry` nodes within canvas bounds; edge indices valid.
+- Compose: `AICoreVisualization` renders without crash.
 - Device (Phase 14): Animation frame rate observed on physical device.
 
 ---
@@ -636,3 +664,42 @@ Prepare the project for potential public open-source release. Includes licensing
 **Risks:**
 - GPL-licensed dependencies would impose restrictions on distribution.
 - Release signing configuration requires secure key management.
+
+---
+
+### P0 — Added in Phase 10 Redesign
+
+---
+
+#### F-020: Swipe-Up App Drawer Gesture
+
+**Priority:** P0
+**Dependencies:** F-004, F-005
+**Implementation Phase:** Phase 10
+**Status:** Not Started
+
+**Description:**
+Replace the bottom launcher dock, search bar, and APPS button with a swipe-up gesture interaction to open the app drawer. Display an `AppDrawerGestureIndicator` (breathing chevrons) at the bottom of the home screen.
+
+**Phases:**
+
+| Phase | ID | Title | Status |
+|---|---|---|---|
+| 1 | F-020-P1 | `AppDrawerGestureIndicator` composable (chevrons + breathing animation) | Not Started |
+| 2 | F-020-P2 | Swipe-up gesture detection (`detectVerticalDragGestures` with threshold) | Not Started |
+| 3 | F-020-P3 | Drawer open animation (`AnimatedVisibility` slide-up + fade) | Not Started |
+| 4 | F-020-P4 | Swipe-down / back dismiss | Not Started |
+| 5 | F-020-P5 | System navigation inset exclusion (avoid gesture conflict) | Not Started |
+
+**Acceptance Criteria:**
+- Upward drag of ≥ 48dp on the home screen opens the app drawer.
+- Drawer animates from bottom of screen upward.
+- Swipe-down or back gesture closes the drawer.
+- Existing app discovery, search, and launch functionality works from inside the drawer.
+- No conflict with Android system navigation gesture zone.
+- `AppDrawerGestureIndicator` shows breathing animation while home screen is visible.
+
+**Testing Requirements:**
+- Unit: Gesture state machine — upward drag > threshold → open; downward drag → close.
+- Compose: `AppDrawerGestureIndicator` renders without crash.
+- Device: Drawer opens/closes correctly; no system navigation conflict.

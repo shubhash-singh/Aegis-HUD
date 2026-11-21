@@ -4,6 +4,24 @@
 
 ## [Unreleased] — Development
 
+### Phase 10 — Full-Screen AI Command Interface — Planning — 2026-11-21
+
+**Planning:**
+- Received and incorporated the **Full-Screen AI Command Interface** redesign brief.
+- Defined `AICoreVisualization` full-screen holographic neural brain composable (Canvas-based).
+- Defined 7 floating semi-transparent HUD panels replacing all stacked card layouts.
+- Defined swipe-up app drawer gesture replacing the bottom launcher dock.
+- Defined `AppDrawerGestureIndicator` with breathing chevron animation.
+- Updated `docs/UI_UX_SPECIFICATION.md` with new screen layout, component specs, animation table.
+- Updated `docs/ARCHITECTURE.md` with new `visualization/` and `panels/` sub-packages.
+- Updated `docs/FEATURE_PLAN.md` with redesigned F-003, F-007, and new F-020.
+- Updated `docs/REQUIREMENTS.md` with FR-007, FR-008, NFR-010.
+- Recorded DEC-014, DEC-015, DEC-016 in `docs/DECISIONS.md`.
+- Created `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md`.
+- Updated `docs/NEXT_STEPS.md` with detailed 30-step implementation checklist.
+
+**Status:** Planning complete; implementation not yet started.
+
 ### Phase 9 — Customization — 2026-11-21
 
 **Added:**

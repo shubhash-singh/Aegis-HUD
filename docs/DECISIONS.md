@@ -233,3 +233,68 @@ The home screen should not appear as a card in the Android Overview (Recents) sc
 **Reasoning:** Standard prebuilt Linux binaries from Google (including AAPT2) request the standard dynamic linker `/lib64/ld-linux-x86-64.so.2`, which does not exist in standard locations on NixOS. Running `patchelf` with the path to the system glibc loader allows AGP tasks (`:app:processDebugResources`, `assembleDebug`, `lintDebug`) to execute natively without requiring full FHS wrapper environments or modifying build configuration files.
 
 **Consequences:** Resolves B-003 and RISK-014. If Gradle caches are cleared or a newer AGP/AAPT2 version is fetched, the patchelf command must be re-run on the newly unpacked AAPT2 binary.
+
+---
+
+### DEC-014: Full-Screen Neural AI Core Replaces Radar Composable
+
+**Date:** 2026-11-21
+**Phase:** PHASE-10
+**Status:** Accepted
+
+**Decision:** Replace the existing `RadarDisplay` composable with a new full-screen `AICoreVisualization` composable rendered via Compose `Canvas`. The visualization fills the entire screen behind all floating information panels.
+
+**Alternatives Considered:**
+- Enhance the existing radar composable: Limited visual impact; still confined to a card container.
+- Use an external GL/Vulkan surface: Higher complexity, harder Compose integration.
+- Animated Lottie file: External dependency; insufficient control over data-driven visual state.
+
+**Reasoning:** The design brief specifies a "living AI intelligence core" as the dominant visual element that occupies almost the entire home screen. The existing radar widget inside a card does not achieve this. A full-screen Canvas composable gives full artistic and performance control.
+
+**Consequences:**
+- `RadarDisplay.kt` is archived (not deleted) — superseded by `AICoreVisualization.kt`.
+- Static geometry must be cached to avoid per-frame allocation.
+- Animation state must be isolated in `NeuralAnimationState` to prevent floating panel data updates from causing `AICoreVisualization` recomposition.
+- `RadarMath.kt` utility class remains valid and may be referenced for geometric calculations.
+
+---
+
+### DEC-015: Floating Transparent Panels Replace Stacked Cards
+
+**Date:** 2026-11-21
+**Phase:** PHASE-10
+**Status:** Accepted
+
+**Decision:** Replace all stacked Telemetry, System Status, and Quick Actions card rows with seven independent floating semi-transparent HUD panels (`FloatingCorePanel`, `FloatingAiStatusPanel`, `FloatingPerformancePanel`, `FloatingDevicePanel`, `FloatingIntelligencePanel`, `FloatingTelemetryPanel`, `FloatingSystemStatusPanel`) positioned using fractional responsive coordinates over the neural visualization.
+
+**Alternatives Considered:**
+- Keep stacked cards below the visualization: Contradicts the full-screen design intent.
+- Overlay panels using fixed `dp` coordinates: Not responsive; breaks on different screen sizes.
+
+**Reasoning:** Floating panels over the full-screen visualization match the holographic HUD aesthetic and ensure the neural brain remains the dominant visual element. Using `BoxWithConstraints` fractional positioning ensures responsiveness across screen sizes.
+
+**Consequences:**
+- Each panel composable must be isolated (stable parameters) to avoid causing `AICoreVisualization` recomposition.
+- No `Material Card` or `Surface` elevation. Panels use direct `Canvas` border drawing via `HudBorder`.
+- Background blur (`BlurMaskFilter` or `Modifier.blur()`) is optional and must respect user "reduce effects" setting.
+
+---
+
+### DEC-016: Swipe-Up Gesture Replaces Launcher Dock
+
+**Date:** 2026-11-21
+**Phase:** PHASE-10
+**Status:** Accepted
+
+**Decision:** Remove the persistent bottom launcher dock row (5 app shortcuts), home-screen search bar, and APPS button. Replace with an `AppDrawerGestureIndicator` (breathing chevrons + "SWIPE UP" text) and a swipe-up gesture using `detectVerticalDragGestures` to open the app drawer.
+
+**Alternatives Considered:**
+- Keep the dock row for fast access: Contradicts full-screen design intent; clutters the bottom.
+- Floating action button to open drawer: Less intuitive than gesture; adds UI clutter.
+
+**Reasoning:** A swipe-up gesture is a modern, well-established launcher interaction (as used by Pixel Launcher, Samsung One UI, etc.). It is consistent with Android platform conventions and clears the bottom of the home screen for the neural visualization. The breathing chevron indicator provides discoverability without permanent clutter.
+
+**Consequences:**
+- Gesture detection zone must exclude the system navigation bar inset (`WindowInsets.navigationBars`).
+- Quick-launch app shortcuts and search are still accessible inside the drawer.
+- Existing `AppDrawerScreen`, search, and app-discovery code remain unchanged.

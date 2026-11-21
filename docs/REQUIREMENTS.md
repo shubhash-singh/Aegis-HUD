@@ -1,7 +1,7 @@
 # REQUIREMENTS.md — AEGIS HUD Launcher
 
-**Version:** 0.1.0-planning
-**Last Updated:** 2026-10-25
+**Version:** 0.2.0-redesign
+**Last Updated:** 2026-11-21 (Phase 10 — Full-Screen AI Command Interface Redesign)
 
 ---
 
@@ -12,12 +12,37 @@
 - The application must appear in the "Select Home App" dialog.
 - The application must start when the home button is pressed after selection as the default.
 
-### FR-002: Home Screen Display
+### FR-002: Home Screen Display — Full-Screen AI Command Interface
+
+> [!IMPORTANT]
+> Updated in Phase 10 redesign. The home screen is now a full-screen AI command interface, not a stacked card dashboard.
+
 - The home screen must display a live digital clock updating every second.
 - The home screen must display the current date.
 - The home screen must display a system label (AEGIS / RAGNAR).
-- The home screen must display quick-launch application slots.
-- The home screen must provide access to the application drawer.
+- The home screen must NOT display a persistent app shortcut row or search bar.
+- The home screen must NOT display a persistent APPS button or launcher dock.
+- The home screen must display an upward-swipe gesture indicator (`AppDrawerGestureIndicator`) at the bottom.
+- The home screen must display the neural AI core visualization as the dominant full-screen element.
+- All system information (CPU, RAM, battery, temperature, network, telemetry) must be displayed as floating transparent HUD panels over the visualization, not in stacked cards below it.
+
+### FR-007: Full-Screen Neural Visualization
+
+- The `AICoreVisualization` composable must fill the available screen area behind all floating panels.
+- The visualization must include: central neural brain, interconnected nodes, connection lines, data pulses, particles, concentric scanning rings, rotating circular indicators, vertical projection beam, circular energy platform, horizontal waveforms.
+- Static geometry (node positions, ring radii, edge list) must be computed once from screen dimensions and cached.
+- Animation state must be isolated so floating panel data updates do not cause the visualization to recompose.
+- Animations must pause when `PowerManager.isPowerSaveMode` is `true`.
+- Animation speed must be configurable by the user (from existing Phase 9 settings).
+
+### FR-008: Swipe-Up App Drawer Gesture
+
+- An upward drag of at least 48dp on the home screen must open the app drawer.
+- The drawer must animate from the bottom upward.
+- A downward drag or back gesture must close the drawer.
+- The gesture detection zone must exclude the system navigation bar inset.
+- All existing app discovery, search, and launch capabilities must remain accessible from within the drawer.
+- The `AppDrawerGestureIndicator` must display breathing chevrons and "SWIPE UP / TO OPEN APP DRAWER" text at the bottom of the home screen at all times when the drawer is closed.
 
 ### FR-003: Battery Telemetry
 - The launcher must display the current battery percentage.
@@ -101,7 +126,15 @@
 ### NFR-009: Testability
 - ViewModel logic must be testable without an Android device.
 - Repository layer must expose `Flow` interfaces testable with fake implementations.
-- Pure computation (sorting, filtering) must be testable with JVM unit tests.
+- Pure computation (sorting, filtering, geometry) must be testable with JVM unit tests.
+
+### NFR-010: Canvas Performance (Phase 10 — Neural Visualization)
+- Static Canvas geometry (node positions, ring radii, connection edges) must be computed once from screen dimensions using `remember` and not recalculated per draw frame.
+- `Paint`, `Path`, and other draw objects must be created outside draw lambdas and cached.
+- `BlurMaskFilter` and `Modifier.blur()` effects must be optional — controlled by a user setting — and not applied every frame unconditionally.
+- The `AICoreVisualization` composable must be isolated with stable parameters to prevent recomposition when floating panel state updates.
+- Animation state must live exclusively in `InfiniteTransition` / `Animatable` constructs. No animation value computation inside `Canvas` draw lambdas.
+- Object allocation inside `Canvas` draw calls must be zero for steady-state rendering (all objects pre-allocated).
 
 ---
 

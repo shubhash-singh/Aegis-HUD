@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.10.0
-**Last Updated:** 2026-11-21 (Phase 9 build verified; device validation pending)
-**Current Stage:** Phase 9 — Customization
-**Overall Status:** Phase 9 implementation complete & build verified; device validation pending (B-002)
+**Version:** 0.11.0
+**Last Updated:** 2026-11-21 (Phase 10 planning — Full-Screen AI Command Interface design finalized)
+**Current Stage:** Phase 10 — Full-Screen AI Command Interface
+**Overall Status:** Phase 9 implementation complete & build verified; Phase 10 planning complete, implementation not started; device validation pending (B-002)
 
 ---
 
@@ -13,17 +13,17 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 9 — Customization |
-| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Stage | Phase 10 — Full-Screen AI Command Interface |
+| Status | Phase 10 — Planning Complete; Implementation Not Started |
 | Last Updated | 2026-11-21 |
 | Last Completed Phase | PHASE-09 (Customization — build verified) |
-| Current Phase | PHASE-09 (build verified; device validation pending) |
-| Next Step | Proceed to PHASE-10 (Application Organization F-011); run device validation when connected |
+| Current Phase | PHASE-10 (Full-Screen AI Command Interface — Planning Complete) |
+| Next Step | Begin PHASE-10 implementation; see `docs/NEXT_STEPS.md` for 30-step checklist |
 | Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (26s, 2026-11-21) |
 | Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (18s, 58 tests passed, 2026-11-21) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | 739725a — feat(phase-9): implement HUD customization and persistence (F-010) |
+| Latest Commit | db7319a — feat(phase-9): implement HUD customization and persistence (F-010) |
 
 ---
 
@@ -73,8 +73,8 @@ Rules:
 
 | Metric | Count | Notes |
 |---|---|---|
-| Total planned features | 19 | F-001 through F-019 |
-| Features with complete phase breakdowns | 19 | All features defined (Correction Task 2026-10-25) |
+| Total planned features | 20 | F-001 through F-019, plus F-020 (Swipe-Up Drawer Gesture — Phase 10 redesign) |
+| Features with complete phase breakdowns | 20 | All features defined |
 | Features with only partial plans | 0 | None remaining |
 | Features with TBD phase counts | 0 | All resolved |
 | Features deferred | 3 | F-017, F-018, F-019 (P3) |
@@ -87,11 +87,11 @@ Rules:
 |---|---|---|---|---|---|---|---|---|
 | F-001 | Launcher Foundation | P0 | 5 | 2 | F-001-P1, F-001-P2 done | Build Verified; Device Pending | Implementation Complete — Device Validation Pending | — |
 | F-002 | HUD Design System | P0 | 5 | 5 | All phases done | Build Verified | Implementation Complete — Build Verified | F-001 |
-| F-003 | HUD Home Screen | P0 | 6 | 6 | All phases done | Build Verified | Implementation Complete — Build Verified | F-002 |
+| F-003 | HUD Home Screen (Phase 10 redesign in progress) | P0 | 9 | 6 | Phases 1–6 done; Phases 7–9 not started | Build Verified (original); Phase 10 pending | Partial — Phase 10 redesign planned | F-002 |
 | F-004 | App Discovery & Launching | P0 | 6 | 6 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-001 |
 | F-005 | Application Search | P0 | 4 | 4 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-004 |
 | F-006 | Battery Telemetry | P0 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
-| F-007 | Animated Radar & HUD Graphics | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
+| F-007 | AI Core Visualization (was: Animated Radar) | P1 | 9 | 5 | Phases 1–5 done; Phases 6–9 (AICoreVisualization) not started | Build Verified (radar); AI Core pending | Partial — Phase 10 redesign planned | F-002 |
 | F-008 | System Telemetry Dashboard | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-006, F-002 |
 | F-009 | Quick Actions | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
 | F-010 | Customization | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
@@ -104,19 +104,20 @@ Rules:
 | F-017 | Advanced HUD Themes | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-010 |
 | F-018 | Extended Automation | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-013 |
 | F-019 | Open-Source Preparation | P3 | 6 | 0 | Not Started | Not Tested | Deferred | All |
+| F-020 | Swipe-Up App Drawer Gesture | P0 | 5 | 0 | Not Started | Not Tested | Not Started (Phase 10) | F-004, F-005 |
 
-**Implementation Progress: 56%** (48 / 86 active planned implementation phases implemented)
+**Implementation Progress: 51%** (48 / 94 active planned implementation phases implemented)
 
-> **Denominator basis:** 86 active (non-deferred) planned phases — 31 P0 + 24 P1 + 31 P2. Deferred P3 phases (16) are excluded per the formula in Section B.2. Phase 4 counts implementation work only; its Gradle and device validation remain pending.
+> **Denominator basis:** 94 active (non-deferred) planned phases — includes Phase 10 redesign additions to F-003 (3 new sub-phases), F-007 (4 new sub-phases, AICoreVisualization), and new F-020 (5 phases). Deferred P3 phases (16) are excluded per the formula in Section B.2.
 
-**Planning Coverage: 100%** (19 / 19 features have defined phases)
+**Planning Coverage: 100%** (20 / 20 features have defined phases)
 
-**P0 phase total:** 31 phases across 6 features
-**P1 phase total:** 24 phases across 5 features
+**P0 phase total:** 36 phases across 7 features (includes F-020 and Phase 10 additions)
+**P1 phase total:** 28 phases across 5 features (includes F-007 Phase 10 additions)
 **P2 phase total:** 31 phases across 5 features
 **P3 phase total (Deferred):** 16 phases across 3 features — excluded from active denominator
 
-**Active (non-deferred) total planned phases:** 86
+**Active (non-deferred) total planned phases:** 95
 
 ---
 
@@ -258,6 +259,35 @@ Rules:
 
 ---
 
+### PHASE-10: Full-Screen AI Command Interface
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-10 |
+| Title | Full-Screen AI Command Interface |
+| Objective | Redesign home screen: full-screen `AICoreVisualization`, 7 floating HUD panels, swipe-up drawer, remove stacked cards and launcher dock |
+| Status | Planning Complete — Implementation Not Started |
+| Build Status | Pending implementation |
+| Test Status | Pending implementation |
+| Dependencies | PHASE-02, PHASE-03, PHASE-06, PHASE-07, PHASE-08, PHASE-09 |
+| Design Docs | `docs/UI_UX_SPECIFICATION.md`, `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md` |
+| Started | 2026-11-21 (planning only) |
+
+**Planned Scope:**
+
+- Remove deprecated UI: dock row, home-screen search bar, APPS button, stacked Telemetry card, stacked System Status card.
+- Archive `RadarDisplay.kt` (superseded by `AICoreVisualization`).
+- Create `visualization/NeuralGeometry.kt`, `visualization/NeuralAnimationState.kt`, `visualization/AICoreVisualization.kt`.
+- Create 7 floating panel composables in `panels/`.
+- Create `AppDrawerGestureIndicator.kt` with breathing chevron animation.
+- Implement swipe-up gesture using `detectVerticalDragGestures` for drawer.
+- Compose full `HomeScreen.kt` with `BoxWithConstraints`-based responsive layout.
+- Write unit tests for geometry, formatters, and gesture state.
+
+**Acceptance Criteria:** See `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md`.
+
+---
+
 ### PHASE-05: Application Search
 
 | Field | Value |
@@ -284,6 +314,35 @@ Rules:
 **Validation:**
 - Assemble, unit tests, and lint all completed successfully with zero errors.
 - Device testing deferred pending physical device / emulator (B-002).
+
+---
+
+### PHASE-10: Full-Screen AI Command Interface
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-10 |
+| Title | Full-Screen AI Command Interface |
+| Objective | Redesign home screen: full-screen `AICoreVisualization`, 7 floating HUD panels, swipe-up drawer, remove stacked cards and launcher dock |
+| Status | Planning Complete — Implementation Not Started |
+| Build Status | Pending implementation |
+| Test Status | Pending implementation |
+| Dependencies | PHASE-02, PHASE-03, PHASE-06, PHASE-07, PHASE-08, PHASE-09 |
+| Design Docs | `docs/UI_UX_SPECIFICATION.md`, `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md` |
+| Started | 2026-11-21 (planning only) |
+
+**Planned Scope:**
+
+- Remove deprecated UI: dock row, home-screen search bar, APPS button, stacked Telemetry card, stacked System Status card.
+- Archive `RadarDisplay.kt` (superseded by `AICoreVisualization`).
+- Create `visualization/NeuralGeometry.kt`, `visualization/NeuralAnimationState.kt`, `visualization/AICoreVisualization.kt`.
+- Create 7 floating panel composables in `panels/`.
+- Create `AppDrawerGestureIndicator.kt` with breathing chevron animation.
+- Implement swipe-up gesture using `detectVerticalDragGestures` for drawer.
+- Compose full `HomeScreen.kt` with `BoxWithConstraints`-based responsive layout.
+- Write unit tests for geometry, formatters, and gesture state.
+
+**Acceptance Criteria:** See `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md`.
 
 ---
 
@@ -315,6 +374,35 @@ Rules:
 
 ---
 
+### PHASE-10: Full-Screen AI Command Interface
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-10 |
+| Title | Full-Screen AI Command Interface |
+| Objective | Redesign home screen: full-screen `AICoreVisualization`, 7 floating HUD panels, swipe-up drawer, remove stacked cards and launcher dock |
+| Status | Planning Complete — Implementation Not Started |
+| Build Status | Pending implementation |
+| Test Status | Pending implementation |
+| Dependencies | PHASE-02, PHASE-03, PHASE-06, PHASE-07, PHASE-08, PHASE-09 |
+| Design Docs | `docs/UI_UX_SPECIFICATION.md`, `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md` |
+| Started | 2026-11-21 (planning only) |
+
+**Planned Scope:**
+
+- Remove deprecated UI: dock row, home-screen search bar, APPS button, stacked Telemetry card, stacked System Status card.
+- Archive `RadarDisplay.kt` (superseded by `AICoreVisualization`).
+- Create `visualization/NeuralGeometry.kt`, `visualization/NeuralAnimationState.kt`, `visualization/AICoreVisualization.kt`.
+- Create 7 floating panel composables in `panels/`.
+- Create `AppDrawerGestureIndicator.kt` with breathing chevron animation.
+- Implement swipe-up gesture using `detectVerticalDragGestures` for drawer.
+- Compose full `HomeScreen.kt` with `BoxWithConstraints`-based responsive layout.
+- Write unit tests for geometry, formatters, and gesture state.
+
+**Acceptance Criteria:** See `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md`.
+
+---
+
 ### PHASE-07: System & Battery Telemetry Dashboard
 
 | Field | Value |
@@ -342,6 +430,35 @@ Rules:
 **Validation:**
 - Assemble, unit tests, and lint all completed successfully with zero errors.
 - Device testing deferred pending physical device / emulator (B-002).
+
+---
+
+### PHASE-10: Full-Screen AI Command Interface
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-10 |
+| Title | Full-Screen AI Command Interface |
+| Objective | Redesign home screen: full-screen `AICoreVisualization`, 7 floating HUD panels, swipe-up drawer, remove stacked cards and launcher dock |
+| Status | Planning Complete — Implementation Not Started |
+| Build Status | Pending implementation |
+| Test Status | Pending implementation |
+| Dependencies | PHASE-02, PHASE-03, PHASE-06, PHASE-07, PHASE-08, PHASE-09 |
+| Design Docs | `docs/UI_UX_SPECIFICATION.md`, `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md` |
+| Started | 2026-11-21 (planning only) |
+
+**Planned Scope:**
+
+- Remove deprecated UI: dock row, home-screen search bar, APPS button, stacked Telemetry card, stacked System Status card.
+- Archive `RadarDisplay.kt` (superseded by `AICoreVisualization`).
+- Create `visualization/NeuralGeometry.kt`, `visualization/NeuralAnimationState.kt`, `visualization/AICoreVisualization.kt`.
+- Create 7 floating panel composables in `panels/`.
+- Create `AppDrawerGestureIndicator.kt` with breathing chevron animation.
+- Implement swipe-up gesture using `detectVerticalDragGestures` for drawer.
+- Compose full `HomeScreen.kt` with `BoxWithConstraints`-based responsive layout.
+- Write unit tests for geometry, formatters, and gesture state.
+
+**Acceptance Criteria:** See `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md`.
 
 ---
 
@@ -377,6 +494,35 @@ Rules:
 
 ---
 
+### PHASE-10: Full-Screen AI Command Interface
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-10 |
+| Title | Full-Screen AI Command Interface |
+| Objective | Redesign home screen: full-screen `AICoreVisualization`, 7 floating HUD panels, swipe-up drawer, remove stacked cards and launcher dock |
+| Status | Planning Complete — Implementation Not Started |
+| Build Status | Pending implementation |
+| Test Status | Pending implementation |
+| Dependencies | PHASE-02, PHASE-03, PHASE-06, PHASE-07, PHASE-08, PHASE-09 |
+| Design Docs | `docs/UI_UX_SPECIFICATION.md`, `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md` |
+| Started | 2026-11-21 (planning only) |
+
+**Planned Scope:**
+
+- Remove deprecated UI: dock row, home-screen search bar, APPS button, stacked Telemetry card, stacked System Status card.
+- Archive `RadarDisplay.kt` (superseded by `AICoreVisualization`).
+- Create `visualization/NeuralGeometry.kt`, `visualization/NeuralAnimationState.kt`, `visualization/AICoreVisualization.kt`.
+- Create 7 floating panel composables in `panels/`.
+- Create `AppDrawerGestureIndicator.kt` with breathing chevron animation.
+- Implement swipe-up gesture using `detectVerticalDragGestures` for drawer.
+- Compose full `HomeScreen.kt` with `BoxWithConstraints`-based responsive layout.
+- Write unit tests for geometry, formatters, and gesture state.
+
+**Acceptance Criteria:** See `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md`.
+
+---
+
 ### PHASE-09: Customization
 
 | Field | Value |
@@ -405,6 +551,35 @@ Rules:
 **Validation:**
 - Assemble, unit tests, and lint all completed successfully with zero errors.
 - Device testing deferred pending physical device / emulator (B-002).
+
+---
+
+### PHASE-10: Full-Screen AI Command Interface
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-10 |
+| Title | Full-Screen AI Command Interface |
+| Objective | Redesign home screen: full-screen `AICoreVisualization`, 7 floating HUD panels, swipe-up drawer, remove stacked cards and launcher dock |
+| Status | Planning Complete — Implementation Not Started |
+| Build Status | Pending implementation |
+| Test Status | Pending implementation |
+| Dependencies | PHASE-02, PHASE-03, PHASE-06, PHASE-07, PHASE-08, PHASE-09 |
+| Design Docs | `docs/UI_UX_SPECIFICATION.md`, `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md` |
+| Started | 2026-11-21 (planning only) |
+
+**Planned Scope:**
+
+- Remove deprecated UI: dock row, home-screen search bar, APPS button, stacked Telemetry card, stacked System Status card.
+- Archive `RadarDisplay.kt` (superseded by `AICoreVisualization`).
+- Create `visualization/NeuralGeometry.kt`, `visualization/NeuralAnimationState.kt`, `visualization/AICoreVisualization.kt`.
+- Create 7 floating panel composables in `panels/`.
+- Create `AppDrawerGestureIndicator.kt` with breathing chevron animation.
+- Implement swipe-up gesture using `detectVerticalDragGestures` for drawer.
+- Compose full `HomeScreen.kt` with `BoxWithConstraints`-based responsive layout.
+- Write unit tests for geometry, formatters, and gesture state.
+
+**Acceptance Criteria:** See `docs/phases/PHASE-10-AI-CORE-VISUALIZATION.md`.
 
 ---
 

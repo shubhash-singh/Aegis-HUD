@@ -1,7 +1,7 @@
 # UI_UX_SPECIFICATION.md — AEGIS HUD Launcher
 
-**Version:** 0.1.0-planning
-**Last Updated:** 2026-10-25
+**Version:** 0.2.0-redesign
+**Last Updated:** 2026-11-21 (Phase 10 — Full-Screen AI Command Interface Redesign)
 
 ---
 
@@ -111,84 +111,265 @@ AEGIS must look and feel like a real technical engineering console, not a conven
 
 ## 5. Layout and Screen Structure
 
-### Home Screen Layout (Portrait)
+### Home Screen Layout — Full-Screen AI Command Interface (Portrait)
+
+> [!IMPORTANT]
+> The home screen is a **full-screen AI command interface**. The neural visualization fills the entire screen behind all floating panels. There is no stacked card layout. No separate telemetry card row. No app shortcut row or search bar on the home screen.
 
 ```
-┌─────────────────────────────────┐
-│  STATUS BAR (system)            │
-├─────────────────────────────────┤
-│  [SYSTEM LABEL]    [CLOCK]      │  <- TopBar zone
-│  RAGNAR // AEGIS   HH:MM:SS    │
-│  [DATE]            [STATUS]     │
-├─────────────────────────────────┤
-│                                 │
-│         [RADAR / HUD CENTER]    │  <- Center HUD zone
-│                                 │
-│   [TELEMETRY PANELS LEFT]       │
-│   Battery: 87%   Network: WiFi  │
-│                                 │
-├─────────────────────────────────┤
-│  [QUICK LAUNCH ROW]             │  <- Quick launch zone
-│  [App] [App] [App] [App] [App]  │
-├─────────────────────────────────┤
-│  [SEARCH BAR]  [DRAWER BUTTON]  │  <- Bottom nav zone
-├─────────────────────────────────┤
-│  NAVIGATION BAR (system)        │
-└─────────────────────────────────┘
+┌────────────────────────────────────────┐
+│  STATUS BAR (system — transparent)     │
+├────────────────────────────────────────┤
+│  RAGNAR // AEGIS    DATE    HH:MM:SS   │  ← Header (clock prominent)
+│  [ONLINE ●]                            │
+├────────────────────────────────────────┤
+│ ┌──────────┐              ┌──────────┐ │
+│ │AEGIS AT  │              │AI STATUS │ │  ← Floating panels (top L/R)
+│ │  CORE    │              │  IDLE    │ │
+│ └──────────┘              └──────────┘ │
+│                                        │
+│ ┌──────────┐  ╔══════════╗ ┌────────┐ │
+│ │  SYSTEM  │  ║          ║ │DEVICE  │ │
+│ │  PERF    │  ║  NEURAL  ║ │STATUS  │ │  ← Full-screen neural viz
+│ │  CPU ▓▓▓ │  ║   BRAIN  ║ │TEMP    │ │     with floating L/R panels
+│ │  RAM ▓▓░ │  ║          ║ │BATT    │ │
+│ └──────────┘  ╚══════════╝ └────────┘ │
+│                                        │
+│ ┌──────────┐              ┌──────────┐ │
+│ │INTELLIGE-│              │TELEMETRY │ │  ← Floating panels (lower L/R)
+│ │  NCE     │              │BATT TEMP │ │
+│ │CONTEXT✓  │              │UPTIME    │ │
+│ │VOICE ✓   │              │VOLTAGE   │ │
+│ └──────────┘              └──────────┘ │
+│                                        │
+│ ┌──────────────────────────────────┐   │
+│ │  SYSTEM STATUS — NETWORK / STOR  │   │  ← Floating bottom panel
+│ └──────────────────────────────────┘   │
+│                                        │
+│         ∧∧  SWIPE UP                   │  ← App drawer indicator
+│        TO OPEN APP DRAWER              │
+├────────────────────────────────────────┤
+│  NAVIGATION BAR (system — transparent) │
+└────────────────────────────────────────┘
 ```
 
-### HUD Panel Anatomy
+### Full-Screen Neural Visualization Layers (bottom → top)
 
 ```
-┌─┬───────────────────────────────┬─┐
-│ │  [SECTION HEADER]             │ │   <- Corner ticks
-│ │                               │ │
-│ │  [CONTENT]                    │ │
-│ │                               │ │
-└─┴───────────────────────────────┴─┘
+Layer 0: Near-black background (#050A0E)
+Layer 1: Concentric scanning rings (Canvas)
+Layer 2: Dynamic connection lines + data pulse animations
+Layer 3: Floating particles
+Layer 4: Rotating circular indicators
+Layer 5: Vertical holographic projection beam
+Layer 6: Circular energy platform (base)
+Layer 7: Central holographic neural brain (dominant element)
+Layer 8: Subtle flowing waveforms (horizontal)
+Layer 9: Floating HUD information panels (semi-transparent overlay)
+Layer 10: Header bar (clock, branding)
+Layer 11: App drawer gesture indicator (bottom)
 ```
-Panels use 1dp borders, 2dp corner radius, with corner tick decorations (6dp lines extending from corners outward).
+
+### Floating HUD Panel Anatomy
+
+All information panels are floating holographic overlays — no opaque card backgrounds.
+
+```
+┌─┬───────────────────────────┬─┐
+│ │  ▸ SECTION HEADER         │ │   ← 1dp cyan border, corner ticks
+│ │                           │ │   ← Semi-transparent dark fill
+│ │  KEY    VALUE             │ │   ← Monospaced compact content
+│ │  KEY    ▓▓▓░░  VALUE      │ │   ← Mini progress bars
+│ │                           │ │
+└─┴───────────────────────────┴─┘
+      ↑ subtle background blur
+```
+
+Panel rules:
+- Background: `#050A0E` at 70–80% opacity (not fully opaque).
+- Border: 1dp `aegis.border.active` (`#00C8FF`) cyan glow.
+- Corner tick decorations: 6dp lines extending outward from each corner.
+- Typography: JetBrains Mono, 11–13sp for labels, 13–15sp for values.
+- No Material `Card` or `Surface` elevation shadows.
+- `Modifier.blur()` used sparingly (only if device GPU permits, opt-out available).
 
 ---
 
 ## 6. Component Design
 
-### HUD Panel
+### Neural AI Core Visualization (`AICoreVisualization`)
 
-- 1dp border in `aegis.border` (inactive) or `aegis.border.active` (active/highlighted).
-- 2dp corner radius.
-- Corner tick marks (4dp lines at each corner, offset outward).
-- Section header in `aegis.type.sectionHeader`, uppercase, `aegis.cyan.dim`.
-- Background `aegis.surface`.
+The dominant visual element. Renders via Compose `Canvas`. Extends across the full screen behind all floating panels.
 
-### Clock Display
+**Visual Elements:**
 
-- Font: JetBrains Mono, `aegis.type.clock`.
-- Color: `aegis.cyan`.
-- Seconds in `aegis.cyan.dim` or smaller weight.
-- No shadow effects; glow achieved with subtle tint bloom if performance permits.
+| Element | Description | Animation |
+|---|---|---|
+| Central holographic neural brain | Layered geometric node clusters, glowing | Slow pulse, rotation |
+| Interconnected glowing nodes | Scattered across Canvas | Idle drift, connection activation |
+| Dynamic connection lines | Lines between nodes with data packet travel | Packet travel along path |
+| Data pulses | Bright dots racing along connection lines | Repeating along each edge |
+| Floating particles | Tiny glowing points drifting upward | Constant gentle float |
+| Concentric scanning rings | 4–6 large rings centered on brain | Slow expand + fade |
+| Rotating circular indicators | Inner and outer rotating arc indicators | Continuous counter-rotation |
+| Vertical holographic projection beam | Vertical column of light through brain center | Slow vertical pulse |
+| Circular energy platform | Flat ring at base of brain | Slow rotation |
+| Horizontal waveforms | Subtle sine waves extending left/right | Animated phase shift |
 
-### Status Indicator Dot
+**Performance rules:**
+- Static geometry (ring positions, node positions) must be computed once and cached — never per frame.
+- Animation state lives in `InfiniteTransition` / `Animatable` — never recomputed in `drawWithContent`.
+- `AICoreVisualization` composable must be isolated with stable parameters to prevent unnecessary recomposition when floating panel data updates.
+- Pause or throttle all animations when `PowerManager.isPowerSaveMode` is `true`.
+- No excessive `BlurMaskFilter` on every draw call — batch or avoid per-frame blur.
 
-- 6dp filled circle.
-- Color: `aegis.status.ok` / `aegis.status.warning` / `aegis.status.critical` / `aegis.status.offline`.
-- Subtle pulse animation for `ok` state (optional, configurable).
+**Composable signature contract:**
+```kotlin
+@Composable
+fun AICoreVisualization(
+    modifier: Modifier = Modifier,
+    animationSpeedMultiplier: Float = 1f, // 0f = paused
+    accentColor: Color = AegisColors.cyan,
+)
+```
 
-### App Icon Grid
+---
 
-- Standard Android launcher icon size: 48dp.
-- No background, no shadow — icons on transparent background.
-- App name below in `aegis.type.appName`, truncated with ellipsis.
-- Grid: 4-5 columns depending on screen width.
+### Floating Information Panels
 
-### Radar Graphic (Phase 6)
+All six panel composables share these style properties:
 
-- Concentric circles in `aegis.border` (dim, 0.3 alpha).
-- Rotating sweep sector using Compose Canvas + `drawArc`.
-- Measurement ticks on outer ring.
-- Center reticle crosshair in `aegis.cyan`.
-- Animation speed: configurable (default 4 seconds per rotation).
-- Pause: when in battery-saver mode or by user setting.
+| Property | Value |
+|---|---|
+| Background | `aegis.background` (#050A0E) @ 75% alpha |
+| Border | 1dp `aegis.border.active` (#00C8FF) |
+| Corner radius | 2dp |
+| Corner ticks | 6dp outward lines at all 4 corners |
+| Font | JetBrains Mono |
+| Label size | 11sp, `aegis.text.secondary` |
+| Value size | 13sp, `aegis.text.primary` or `aegis.cyan` |
+| Padding | 8dp inner (`spacing.sm`) |
+| Blur | Optional; must respect user "reduce effects" setting |
+
+#### `FloatingCorePanel` — Top-left
+
+Displays:
+- `AEGIS AT CORE` label
+- Application version string
+
+#### `FloatingAiStatusPanel` — Top-right
+
+Displays:
+- `AI STATUS` label
+- State: `IDLE` / `PROCESSING` / `ACTIVE`
+- Color-coded: `aegis.text.secondary` for IDLE, `aegis.cyan` for PROCESSING, `aegis.status.ok` for ACTIVE
+- Reflects actual `HomeViewModel` state
+
+#### `FloatingPerformancePanel` — Left side
+
+Displays:
+- `SYSTEM PERFORMANCE` label
+- CPU utilization % + small progress bar
+- RAM utilization % + small progress bar
+
+Data source: `SystemTelemetryRepository` (CPU via `/proc/stat`; RAM via `ActivityManager.MemoryInfo`)
+
+#### `FloatingDevicePanel` — Right side
+
+Displays:
+- `DEVICE STATUS` label
+- Temperature (°C) from `BatteryRepository`
+- Battery percentage + charging state indicator
+
+#### `FloatingIntelligencePanel` — Lower-left
+
+Displays:
+- `INTELLIGENCE` label
+- `CONTEXT` — availability indicator
+- `VOICE` — availability indicator
+- `VISION` — availability indicator
+- `AUTOMATION` — availability indicator
+
+Indicators use `aegis.status.ok` (green) for available, `aegis.status.offline` (dim) for unavailable.
+
+#### `FloatingTelemetryPanel` — Lower-right
+
+Displays:
+- `TELEMETRY` label
+- Battery temperature (°C)
+- Device uptime (formatted HH:MM:SS or Xd Xh Xm)
+- Battery voltage (mV)
+
+> [!IMPORTANT]
+> This replaces the old separate Telemetry card. No separate card below the visualization.
+
+#### `FloatingSystemStatusPanel` — Bottom (above nav gesture)
+
+Displays:
+- `SYSTEM STATUS` label
+- Network connectivity: Wi-Fi / Mobile / Offline
+- Network info: SSID (Wi-Fi) or carrier name (Mobile)
+- Download speed (↓ kb/s or Mb/s)
+- Upload speed (↑ kb/s or Mb/s)
+- Storage: used / total formatted
+
+> [!IMPORTANT]
+> This replaces the old separate System Status card. It floats above the system navigation bar.
+
+---
+
+### App Drawer Gesture Indicator (`AppDrawerGestureIndicator`)
+
+Replaces all previous bottom launcher rows, search bars, and APPS buttons.
+
+Displays at the bottom of the home screen:
+- Two upward-pointing cyan chevrons (`∧∧`)
+- Text: `SWIPE UP`
+- Text: `TO OPEN APP DRAWER`
+- Subtle "breathing" alpha animation (1.0 → 0.5 → 1.0, 2–3s period)
+
+Tapping the indicator also triggers the drawer open.
+
+---
+
+### App Drawer (Swipe-Up Gesture)
+
+- Triggered by upward swipe from bottom of screen OR tap on `AppDrawerGestureIndicator`.
+- Dismissed by swipe down or back gesture.
+- Animates from bottom of screen upward (`AnimatedVisibility` with `slideInVertically` + `fadeIn`).
+- Full-screen dark overlay with app grid + search bar inside the drawer.
+- Must not conflict with system navigation gesture zone (apply `WindowInsets.navigationBars` padding).
+
+---
+
+### Header
+
+Retained from current implementation:
+- Android status bar (transparent, edge-to-edge)
+- `RAGNAR // AEGIS` branding
+- Current date
+- Large digital clock (JetBrains Mono, `aegis.type.clock`, `aegis.cyan`)
+- Online indicator dot
+
+The clock must remain prominent — it is the primary time reference — but must not block the neural brain visualization center. Position in upper portion of screen.
+
+---
+
+### Removed Elements
+
+> [!WARNING]
+> The following UI elements are **removed** in this redesign. Do not re-implement them.
+
+| Removed Element | Reason |
+|---|---|
+| App shortcut row (5 icons) | Replaced by swipe-up drawer |
+| Assistant / Browser / Calculator / Calendar / Camera shortcuts | Replaced by swipe-up drawer |
+| Search bar on home screen | Lives only inside drawer |
+| APPS button / drawer open button | Replaced by gesture + indicator |
+| Persistent bottom launcher dock | Replaced by gesture indicator |
+| Separate stacked Telemetry card | Integrated into `FloatingTelemetryPanel` |
+| Separate stacked System Status card | Integrated into `FloatingSystemStatusPanel` |
+| Radar widget (isolated card) | Replaced by full-screen `AICoreVisualization` |
 
 ---
 
@@ -196,18 +377,28 @@ Panels use 1dp borders, 2dp corner radius, with corner tick decorations (6dp lin
 
 | Animation | Type | Duration | Easing | Notes |
 |---|---|---|---|---|
-| Radar sweep | Infinite rotation | 4s per revolution | Linear | Configurable; pausable |
-| Scan line | Vertical translate | 3s top to bottom | Linear, repeat | Optional overlay |
+| Neural brain pulse | Scale 1.0 → 1.05 → 1.0 | 3s | EaseInOut | Continuous; pausable |
+| Node activation | Brightness flash | 400ms | EaseOut | Triggered per node |
+| Data pulse travel | Path animation | 1.5–3s per edge | Linear | Repeating per connection |
+| Particle float | Y-axis drift + fade | 4–8s | Linear | Staggered; pooled |
+| Scanning rings | Scale + fade out | 4s | EaseOut | Repeating concentric |
+| Rotating indicators | Infinite rotation | 6s / 10s (inner/outer) | Linear | Counter-rotating |
+| Projection beam | Alpha pulse | 2s | EaseInOut | Continuous |
+| Energy platform | Rotation | 12s | Linear | Continuous |
+| Waveform phase | Phase shift | 4s cycle | Linear | Continuous |
 | Status dot pulse | Scale 1.0 → 1.3 → 1.0 | 2s | EaseInOut | Only for OK state |
 | Screen transitions | Fade + slide | 200ms | FastOutSlowIn | Navigation transitions |
 | App launch ripple | Scale + fade | 150ms | EaseOut | Feedback on app tap |
 | Panel appear | Fade in | 300ms | EaseOut | Initial screen load |
+| Drawer open | SlideInVertically + fade | 350ms | FastOutSlowIn | Swipe-up drawer |
+| Drawer gesture indicator | Alpha breathe | 2.5s | EaseInOut | Continuous on home screen |
 
 **Rules:**
-- Never animate more than 2 major elements simultaneously.
-- All animations must be interruptible.
+- Never animate more than 3 major elements simultaneously using heavy Canvas draw calls per frame.
+- All animations must be interruptible and pausable via user setting or battery-saver mode.
 - Pause or reduce nonessential animation when `PowerManager.isPowerSaveMode` is true.
-- Provide a global "reduce motion" or "disable animations" setting.
+- Provide a global "reduce motion" / "disable animations" setting.
+- Static geometry (node positions, ring radii) is computed once and cached — never on each frame.
 
 ---
 
@@ -239,3 +430,9 @@ Panels use 1dp borders, 2dp corner radius, with corner tick decorations (6dp lin
 - No simulated fake data labeled as real sensor readings.
 - No design that only works at one screen density or aspect ratio.
 - No heavy PNG assets where vector or Canvas drawing suffices.
+- **No isolated radar widget inside a card** — the visualization fills the whole screen.
+- **No stacked card layout** for telemetry and system status below the visualization.
+- **No persistent app shortcut row on the home screen** — use swipe-up drawer only.
+- **No fixed screen-coordinate positioning** — all panel placement must be responsive to screen dimensions.
+- **No excessive object allocation inside `Canvas` draw lambdas** — cache `Paint`, `Path`, and geometry objects.
+- **No blur (`BlurMaskFilter`) applied every frame** — batch or conditionally disable.
