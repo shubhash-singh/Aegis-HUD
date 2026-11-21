@@ -23,7 +23,7 @@
 | Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (17s, 87 tests passed, 2026-11-22) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | 8a215da — feat(phase-11): implement application organization (F-011) with pinning, sorting, and grid layout |
+| Latest Commit | 7392c89 — feat(phase-12): implement developer console (F-014) with real-time runtime diagnostics and log viewer |
 
 ---
 
