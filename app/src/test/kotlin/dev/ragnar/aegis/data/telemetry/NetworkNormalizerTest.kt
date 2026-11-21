@@ -72,4 +72,91 @@ class NetworkNormalizerTest {
         assertTrue(vpn.isConnected)
         assertTrue(vpn.isVpn)
     }
+
+    @Test
+    fun `calculateBandwidth with positive deltas returns expected rx and tx rate`() {
+        val (rx, tx) = NetworkNormalizer.calculateBandwidth(
+            currentRxBytes = 194_560L,
+            previousRxBytes = 0L,
+            currentTxBytes = 20_480L,
+            previousTxBytes = 0L,
+            elapsedSeconds = 1.0,
+        )
+        assertEquals(194_560L, rx)
+        assertEquals(20_480L, tx)
+    }
+
+    @Test
+    fun `calculateBandwidth handles counter wrap or reboot by returning zero`() {
+        val (rx, tx) = NetworkNormalizer.calculateBandwidth(
+            currentRxBytes = 100L,
+            previousRxBytes = 500L,
+            currentTxBytes = 100L,
+            previousTxBytes = 500L,
+            elapsedSeconds = 1.0,
+        )
+        assertEquals(0L, rx)
+        assertEquals(0L, tx)
+    }
+
+    @Test
+    fun `calculateBandwidth handles zero or negative elapsed time gracefully`() {
+        val (rx, tx) = NetworkNormalizer.calculateBandwidth(
+            currentRxBytes = 1000L,
+            previousRxBytes = 500L,
+            currentTxBytes = 1000L,
+            previousTxBytes = 500L,
+            elapsedSeconds = 0.0,
+        )
+        assertEquals(0L, rx)
+        assertEquals(0L, tx)
+    }
+
+    @Test
+    fun `formatSpeed formats kilobytes and megabytes correctly`() {
+        assertEquals("0kb/s", NetworkNormalizer.formatSpeed(0L))
+        assertEquals("190kb/s", NetworkNormalizer.formatSpeed(194_560L))
+        assertEquals("20kb/s", NetworkNormalizer.formatSpeed(20_480L))
+        assertEquals("2.5mb/s", NetworkNormalizer.formatSpeed((2.5 * 1024 * 1024).toLong()))
+    }
+
+    @Test
+    fun `normalize preserves throughput metrics`() {
+        val state = NetworkNormalizer.normalize(
+            hasCapabilityInternet = true,
+            hasTransportWifi = true,
+            hasTransportCellular = false,
+            hasTransportEthernet = false,
+            hasTransportVpn = false,
+            isMetered = false,
+            downBytesPerSecond = 194_560L,
+            upBytesPerSecond = 20_480L,
+        )
+        assertEquals(194_560L, state.downBytesPerSecond)
+        assertEquals(20_480L, state.upBytesPerSecond)
+    }
+
+    @Test
+    fun `formatNetworkLabel produces user-specified down and up arrow format`() {
+        val state = dev.ragnar.aegis.domain.telemetry.NetworkState(
+            isConnected = true,
+            type = NetworkType.Wifi,
+            downBytesPerSecond = 194_560L,
+            upBytesPerSecond = 20_480L,
+        )
+        val label = dev.ragnar.aegis.ui.telemetry.TelemetryViewModel.formatNetworkLabel(state)
+        assertEquals("WIFI - 190kb/s↓ 20kb/s↑", label)
+    }
+
+    @Test
+    fun `formatNetworkLabel produces OFFLINE when disconnected`() {
+        val state = dev.ragnar.aegis.domain.telemetry.NetworkState(
+            isConnected = false,
+            type = NetworkType.None,
+            downBytesPerSecond = 0L,
+            upBytesPerSecond = 0L,
+        )
+        val label = dev.ragnar.aegis.ui.telemetry.TelemetryViewModel.formatNetworkLabel(state)
+        assertEquals("OFFLINE", label)
+    }
 }

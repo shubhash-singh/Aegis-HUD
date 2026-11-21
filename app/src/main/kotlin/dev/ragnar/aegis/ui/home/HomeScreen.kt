@@ -286,7 +286,7 @@ internal fun StatusRow(
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = (value ?: status.label).uppercase(),
+            text = value ?: status.label.uppercase(),
             style = typography.telemetry,
             color = when (status) {
                 StatusLevel.Ok -> colors.statusOk

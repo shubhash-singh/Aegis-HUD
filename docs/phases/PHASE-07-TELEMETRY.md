@@ -13,9 +13,10 @@
 Deliver real-time battery and system telemetry to the AEGIS HUD dashboard:
 1. Battery percentage, charging state, temperature, health, and plug type via `Intent.ACTION_BATTERY_CHANGED` sticky broadcast.
 2. Network connectivity state, transport type (Wi-Fi, Cellular, Ethernet), meteredness, and offline indicator via `ConnectivityManager.NetworkCallback`.
-3. Genuine system uptime tracking via `SystemClock.elapsedRealtime()`.
-4. Strict enforcement of DEC-009: No fake telemetry. Missing or unavailable values display as "N/A" or "---".
-5. No long-running background polling services; purely event-driven and lifecycle-aware.
+3. Live network throughput monitoring (download & upload speed) using real Android `TrafficStats` deltas formatted as `${TYPE} - ${downSpeed}↓ ${upSpeed}↑` (e.g. `WIFI - 190kb/s↓ 20kb/s↑`).
+4. Genuine system uptime tracking via `SystemClock.elapsedRealtime()`.
+5. Strict enforcement of DEC-009: No fake telemetry. Missing or unavailable values display as "N/A" or "---".
+6. No long-running background polling services; purely event-driven and lifecycle-aware coroutines scoped to active flow collection.
 
 ---
 
@@ -49,9 +50,10 @@ Deliver real-time battery and system telemetry to the AEGIS HUD dashboard:
 - [x] Charging state accurately reflects Charging, Full, or Discharging (`BatteryNormalizer.mapChargingStatus`).
 - [x] Battery temperature displays real °C or "---" when unavailable (`BatteryNormalizer` tenths to °C conversion).
 - [x] Network status reflects real connectivity (Wi-Fi, Cellular, Offline via `ConnectivityManager.NetworkCallback`).
+- [x] Real-time network download and upload speeds sampled via `TrafficStats` and formatted beside network type (e.g., `WIFI - 190kb/s↓ 20kb/s↑`).
 - [x] Real system uptime displayed from `SystemClock.elapsedRealtime()`.
 - [x] No fake telemetry presented as real data (DEC-009).
-- [x] Unit tests pass for battery and network normalization (8 tests across `BatteryNormalizerTest` and `NetworkNormalizerTest`).
+- [x] Unit tests pass for battery and network normalization (15 tests across `BatteryNormalizerTest` and `NetworkNormalizerTest`, 41 total project tests).
 
 ---
 
@@ -61,6 +63,10 @@ Deliver real-time battery and system telemetry to the AEGIS HUD dashboard:
 - [x] `UT-006-03`: Temperature converts from tenths of degrees to degrees.
 - [x] `UT-006-04`: Missing platform-neutral values produce safe defaults.
 - [x] `UT-008-02`: Fake network source produces the correct offline `NetworkState`.
+- [x] `UT-008-03`: `calculateBandwidth` calculates accurate rx/tx transfer speeds from byte deltas.
+- [x] `UT-008-04`: `calculateBandwidth` safely handles device reboot and counter wrap (returns 0).
+- [x] `UT-008-05`: `formatSpeed` correctly formats kb/s and mb/s rates.
+- [x] `UT-008-06`: `formatNetworkLabel` formats HUD network speed with user-specified arrows (`WIFI - 190kb/s↓ 20kb/s↑`).
 
 ---
 
@@ -90,6 +96,6 @@ Deliver real-time battery and system telemetry to the AEGIS HUD dashboard:
 
 | Date | Command | Result | Notes |
 |---|---|---|---|
-| 2026-11-21 | `./gradlew --no-daemon assembleDebug` | BUILD SUCCESSFUL (34s) | APK generated successfully |
-| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | BUILD SUCCESSFUL (21s) | 34 tests passed (8 new telemetry tests) |
-| 2026-11-21 | `./gradlew --no-daemon lintDebug` | BUILD SUCCESSFUL (44s) | 0 errors |
+| 2026-11-21 | `./gradlew --no-daemon assembleDebug` | BUILD SUCCESSFUL (16s) | APK generated successfully |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | BUILD SUCCESSFUL (21s) | 41 tests passed (15 telemetry tests) |
+| 2026-11-21 | `./gradlew --no-daemon lintDebug` | BUILD SUCCESSFUL (39s) | 0 errors |

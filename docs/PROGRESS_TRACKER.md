@@ -19,8 +19,8 @@
 | Last Completed Phase | PHASE-07 (System Telemetry Dashboard — build verified) |
 | Current Phase | PHASE-07 (build verified; device validation pending) |
 | Next Step | Proceed to PHASE-08 (Quick Actions F-009) / Customization (F-010); run device validation when connected |
-| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (34s, 2026-11-21) |
-| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (21s, 34 tests passed, 2026-11-21) |
+| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (16s, 2026-11-21) |
+| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (21s, 41 tests passed, 2026-11-21) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
 | Latest Commit | 74d8959 — feat(phase-7): implement live battery and system telemetry dashboard |
@@ -322,22 +322,22 @@ Rules:
 | Phase ID | PHASE-07 |
 | Objective | Live battery percentage, charging state, temperature, network connectivity, meteredness, genuine system uptime |
 | Status | Implementation Complete — Build Verified (Device Validation Pending) |
-| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (34s, 2026-11-21) |
-| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (21s, 34 tests passed, 2026-11-21) |
-| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (44s, 0 errors, 2026-11-21) |
+| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (16s, 2026-11-21) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (21s, 41 tests passed, 2026-11-21) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (39s, 0 errors, 2026-11-21) |
 | Dependencies | PHASE-02, PHASE-03, PHASE-06 |
 | Started | 2026-11-21 |
-| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (34 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (41 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
 
 **Implemented:**
 
-- Domain models `BatteryState` and `NetworkState`.
+- Domain models `BatteryState` and `NetworkState` with real throughput metrics (`downBytesPerSecond`, `upBytesPerSecond`).
 - Pure parsing and normalization engines `BatteryNormalizer` and `NetworkNormalizer` with safe fallback handling (DEC-009).
 - `AndroidBatteryRepository` using `Intent.ACTION_BATTERY_CHANGED` sticky broadcast without background polling services.
-- `AndroidNetworkRepository` using `ConnectivityManager.NetworkCallback` with internet capability tracking.
-- `TelemetryViewModel` combining battery, network, and system uptime into formatted HUD UI state.
+- `AndroidNetworkRepository` using `ConnectivityManager.NetworkCallback` with internet capability tracking and live `TrafficStats` delta sampling while subscribed.
+- `TelemetryViewModel` combining battery, network, bandwidth, and system uptime into formatted HUD UI state (`WIFI - 190kb/s↓ 20kb/s↑`).
 - Live `HomeScreen` telemetry integration for System Status and Telemetry panels.
-- Eight new JVM unit tests in `BatteryNormalizerTest` and `NetworkNormalizerTest`.
+- 15 JVM unit tests across `BatteryNormalizerTest` and `NetworkNormalizerTest`.
 
 **Validation:**
 - Assemble, unit tests, and lint all completed successfully with zero errors.
@@ -370,6 +370,9 @@ Rules:
 | 2026-11-21 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (34s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-07 |
 | 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (21s) | 34 tests passed (8 new telemetry tests) | PHASE-07 |
 | 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (44s) | 0 errors | PHASE-07 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (21s) | 41 tests passed (15 telemetry tests including network speed) | PHASE-07 |
+| 2026-11-21 | `./gradlew --no-daemon assembleDebug` | Same | BUILD SUCCESSFUL (16s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-07 |
+| 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (39s) | 0 errors | PHASE-07 |
 
 ---
 
@@ -429,9 +432,9 @@ Rules:
    - `docs/README.md`
    - `README.md`
 3. **Validated:**
-   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (34s)
-   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (21s, 34 tests passed)
-   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (44s, 0 errors)
+   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (16s)
+   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (21s, 41 tests passed)
+   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (39s, 0 errors)
    - APK produced: `app/build/outputs/apk/debug/app-debug.apk`
 4. **Unverified:** Device testing (real-world network transitions and status bar battery alignment on physical hardware).
 5. **Blockers:** B-002 — No device available for on-device tests.

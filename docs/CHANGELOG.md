@@ -12,8 +12,9 @@
 - Pure parsing and normalization engines (`BatteryNormalizer`, `NetworkNormalizer`) with safe default handling.
 - Real system uptime tracking via `SystemClock.elapsedRealtime()`.
 - Declared `android.permission.ACCESS_NETWORK_STATE` in manifest.
+- Real-time download and upload bandwidth monitoring via Android `TrafficStats` (`downBytesPerSecond`, `upBytesPerSecond`) formatted as `${TYPE} - ${down}↓ ${up}↑` (e.g. `WIFI - 190kb/s↓ 20kb/s↑`). Bandwidth sampling coroutine is active strictly while UI collects the flow.
 - Wired live telemetry into `HomeScreen` status and telemetry panels (DEC-009 compliant).
-- 8 JVM unit tests across `BatteryNormalizerTest` and `NetworkNormalizerTest` (34 total project unit tests passing).
+- 15 JVM unit tests across `BatteryNormalizerTest` and `NetworkNormalizerTest` (41 total project unit tests passing).
 
 **Validation:**
 - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (34s).

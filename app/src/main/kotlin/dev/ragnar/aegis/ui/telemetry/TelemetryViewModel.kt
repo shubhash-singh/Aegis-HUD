@@ -112,13 +112,16 @@ class TelemetryViewModel(
 
         fun formatNetworkLabel(network: NetworkState): String {
             if (!network.isConnected) return "OFFLINE"
-            return when (network.type) {
-                NetworkType.Wifi -> "WI-FI"
+            val typeStr = when (network.type) {
+                NetworkType.Wifi -> "WIFI"
                 NetworkType.Cellular -> "CELLULAR"
                 NetworkType.Ethernet -> "ETHERNET"
                 NetworkType.None -> "OFFLINE"
                 NetworkType.Unknown -> "CONNECTED"
             }
+            val downStr = dev.ragnar.aegis.data.telemetry.NetworkNormalizer.formatSpeed(network.downBytesPerSecond)
+            val upStr = dev.ragnar.aegis.data.telemetry.NetworkNormalizer.formatSpeed(network.upBytesPerSecond)
+            return "$typeStr - $downStr↓ $upStr↑"
         }
 
         fun determineNetworkStatusLevel(network: NetworkState): StatusLevel {

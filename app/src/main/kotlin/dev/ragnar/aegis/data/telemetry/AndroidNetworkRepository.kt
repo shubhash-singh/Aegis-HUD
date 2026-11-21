@@ -5,15 +5,20 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.net.TrafficStats
+import android.os.SystemClock
 import dev.ragnar.aegis.domain.telemetry.NetworkState
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 /**
- * Implementation of [NetworkRepository] using [ConnectivityManager.NetworkCallback].
+ * Implementation of [NetworkRepository] using [ConnectivityManager.NetworkCallback] and [TrafficStats].
  *
- * Fully lifecycle-aware, event-driven, without background polling.
+ * Fully lifecycle-aware, event-driven, with periodic bandwidth sampling active only while subscribed.
  */
 class AndroidNetworkRepository(
     private val context: Context,
@@ -29,27 +34,36 @@ class AndroidNetworkRepository(
             return@callbackFlow
         }
 
-        fun updateState() {
-            val activeNetwork = connectivityManager.activeNetwork
-            val capabilities = activeNetwork?.let { connectivityManager.getNetworkCapabilities(it) }
-            val state = mapCapabilities(capabilities)
+        var currentCapabilities: NetworkCapabilities? =
+            connectivityManager.activeNetwork?.let { connectivityManager.getNetworkCapabilities(it) }
+
+        var currentDownSpeed = 0L
+        var currentUpSpeed = 0L
+
+        fun emitState() {
+            val state = mapCapabilities(currentCapabilities, currentDownSpeed, currentUpSpeed)
             trySend(state)
         }
 
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                updateState()
+                currentCapabilities = connectivityManager.getNetworkCapabilities(network)
+                emitState()
             }
 
             override fun onLost(network: Network) {
-                updateState()
+                currentCapabilities = null
+                currentDownSpeed = 0L
+                currentUpSpeed = 0L
+                emitState()
             }
 
             override fun onCapabilitiesChanged(
                 network: Network,
                 networkCapabilities: NetworkCapabilities,
             ) {
-                trySend(mapCapabilities(networkCapabilities))
+                currentCapabilities = networkCapabilities
+                emitState()
             }
         }
 
@@ -59,15 +73,54 @@ class AndroidNetworkRepository(
 
         connectivityManager.registerNetworkCallback(request, callback)
 
-        // Send current status immediately
-        updateState()
+        // Send initial state immediately
+        emitState()
+
+        // Background bandwidth sampling coroutine active only while collected
+        var previousRxBytes = TrafficStats.getTotalRxBytes()
+        var previousTxBytes = TrafficStats.getTotalTxBytes()
+        var previousTimeMs = SystemClock.elapsedRealtime()
+
+        val tickerJob = launch {
+            while (isActive) {
+                delay(1000)
+                val now = SystemClock.elapsedRealtime()
+                val currentRx = TrafficStats.getTotalRxBytes()
+                val currentTx = TrafficStats.getTotalTxBytes()
+                val elapsedSec = (now - previousTimeMs) / 1000.0
+
+                if (elapsedSec > 0.5 &&
+                    previousRxBytes != TrafficStats.UNSUPPORTED.toLong() &&
+                    currentRx != TrafficStats.UNSUPPORTED.toLong()
+                ) {
+                    val (down, up) = NetworkNormalizer.calculateBandwidth(
+                        currentRxBytes = currentRx,
+                        previousRxBytes = previousRxBytes,
+                        currentTxBytes = currentTx,
+                        previousTxBytes = previousTxBytes,
+                        elapsedSeconds = elapsedSec,
+                    )
+                    currentDownSpeed = down
+                    currentUpSpeed = up
+                    previousRxBytes = currentRx
+                    previousTxBytes = currentTx
+                    previousTimeMs = now
+                    emitState()
+                }
+            }
+        }
 
         awaitClose {
+            tickerJob.cancel()
             connectivityManager.unregisterNetworkCallback(callback)
         }
     }
 
-    private fun mapCapabilities(capabilities: NetworkCapabilities?): NetworkState {
+    private fun mapCapabilities(
+        capabilities: NetworkCapabilities?,
+        downSpeed: Long,
+        upSpeed: Long,
+    ): NetworkState {
         if (capabilities == null) {
             return NetworkNormalizer.normalize(
                 hasCapabilityInternet = false,
@@ -76,6 +129,8 @@ class AndroidNetworkRepository(
                 hasTransportEthernet = false,
                 hasTransportVpn = false,
                 isMetered = false,
+                downBytesPerSecond = 0L,
+                upBytesPerSecond = 0L,
             )
         }
 
@@ -86,6 +141,8 @@ class AndroidNetworkRepository(
             hasTransportEthernet = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET),
             hasTransportVpn = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN),
             isMetered = !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED),
+            downBytesPerSecond = downSpeed,
+            upBytesPerSecond = upSpeed,
         )
     }
 }

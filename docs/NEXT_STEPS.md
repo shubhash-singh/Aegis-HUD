@@ -10,17 +10,18 @@
 
 - Implemented **PHASE-07 (System & Battery Telemetry Dashboard — F-006 & F-008)**:
   - Declared `ACCESS_NETWORK_STATE` in `AndroidManifest.xml`.
-  - Created `BatteryState` and `NetworkState` domain models.
-  - Implemented `BatteryNormalizer` and `NetworkNormalizer` pure mapping engines.
+  - Created `BatteryState` and `NetworkState` domain models with real throughput metrics.
+  - Implemented `BatteryNormalizer` and `NetworkNormalizer` pure mapping and bandwidth calculation engines.
   - Implemented `AndroidBatteryRepository` using `Intent.ACTION_BATTERY_CHANGED` sticky broadcast.
-  - Implemented `AndroidNetworkRepository` using `ConnectivityManager.NetworkCallback`.
-  - Created `TelemetryViewModel` combining battery, network, and uptime flows into UI state.
+  - Implemented `AndroidNetworkRepository` using `ConnectivityManager.NetworkCallback` and lifecycle-scoped `TrafficStats` delta sampling.
+  - Created `TelemetryViewModel` combining battery, network, bandwidth, and uptime flows into UI state.
+  - Added real-time network speed formatted with user-specified arrows (`WIFI - 190kb/s↓ 20kb/s↑`) next to network status.
   - Wired live telemetry into `HomeScreen`'s System Status and Telemetry panels.
-  - Added 8 unit tests in `BatteryNormalizerTest` and `NetworkNormalizerTest` (34 total project unit tests passing).
+  - Added 15 unit tests in `BatteryNormalizerTest` and `NetworkNormalizerTest` (41 total project unit tests passing).
 - Validated Phase 7 implementation:
-  - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (34s).
-  - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (21s, 34 tests passed with 0 failures).
-  - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (44s, 0 errors).
+  - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (16s).
+  - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (21s, 41 tests passed with 0 failures).
+  - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (39s, 0 errors).
 - Synchronized all project documentation (Progress Tracker, Feature Plan, Phase Log, Changelog, Phase 7 doc, Test Plan, Project Plan).
 
 ## Outstanding Blockers
