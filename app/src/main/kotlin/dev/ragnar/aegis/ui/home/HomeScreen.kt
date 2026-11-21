@@ -315,17 +315,6 @@ fun HomeScreen(
             }
 
             // =================================================================
-            // LAYER 1: TACTICAL HUD CORNER BRACKETS
-            // =================================================================
-            HudCornerBrackets(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .padding(8.dp),
-            )
-
-            // =================================================================
             // LAYER 2: FLOATING HOLOGRAPHIC INFORMATION PANELS & CONTROLS
             // =================================================================
             Column(
@@ -378,7 +367,7 @@ fun HomeScreen(
                 ) {
                     FloatingPerformancePanel(
                         cpuPercent = telemetryState.systemPerformance.cpuUtilizationPercent,
-                        ramPercent = telemetryState.systemPerformance.ramPercent,
+                        ramPercent = telemetryState.systemPerformance.ramPercent ?: 0,
                     )
 
                     FloatingDevicePanel(
@@ -424,11 +413,6 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                     }
-
-                    // Gesture indicator at bottom
-                    AppDrawerGestureIndicator(
-                        onClick = { isDrawerVisible = true },
-                    )
                 }
             }
         }
