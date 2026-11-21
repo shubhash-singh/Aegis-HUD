@@ -6,7 +6,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.PowerManager
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import dev.ragnar.aegis.R
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -288,6 +292,16 @@ fun HomeScreen(
                 }
                 .semantics { contentDescription = "AEGIS AI Command Interface" },
         ) {
+            // =================================================================
+            // LAYER 0: STATIC BACKGROUND IMAGE (home_bg)
+            // =================================================================
+            Image(
+                painter = painterResource(id = R.drawable.home_bg),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+
             // =================================================================
             // LAYER 0: FULL-SCREEN HOLOGRAPHIC NEURAL AI CORE VISUALIZATION
             // =================================================================
