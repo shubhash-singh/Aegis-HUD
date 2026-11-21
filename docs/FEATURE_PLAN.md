@@ -306,17 +306,17 @@ Display live battery level, charge state, and temperature. No polling; use stick
 **Priority:** P1
 **Dependencies:** F-002
 **Implementation Phase:** Phase 9
-**Status:** Not Started
+**Status:** Implementation Complete — Build Verified (Device Validation Pending)
 
 **Phases:**
 
 | Phase | ID | Title | Status |
 |---|---|---|---|
-| 1 | F-010-P1 | DataStore preferences setup | Not Started |
-| 2 | F-010-P2 | Accent color selection | Not Started |
-| 3 | F-010-P3 | Panel visibility toggles | Not Started |
-| 4 | F-010-P4 | Animation speed setting | Not Started |
-| 5 | F-010-P5 | Clock style selection | Not Started |
+| 1 | F-010-P1 | DataStore preferences setup | Implemented — Build Verified |
+| 2 | F-010-P2 | Accent color selection | Implemented — Build Verified |
+| 3 | F-010-P3 | Panel visibility toggles | Implemented — Build Verified |
+| 4 | F-010-P4 | Animation speed setting | Implemented — Build Verified |
+| 5 | F-010-P5 | Clock style selection | Implemented — Build Verified |
 
 **Acceptance Criteria:**
 - Settings persist across app restarts.

@@ -72,6 +72,20 @@ data class AegisColorScheme(
             textMuted = Color(0xFF304050),
         )
     }
+
+    /**
+     * Derives a color scheme updated with the specified [accent] color.
+     */
+    fun withAccent(accent: dev.ragnar.aegis.domain.settings.AccentColor): AegisColorScheme {
+        val primary = Color(accent.primaryColorArgb)
+        val dim = Color(accent.dimColorArgb)
+        return copy(
+            cyan = primary,
+            cyanDim = dim,
+            borderActive = primary,
+            textAccent = primary,
+        )
+    }
 }
 
 /**

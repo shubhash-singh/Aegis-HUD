@@ -160,6 +160,7 @@ The following tests verify the manifest attributes accepted in DEC-010:
 | 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | PASS | 34 tests passed (8 battery/network telemetry tests) | 7 |
 | 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | PASS | 41 tests passed (15 telemetry tests including network throughput) | 7 |
 | 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | PASS | 47 tests passed (6 new QuickActions tests) | 8 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | PASS | 58 tests passed (11 new customization tests) | 9 |
 
 ---
 

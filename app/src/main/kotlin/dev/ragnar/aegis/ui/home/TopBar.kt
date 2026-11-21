@@ -1,11 +1,13 @@
 package dev.ragnar.aegis.ui.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,11 +29,15 @@ import dev.ragnar.aegis.ui.theme.AegisTheme
  * ```
  *
  * @param clockState Current clock state with time and date.
+ * @param showSeconds Whether to display seconds in the clock.
+ * @param onSettingsClick Optional callback when clicking the system title to open HUD settings.
  */
 @Composable
 fun TopBar(
     clockState: ClockState,
     modifier: Modifier = Modifier,
+    showSeconds: Boolean = true,
+    onSettingsClick: (() -> Unit)? = null,
 ) {
     val colors = AegisTheme.colors
     val typography = AegisTheme.typography
@@ -48,19 +54,35 @@ fun TopBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Bottom,
         ) {
-            // System label
-            Column {
+            // System label with optional customization launcher
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = if (onSettingsClick != null) {
+                    Modifier
+                        .clickable(onClick = onSettingsClick)
+                        .semantics { contentDescription = "Open HUD Settings" }
+                } else Modifier,
+            ) {
                 Text(
                     text = "RAGNAR // AEGIS",
                     style = typography.telemetry,
                     color = colors.cyan,
                 )
+                if (onSettingsClick != null) {
+                    Spacer(modifier = Modifier.width(spacing.xs))
+                    Text(
+                        text = "⚙",
+                        style = typography.telemetryLabel,
+                        color = colors.cyanDim,
+                    )
+                }
             }
             // Live clock
             HudClock(
                 hours = clockState.hours,
                 minutes = clockState.minutes,
                 seconds = clockState.seconds,
+                showSeconds = showSeconds,
             )
         }
 

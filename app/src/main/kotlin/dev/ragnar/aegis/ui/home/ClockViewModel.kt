@@ -24,13 +24,22 @@ import java.util.Locale
  */
 class ClockViewModel : ViewModel() {
 
-    private val _clockState = MutableStateFlow(ClockState.now())
+    private var is24Hour: Boolean = true
+
+    private val _clockState = MutableStateFlow(ClockState.now(is24Hour))
     val clockState: StateFlow<ClockState> = _clockState.asStateFlow()
+
+    fun set24Hour(enabled: Boolean) {
+        if (is24Hour != enabled) {
+            is24Hour = enabled
+            _clockState.value = ClockState.now(is24Hour)
+        }
+    }
 
     init {
         viewModelScope.launch {
             while (isActive) {
-                _clockState.value = ClockState.now()
+                _clockState.value = ClockState.now(is24Hour)
                 // Calculate delay until the next second boundary for precise ticking
                 val now = System.currentTimeMillis()
                 val delayMs = 1000L - (now % 1000L)
@@ -54,11 +63,17 @@ data class ClockState(
         private val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH)
         private val dayFormatter = DateTimeFormatter.ofPattern("EEEE", Locale.ENGLISH)
 
-        fun now(): ClockState {
+        fun now(is24Hour: Boolean = true): ClockState {
             val time = LocalTime.now()
             val date = LocalDate.now()
+            val hourFormatted = if (is24Hour) {
+                String.format(Locale.ROOT, "%02d", time.hour)
+            } else {
+                val h12 = time.hour % 12
+                String.format(Locale.ROOT, "%02d", if (h12 == 0) 12 else h12)
+            }
             return ClockState(
-                hours = String.format(Locale.ROOT, "%02d", time.hour),
+                hours = hourFormatted,
                 minutes = String.format(Locale.ROOT, "%02d", time.minute),
                 seconds = String.format(Locale.ROOT, "%02d", time.second),
                 dateFormatted = date.format(dateFormatter).uppercase(Locale.ENGLISH),

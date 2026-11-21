@@ -27,13 +27,14 @@ fun HudClock(
     minutes: String,
     seconds: String,
     modifier: Modifier = Modifier,
+    showSeconds: Boolean = true,
 ) {
     val colors = AegisTheme.colors
     val typography = AegisTheme.typography
 
     Row(
         modifier = modifier.semantics {
-            contentDescription = "Clock: $hours:$minutes:$seconds"
+            contentDescription = if (showSeconds) "Clock: $hours:$minutes:$seconds" else "Clock: $hours:$minutes"
         },
         verticalAlignment = Alignment.Bottom,
     ) {
@@ -43,11 +44,13 @@ fun HudClock(
             style = typography.clock,
             color = colors.cyan,
         )
-        // Seconds in dimmed cyan, smaller size
-        Text(
-            text = ":$seconds",
-            style = typography.clockSmall,
-            color = colors.cyanDim,
-        )
+        if (showSeconds) {
+            // Seconds in dimmed cyan, smaller size
+            Text(
+                text = ":$seconds",
+                style = typography.clockSmall,
+                color = colors.cyanDim,
+            )
+        }
     }
 }

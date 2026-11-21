@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.9.0
-**Last Updated:** 2026-11-21 (Phase 8 build verified; device validation pending)
-**Current Stage:** Phase 8 — Quick Actions
-**Overall Status:** Phase 8 implementation complete & build verified; device validation pending (B-002)
+**Version:** 0.10.0
+**Last Updated:** 2026-11-21 (Phase 9 build verified; device validation pending)
+**Current Stage:** Phase 9 — Customization
+**Overall Status:** Phase 9 implementation complete & build verified; device validation pending (B-002)
 
 ---
 
@@ -13,17 +13,17 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 8 — Quick Actions |
+| Stage | Phase 9 — Customization |
 | Status | Implementation Complete — Build Verified (Device Validation Pending) |
 | Last Updated | 2026-11-21 |
-| Last Completed Phase | PHASE-08 (Quick Actions — build verified) |
-| Current Phase | PHASE-08 (build verified; device validation pending) |
-| Next Step | Proceed to PHASE-09 (Customization F-010); run device validation when connected |
-| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (44s, 2026-11-21) |
-| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (37s, 47 tests passed, 2026-11-21) |
+| Last Completed Phase | PHASE-09 (Customization — build verified) |
+| Current Phase | PHASE-09 (build verified; device validation pending) |
+| Next Step | Proceed to PHASE-10 (Application Organization F-011); run device validation when connected |
+| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (26s, 2026-11-21) |
+| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (18s, 58 tests passed, 2026-11-21) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | 83b7b3e — feat(phase-8): implement Quick Actions panel (settings, torch, wi-fi, bluetooth) |
+| Latest Commit | 739725a — feat(phase-9): implement HUD customization and persistence (F-010) |
 
 ---
 
@@ -94,7 +94,7 @@ Rules:
 | F-007 | Animated Radar & HUD Graphics | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
 | F-008 | System Telemetry Dashboard | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-006, F-002 |
 | F-009 | Quick Actions | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
-| F-010 | Customization | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
+| F-010 | Customization | P1 | 5 | 5 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-002 |
 | F-011 | Application Organization | P1 | 4 | 0 | Not Started | Not Tested | Not Started | F-004, F-010 |
 | F-012 | Widget Hosting | P2 | 6 | 0 | Not Started | Not Tested | Not Started | F-001 |
 | F-013 | Context-Aware HUD | P2 | 7 | 0 | Not Started | Not Tested | Not Started | F-010 |
@@ -105,7 +105,7 @@ Rules:
 | F-018 | Extended Automation | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-013 |
 | F-019 | Open-Source Preparation | P3 | 6 | 0 | Not Started | Not Tested | Deferred | All |
 
-**Implementation Progress: 50%** (43 / 86 active planned implementation phases implemented)
+**Implementation Progress: 56%** (48 / 86 active planned implementation phases implemented)
 
 > **Denominator basis:** 86 active (non-deferred) planned phases — 31 P0 + 24 P1 + 31 P2. Deferred P3 phases (16) are excluded per the formula in Section B.2. Phase 4 counts implementation work only; its Gradle and device validation remain pending.
 
@@ -375,6 +375,38 @@ Rules:
 - Assemble, unit tests, and lint all completed successfully with zero errors.
 - Device testing deferred pending physical device / emulator (B-002).
 
+---
+
+### PHASE-09: Customization
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-09 |
+| Objective | DataStore preferences setup, accent color selection, panel visibility toggles, animation speed setting, clock style selection |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (26s, 2026-11-21) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (18s, 58 tests passed, 2026-11-21) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (55s, 0 errors, 2026-11-21) |
+| Dependencies | PHASE-02, PHASE-03, PHASE-06, PHASE-07, PHASE-08 |
+| Started | 2026-11-21 |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (58 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+
+**Implemented:**
+
+- Integrated `androidx.datastore:datastore-preferences:1.1.1` for persistent configuration.
+- `UserPreferences`, `AccentColor` (Cyan, Amber, Matrix Green, Tactical Crimson), and `AnimationSpeed` (Fast 2s, Normal 4s, Slow 8s, Disabled) domain models.
+- `PreferencesRepository` interface and `DataStorePreferencesRepository` backing persistence.
+- Dynamic `AegisColorScheme.withAccent(accent)` enabling live theme customization across all UI elements.
+- `SettingsViewModel` managing reactive preferences flow (`SharingStarted.Eagerly`).
+- `SettingsSheet` technical HUD overlay with live accent color preview, animation speed chips, panel visibility toggles, and clock formatting.
+- `HomeScreen` and `TopBar` integration with dynamic theming, panel conditionals, radar speed wiring, 12H/24H clock and seconds toggles.
+- 11 new JVM unit tests across `UserPreferencesTest` and `SettingsViewModelTest` (58 total project tests passing).
+
+**Validation:**
+- Assemble, unit tests, and lint all completed successfully with zero errors.
+- Device testing deferred pending physical device / emulator (B-002).
+
+---
 
 ## F. Build and Test History
 
@@ -404,6 +436,12 @@ Rules:
 | 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (21s) | 41 tests passed (15 telemetry tests including network speed) | PHASE-07 |
 | 2026-11-21 | `./gradlew --no-daemon assembleDebug` | Same | BUILD SUCCESSFUL (16s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-07 |
 | 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (39s) | 0 errors | PHASE-07 |
+| 2026-11-21 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (44s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-08 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (37s) | 47 tests passed (6 new QuickActions tests) | PHASE-08 |
+| 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (81s) | 0 errors | PHASE-08 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (18s) | 58 tests passed (11 new customization tests) | PHASE-09 |
+| 2026-11-21 | `./gradlew --no-daemon assembleDebug` | Same | BUILD SUCCESSFUL (26s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-09 |
+| 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (55s) | 0 errors | PHASE-09 |
 
 ---
 
@@ -431,23 +469,32 @@ Rules:
 | 2026-11-21 | **Phase 7 implemented & build verified:** real-time battery and network telemetry, pure normalizers, sticky broadcast / NetworkCallback repositories, genuine uptime tracking, and 8 JVM tests added; `assembleDebug`, `testDebugUnitTest` (34 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-07-TELEMETRY.md |
 | 2026-11-21 | **Phase 7 network speed addition:** live TrafficStats bandwidth sampling, `formatSpeed` utility, `formatNetworkLabel` with `↓↑` arrows, 7 additional JVM tests (41 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all successful | PHASE-07-TELEMETRY.md |
 | 2026-11-21 | **Phase 8 implemented & build verified:** `TorchController` facade, `AndroidTorchController`, `QuickActionsViewModel`, `QuickActionsPanel` with Settings/Torch/Wi-Fi/BT buttons, integrated into HomeScreen, 6 JVM tests added (47 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all successful; device testing pending (B-002) | PHASE-08-QUICK-ACTIONS.md |
+| 2026-11-21 | **Phase 9 implemented & build verified:** DataStore preferences, accent color themes (Cyan/Amber/Green/Crimson), panel visibility toggles, radar animation speed control, clock 12H/24H style, SettingsSheet modal, and 11 JVM tests added (58 total); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all successful; device testing pending (B-002) | PHASE-09-CUSTOMIZATION.md |
 
 ---
 
 ## I. Session Handoff
 
-**Session:** Phase 8 — Quick Actions
+**Session:** Phase 9 — Customization
 **Date:** 2026-11-21
 
-1. **Completed:** Full Phase 8 Quick Actions (F-009). Implemented `TorchController` interface, `AndroidTorchController` using `CameraManager.setTorchMode`, `QuickActionsViewModel` with real torch state tracking and error handling, `QuickActionsPanel` composable with four HUD-styled buttons (Settings, Torch, Wi-Fi, Bluetooth), integrated into `HomeScreen`. Added 6 JVM unit tests in `QuickActionsViewModelTest`.
+1. **Completed:** Full Phase 9 Customization (F-010). Integrated `androidx.datastore:datastore-preferences:1.1.1`. Implemented `UserPreferences`, `AccentColor` (Cyan, Amber, Matrix Green, Tactical Crimson), and `AnimationSpeed` models. Implemented `DataStorePreferencesRepository` with persistent state. Added dynamic `AegisColorScheme.withAccent`. Created `SettingsViewModel` and `SettingsSheet` modal. Integrated customizable theming, radar speed, panel visibility toggles, and clock 12H/24H into `HomeScreen` and `TopBar`. Added 11 JVM unit tests (58 total passing).
 2. **Changed files:**
-   - `app/src/main/kotlin/dev/ragnar/aegis/data/quickactions/TorchController.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/data/quickactions/AndroidTorchController.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/quickactions/QuickActionsViewModel.kt` (new)
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/quickactions/QuickActionsPanel.kt` (new)
+   - `gradle/libs.versions.toml`
+   - `app/build.gradle.kts`
+   - `app/src/main/kotlin/dev/ragnar/aegis/domain/settings/UserPreferences.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/settings/PreferencesRepository.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/settings/DataStorePreferencesRepository.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/settings/SettingsViewModel.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/settings/SettingsSheet.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/theme/Color.kt`
    - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/HomeScreen.kt`
-   - `app/src/test/kotlin/dev/ragnar/aegis/ui/quickactions/QuickActionsViewModelTest.kt` (new)
-   - `docs/phases/PHASE-08-QUICK-ACTIONS.md` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/TopBar.kt`
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/ClockViewModel.kt`
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/HudClock.kt`
+   - `app/src/test/kotlin/dev/ragnar/aegis/domain/settings/UserPreferencesTest.kt` (new)
+   - `app/src/test/kotlin/dev/ragnar/aegis/ui/settings/SettingsViewModelTest.kt` (new)
+   - `docs/phases/PHASE-09-CUSTOMIZATION.md` (new)
    - `docs/PROGRESS_TRACKER.md`
    - `docs/PHASE_LOG.md`
    - `docs/NEXT_STEPS.md`
@@ -455,14 +502,14 @@ Rules:
    - `docs/TEST_PLAN.md`
    - `docs/FEATURE_PLAN.md`
 3. **Validated:**
-   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (44s)
-   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (37s, 47 tests passed)
-   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (81s, 0 errors)
+   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (26s)
+   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (18s, 58 tests passed)
+   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (55s, 0 errors)
    - APK produced: `app/build/outputs/apk/debug/app-debug.apk`
-4. **Unverified:** Device testing (torch toggle, settings intents, physical device).
+4. **Unverified:** Device testing (real-time DataStore persistence and theme switching on physical hardware).
 5. **Blockers:** B-002 — No device available for on-device tests.
-6. **Next Task:** Phase 9 — Customization (F-010).
-7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-08-QUICK-ACTIONS.md`.
+6. **Next Task:** Phase 10 — Application Organization (F-011).
+7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-09-CUSTOMIZATION.md`.
 8. **Commands to run when resuming:**
    ```bash
    git status

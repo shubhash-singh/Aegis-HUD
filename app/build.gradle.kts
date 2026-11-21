@@ -70,6 +70,9 @@ dependencies {
     // Navigation
     implementation(libs.androidx.navigation.compose)
 
+    // DataStore Preferences (F-010 Customization)
+    implementation(libs.androidx.datastore.preferences)
+
     // Core
     implementation(libs.androidx.core.ktx)
 

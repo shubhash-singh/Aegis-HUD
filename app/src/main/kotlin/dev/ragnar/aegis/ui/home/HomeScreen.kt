@@ -46,8 +46,12 @@ import dev.ragnar.aegis.ui.components.ScanLineOverlay
 import dev.ragnar.aegis.ui.components.StatusIndicator
 import dev.ragnar.aegis.ui.components.StatusLevel
 import dev.ragnar.aegis.ui.quickactions.QuickActionsPanel
+import dev.ragnar.aegis.ui.settings.SettingsSheet
+import dev.ragnar.aegis.ui.settings.SettingsViewModel
+import dev.ragnar.aegis.ui.settings.SettingsViewModelFactory
 import dev.ragnar.aegis.ui.telemetry.TelemetryViewModel
 import dev.ragnar.aegis.ui.telemetry.TelemetryViewModelFactory
+import dev.ragnar.aegis.ui.theme.AegisColorScheme
 import dev.ragnar.aegis.ui.theme.AegisTheme
 
 /**
@@ -71,13 +75,35 @@ import dev.ragnar.aegis.ui.theme.AegisTheme
 fun HomeScreen(
     clockViewModel: ClockViewModel = viewModel(),
 ) {
-    // Launcher must not finish on back press — no-op handler.
+    val context = LocalContext.current
+
+    val settingsViewModel: SettingsViewModel = viewModel(
+        factory = remember(context.applicationContext) {
+            SettingsViewModelFactory(context.applicationContext)
+        },
+    )
+    val preferences by settingsViewModel.uiState.collectAsStateWithLifecycle()
+
+    var isDrawerVisible by rememberSaveable { mutableStateOf(false) }
+    var isSettingsVisible by rememberSaveable { mutableStateOf(false) }
+    var openWithSearchFocus by rememberSaveable { mutableStateOf(false) }
+    var launchError by remember { mutableStateOf<String?>(null) }
+
+    // Launcher back press handling: closes overlays first, no-op on root home
     BackHandler {
-        // Intentionally empty: a home-screen launcher does not exit on back press.
+        if (isSettingsVisible) {
+            isSettingsVisible = false
+        } else if (isDrawerVisible) {
+            isDrawerVisible = false
+            openWithSearchFocus = false
+        }
+    }
+
+    androidx.compose.runtime.LaunchedEffect(preferences.is24HourClock) {
+        clockViewModel.set24Hour(preferences.is24HourClock)
     }
 
     val clockState by clockViewModel.clockState.collectAsState()
-    val context = LocalContext.current
 
     val appDrawerViewModel: AppDrawerViewModel = viewModel(
         factory = remember(context.applicationContext) {
@@ -93,175 +119,207 @@ fun HomeScreen(
     )
     val telemetryState by telemetryViewModel.uiState.collectAsStateWithLifecycle()
 
-    var isDrawerVisible by rememberSaveable { mutableStateOf(false) }
-    var openWithSearchFocus by rememberSaveable { mutableStateOf(false) }
-    var launchError by remember { mutableStateOf<String?>(null) }
-    val colors = AegisTheme.colors
-    val typography = AegisTheme.typography
-    val spacing = AegisTheme.spacing
+    AegisTheme(
+        colors = AegisColorScheme.default().withAccent(preferences.accentColor),
+    ) {
+        val colors = AegisTheme.colors
+        val typography = AegisTheme.typography
+        val spacing = AegisTheme.spacing
 
-    // Observe battery-saver mode dynamically (F-007-P5)
-    var isPowerSaveMode by remember {
-        val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
-        mutableStateOf(pm?.isPowerSaveMode == true)
-    }
+        // Observe battery-saver mode dynamically (F-007-P5)
+        var isPowerSaveMode by remember {
+            val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+            mutableStateOf(pm?.isPowerSaveMode == true)
+        }
 
-    DisposableEffect(context) {
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(c: Context?, intent: Intent?) {
-                val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
-                isPowerSaveMode = pm?.isPowerSaveMode == true
+        DisposableEffect(context) {
+            val receiver = object : BroadcastReceiver() {
+                override fun onReceive(c: Context?, intent: Intent?) {
+                    val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+                    isPowerSaveMode = pm?.isPowerSaveMode == true
+                }
+            }
+            val filter = IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
+            context.registerReceiver(receiver, filter)
+            onDispose {
+                context.unregisterReceiver(receiver)
             }
         }
-        val filter = IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
-        context.registerReceiver(receiver, filter)
-        onDispose {
-            context.unregisterReceiver(receiver)
-        }
-    }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.systemBars)
-                .padding(horizontal = spacing.md)
-                .semantics { contentDescription = "AEGIS Home Screen" },
-        ) {
-            Spacer(modifier = Modifier.height(spacing.sm))
-
-            // === TOP BAR ZONE ===
-            TopBar(clockState = clockState)
-
-            Spacer(modifier = Modifier.height(spacing.md))
-
-            // === CENTER HUD ZONE ===
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Top,
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.systemBars)
+                    .padding(horizontal = spacing.md)
+                    .semantics { contentDescription = "AEGIS Home Screen" },
             ) {
-                // Animated technical radar graphic (F-007)
-                RadarDisplay(
-                    isPaused = isPowerSaveMode,
-                    modifier = Modifier.padding(bottom = spacing.sm),
+                Spacer(modifier = Modifier.height(spacing.sm))
+
+                // === TOP BAR ZONE ===
+                TopBar(
+                    clockState = clockState,
+                    showSeconds = preferences.showClockSeconds,
+                    onSettingsClick = { isSettingsVisible = true },
                 )
 
-                // Live system status panel (F-006 & F-008)
-                HudPanel(title = "System Status") {
-                    Column(modifier = Modifier.padding(top = spacing.xs)) {
-                        StatusRow(
-                            label = "NETWORK",
-                            status = telemetryState.networkStatusLevel,
-                            value = telemetryState.networkLabel,
+                Spacer(modifier = Modifier.height(spacing.md))
+
+                // === CENTER HUD ZONE ===
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.Top,
+                ) {
+                    // Animated technical radar graphic (F-007)
+                    if (preferences.showRadar) {
+                        RadarDisplay(
+                            isPaused = isPowerSaveMode || !preferences.animationSpeed.isEnabled,
+                            rotationDurationMillis = if (preferences.animationSpeed.isEnabled) {
+                                preferences.animationSpeed.durationMillis
+                            } else {
+                                4000
+                            },
+                            modifier = Modifier.padding(bottom = spacing.sm),
                         )
-                        Spacer(modifier = Modifier.height(spacing.xs))
-                        StatusRow(
-                            label = "BATTERY",
-                            status = telemetryState.batteryStatusLevel,
-                            value = telemetryState.batteryLabel,
-                        )
-                        Spacer(modifier = Modifier.height(spacing.xs))
-                        StatusRow(
-                            label = "STORAGE",
-                            status = StatusLevel.Ok,
-                            value = "ONLINE",
-                        )
+                    }
+
+                    // Live system status panel (F-006 & F-008)
+                    if (preferences.showSystemStatus) {
+                        HudPanel(title = "System Status") {
+                            Column(modifier = Modifier.padding(top = spacing.xs)) {
+                                StatusRow(
+                                    label = "NETWORK",
+                                    status = telemetryState.networkStatusLevel,
+                                    value = telemetryState.networkLabel,
+                                )
+                                Spacer(modifier = Modifier.height(spacing.xs))
+                                StatusRow(
+                                    label = "BATTERY",
+                                    status = telemetryState.batteryStatusLevel,
+                                    value = telemetryState.batteryLabel,
+                                )
+                                Spacer(modifier = Modifier.height(spacing.xs))
+                                StatusRow(
+                                    label = "STORAGE",
+                                    status = StatusLevel.Ok,
+                                    value = "ONLINE",
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(spacing.sm))
+                    }
+
+                    // Live telemetry panel (F-006 & F-008)
+                    if (preferences.showTelemetry) {
+                        HudPanel(title = "Telemetry") {
+                            Column(modifier = Modifier.padding(top = spacing.xs)) {
+                                TelemetryRow(
+                                    label = "BATTERY TEMP",
+                                    value = telemetryState.batteryTemperatureLabel,
+                                )
+                                Spacer(modifier = Modifier.height(spacing.xs))
+                                TelemetryRow(
+                                    label = "UPTIME",
+                                    value = telemetryState.uptimeFormatted,
+                                )
+                                Spacer(modifier = Modifier.height(spacing.xs))
+                                TelemetryRow(
+                                    label = "VOLTAGE",
+                                    value = telemetryState.battery.voltageMv?.let { "${it}mV" } ?: "---",
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(spacing.sm))
+                    }
+
+                    // Quick Actions panel (F-009)
+                    if (preferences.showQuickActions) {
+                        QuickActionsPanel()
                     }
                 }
 
                 Spacer(modifier = Modifier.height(spacing.sm))
 
-                // Live telemetry panel (F-006 & F-008)
-                HudPanel(title = "Telemetry") {
-                    Column(modifier = Modifier.padding(top = spacing.xs)) {
-                        TelemetryRow(
-                            label = "BATTERY TEMP",
-                            value = telemetryState.batteryTemperatureLabel,
-                        )
-                        Spacer(modifier = Modifier.height(spacing.xs))
-                        TelemetryRow(
-                            label = "UPTIME",
-                            value = telemetryState.uptimeFormatted,
-                        )
-                        Spacer(modifier = Modifier.height(spacing.xs))
-                        TelemetryRow(
-                            label = "VOLTAGE",
-                            value = telemetryState.battery.voltageMv?.let { "${it}mV" } ?: "---",
-                        )
-                    }
-                }
+                // === QUICK LAUNCH ZONE ===
+                QuickLaunchRow(
+                    apps = appDrawerState.apps,
+                    onAppClick = { app ->
+                        launchError = appDrawerViewModel.launch(app)
+                    },
+                )
 
                 Spacer(modifier = Modifier.height(spacing.sm))
 
-                // Quick Actions panel (F-009)
-                QuickActionsPanel()
+                // === BOTTOM NAV ZONE ===
+                BottomNavBar(
+                    onDrawerClick = {
+                        launchError = null
+                        openWithSearchFocus = false
+                        isDrawerVisible = true
+                    },
+                    onSearchClick = {
+                        launchError = null
+                        openWithSearchFocus = true
+                        isDrawerVisible = true
+                    },
+                )
+
+                Spacer(modifier = Modifier.height(spacing.sm))
             }
 
-            Spacer(modifier = Modifier.height(spacing.sm))
-
-            // === QUICK LAUNCH ZONE ===
-            QuickLaunchRow(
-                apps = appDrawerState.apps,
-                onAppClick = { app ->
-                    launchError = appDrawerViewModel.launch(app)
-                },
-            )
-
-            Spacer(modifier = Modifier.height(spacing.sm))
-
-            // === BOTTOM NAV ZONE ===
-            BottomNavBar(
-                onDrawerClick = {
-                    launchError = null
-                    openWithSearchFocus = false
-                    isDrawerVisible = true
-                },
-                onSearchClick = {
-                    launchError = null
-                    openWithSearchFocus = true
-                    isDrawerVisible = true
-                },
-            )
-
-            Spacer(modifier = Modifier.height(spacing.sm))
+            // CRT scan-line overlay (F-007-P3)
+            ScanLineOverlay(isPaused = isPowerSaveMode)
         }
 
-        // CRT scan-line overlay (F-007-P3)
-        ScanLineOverlay(isPaused = isPowerSaveMode)
-    }
+        if (isDrawerVisible) {
+            AppDrawer(
+                state = appDrawerState.copy(errorMessage = launchError ?: appDrawerState.errorMessage),
+                onDismiss = {
+                    isDrawerVisible = false
+                    openWithSearchFocus = false
+                    appDrawerViewModel.clearSearch()
+                },
+                onAppClick = { app ->
+                    launchError = appDrawerViewModel.launch(app)
+                    if (launchError == null) {
+                        isDrawerVisible = false
+                        openWithSearchFocus = false
+                        appDrawerViewModel.clearSearch()
+                    }
+                },
+                onSearchQueryChange = appDrawerViewModel::onSearchQueryChanged,
+                onClearSearch = appDrawerViewModel::clearSearch,
+                onSearchAction = {
+                    val error = appDrawerViewModel.launchTopResult()
+                    if (error != null) {
+                        launchError = error
+                    } else if (appDrawerState.filteredApps.isNotEmpty()) {
+                        isDrawerVisible = false
+                        openWithSearchFocus = false
+                        appDrawerViewModel.clearSearch()
+                    }
+                },
+                initialSearchFocus = openWithSearchFocus,
+            )
+        }
 
-    if (isDrawerVisible) {
-        AppDrawer(
-            state = appDrawerState.copy(errorMessage = launchError ?: appDrawerState.errorMessage),
-            onDismiss = {
-                isDrawerVisible = false
-                openWithSearchFocus = false
-                appDrawerViewModel.clearSearch()
-            },
-            onAppClick = { app ->
-                launchError = appDrawerViewModel.launch(app)
-                if (launchError == null) {
-                    isDrawerVisible = false
-                    openWithSearchFocus = false
-                    appDrawerViewModel.clearSearch()
-                }
-            },
-            onSearchQueryChange = appDrawerViewModel::onSearchQueryChanged,
-            onClearSearch = appDrawerViewModel::clearSearch,
-            onSearchAction = {
-                val error = appDrawerViewModel.launchTopResult()
-                if (error != null) {
-                    launchError = error
-                } else if (appDrawerState.filteredApps.isNotEmpty()) {
-                    isDrawerVisible = false
-                    openWithSearchFocus = false
-                    appDrawerViewModel.clearSearch()
-                }
-            },
-            initialSearchFocus = openWithSearchFocus,
-        )
+        if (isSettingsVisible) {
+            SettingsSheet(
+                preferences = preferences,
+                onAccentColorChange = settingsViewModel::setAccentColor,
+                onAnimationSpeedChange = settingsViewModel::setAnimationSpeed,
+                onToggleRadar = settingsViewModel::setShowRadar,
+                onToggleSystemStatus = settingsViewModel::setShowSystemStatus,
+                onToggleTelemetry = settingsViewModel::setShowTelemetry,
+                onToggleQuickActions = settingsViewModel::setShowQuickActions,
+                onToggle24HourClock = settingsViewModel::set24HourClock,
+                onToggleClockSeconds = settingsViewModel::setShowClockSeconds,
+                onResetDefaults = settingsViewModel::resetToDefaults,
+                onDismiss = { isSettingsVisible = false },
+            )
+        }
     }
 }
 

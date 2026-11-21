@@ -4,6 +4,24 @@
 
 ## [Unreleased] — Development
 
+### Phase 9 — Customization — 2026-11-21
+
+**Added:**
+- Persistent configuration management using AndroidX DataStore Preferences (`androidx.datastore:datastore-preferences:1.1.1`).
+- Domain models `UserPreferences`, `AccentColor` (Cyan, Amber, Matrix Green, Tactical Crimson), and `AnimationSpeed` (Fast 2s, Normal 4s, Slow 8s, Disabled).
+- `PreferencesRepository` interface and `DataStorePreferencesRepository` backing persistence.
+- Dynamic `AegisColorScheme.withAccent(accent)` dynamically updating HUD colors across the entire UI.
+- `SettingsViewModel` managing reactive preferences flow.
+- Full-screen `SettingsSheet` technical HUD modal with theme selection, radar animation speed chips, panel visibility toggles, clock formatting, and system defaults reset.
+- Live `HomeScreen` and `TopBar` integration with dynamic theming, panel conditionals, radar speed wiring, 12H/24H clock and seconds toggles.
+- 11 JVM unit tests in `UserPreferencesTest` and `SettingsViewModelTest` (58 total project unit tests passing).
+
+**Validation:**
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (26s).
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (18s, 58 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (55s, 0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### Phase 8 — Quick Actions — 2026-11-21
 
 **Added:**

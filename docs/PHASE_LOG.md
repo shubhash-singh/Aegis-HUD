@@ -469,5 +469,46 @@ All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) pass
 
 ---
 
+### PHASE-09 — Customization
+
+| Field | Value |
+|---|---|
+| Phase | PHASE-09 |
+| Title | Customization (F-010) |
+| Date Started | 2026-11-21 |
+| Date Completed | 2026-11-21 (build verified; device validation pending) |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Result | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (26s) |
+| Test Result | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (18s, 58 tests passed) |
+| Lint Result | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (55s, 0 errors) |
+
+**Summary:**
+
+Phase 9 delivered persistent, immediate launcher customization using AndroidX DataStore Preferences:
+
+1. **DataStore Preferences & Repository (F-010-P1):**
+   - Integrated `androidx.datastore:datastore-preferences:1.1.1`.
+   - Implemented `UserPreferences`, `AccentColor` (Cyan, Amber, Matrix Green, Tactical Crimson), and `AnimationSpeed` (Fast 2s, Normal 4s, Slow 8s, Disabled).
+   - Created `DataStorePreferencesRepository` with non-blocking Flow reading, error catching, and atomic preference writes.
+2. **Dynamic Theme Accent Tokens (F-010-P2):**
+   - Added `AegisColorScheme.withAccent(accent)` to derive customized theme colors (primary cyan, active border, text accent) across all components.
+3. **Panel Visibility Toggles (F-010-P3):**
+   - Independent persistent toggles for Radar, System Status, Telemetry, and Quick Actions panels on `HomeScreen`.
+4. **Animation Speed Control (F-010-P4):**
+   - Connected `AnimationSpeed` duration directly to `RadarDisplay`'s rotation sweep and pause state.
+5. **Clock Style Selection (F-010-P5):**
+   - Added 12-hour / 24-hour mode and seconds visibility toggling in `ClockViewModel` and `HudClock`.
+6. **SettingsSheet & UI Integration:**
+   - Full-screen HUD modal overlay accessible from the `⚙` icon in `TopBar`.
+   - Provides live accent color preview, speed selection chips, panel visibility toggles, clock formatting switches, and a system reset button.
+7. **Unit Tests:**
+   - Added 11 new unit tests in `UserPreferencesTest` and `SettingsViewModelTest` validating default values, enum parsing, color derivation, clock formatting, and reactive ViewModel updates. All 58 project unit tests pass.
+
+All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) passed with zero errors. Device validation remains pending connection of a target device (B-002).
+
+**Next phase:** PHASE-10 — Application Organization (F-011)
+
+---
+
 *(Subsequent phases will be logged as they are completed.)*
 
