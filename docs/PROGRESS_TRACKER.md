@@ -23,7 +23,7 @@
 | Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (30s, 103 tests passed, 2026-11-22) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | 25f484d — docs: update docs for phase 13 context-aware HUD completion |
+| Latest Commit | 71e5d52 — feat(phase-14): implement gesture navigation (F-015) with swipe-down settings, long-press hint overlay, and per-gesture toggles |
 
 ---
 
