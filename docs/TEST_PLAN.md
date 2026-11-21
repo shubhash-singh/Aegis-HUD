@@ -34,23 +34,23 @@
 - [ ] `CT-002-03`: `HudPanel` composable renders with and without content (Compose instrumentation test).
 
 ### F-003: HUD Home Screen
-- [ ] `UT-003-01`: Clock displays correct time format (unit test on formatting function).
-- [ ] `VT-003-02`: Clock updates after one second (ViewModel test with `runTest` and a test dispatcher).
-- [ ] `UT-003-03`: Date label displays correct date string (unit test).
+- [x] `UT-003-01`: Clock displays correct time format (unit test on formatting function).
+- [x] `VT-003-02`: Clock updates after one second (ViewModel test with `runTest` and a test dispatcher).
+- [x] `UT-003-03`: Date label displays correct date string (unit test).
 - [ ] `CT-003-04`: Home screen renders without crash (Compose instrumentation test).
 
 ### F-004: Application Discovery
 - [ ] `IT-004-01`: PackageManager adapter maps `ResolveInfo` into a platform-neutral `AppInfo` (instrumentation test).
-- [ ] `UT-004-02`: App list sorts alphabetically (unit test).
-- [ ] `UT-004-03`: Duplicate entries are removed (unit test).
-- [ ] `UT-004-04`: Empty package list produces empty `AppInfo` list (unit test).
+- [x] `UT-004-02`: App list sorts alphabetically (unit test).
+- [x] `UT-004-03`: Duplicate entries are removed (unit test).
+- [x] `UT-004-04`: Empty package list produces empty `AppInfo` list (unit test).
 - [ ] `UT-004-05`: `AppRepository` emits updated list on package change (ViewModel test).
 
 ### F-005: Application Search
-- [ ] `UT-005-01`: Filter by exact name returns correct app (unit test).
-- [ ] `UT-005-02`: Filter by partial name (case-insensitive) returns matches (unit test).
-- [ ] `UT-005-03`: Empty query returns all apps (unit test).
-- [ ] `UT-005-04`: Query with no matches returns empty list (unit test).
+- [x] `UT-005-01`: Filter by exact name returns correct app (unit test).
+- [x] `UT-005-02`: Filter by partial name (case-insensitive) returns matches (unit test).
+- [x] `UT-005-03`: Empty query returns all apps (unit test).
+- [x] `UT-005-04`: Query with no matches returns empty list (unit test).
 
 ### F-006: Battery Telemetry
 - [ ] `IT-006-01`: Battery adapter extracts values from `Intent.ACTION_BATTERY_CHANGED` extras (instrumentation test).
@@ -151,7 +151,11 @@ The following tests verify the manifest attributes accepted in DEC-010:
 
 | Date | Command | Result | Notes | Phase |
 |---|---|---|---|---|
-| 2026-10-25 | (not yet run) | Pending | No code yet; Phase 0 only | 0 |
+| 2026-10-25 | `./gradlew testDebugUnitTest` | PASS | 2 tests passed | 1 |
+| 2026-11-01 | `./gradlew testDebugUnitTest` | PASS | 7 tests passed | 2 |
+| 2026-11-01 | `./gradlew testDebugUnitTest` | PASS | 12 tests passed | 3 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | PASS | 15 tests passed | 4 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | PASS | 19 tests passed (4 search filter tests) | 5 |
 
 ---
 

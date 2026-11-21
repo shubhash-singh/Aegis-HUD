@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.5.1
-**Last Updated:** 2026-11-21 (Phase 4 build verified; device validation pending)
-**Current Stage:** Phase 4 — App Discovery & Launching
-**Overall Status:** Phase 4 implementation complete & build verified; device validation pending (B-002)
+**Version:** 0.6.0
+**Last Updated:** 2026-11-21 (Phase 5 build verified; device validation pending)
+**Current Stage:** Phase 5 — Application Search
+**Overall Status:** Phase 5 implementation complete & build verified; device validation pending (B-002)
 
 ---
 
@@ -13,17 +13,17 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 4 — App Discovery & Launching |
+| Stage | Phase 5 — Application Search |
 | Status | Implementation Complete — Build Verified (Device Validation Pending) |
 | Last Updated | 2026-11-21 |
-| Last Completed Phase | PHASE-04 (App Discovery & Launching — build verified) |
-| Current Phase | PHASE-04 (build verified; device validation pending) |
-| Next Step | Proceed to PHASE-05 (Application Search); run device validation when connected |
-| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (41s, 2026-11-21) |
-| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (31s, 15 tests passed, 2026-11-21) |
+| Last Completed Phase | PHASE-05 (Application Search — build verified) |
+| Current Phase | PHASE-05 (build verified; device validation pending) |
+| Next Step | Proceed to PHASE-06 (Animated Radar and HUD Graphics); run device validation when connected |
+| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (21s, 2026-11-21) |
+| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 19 tests passed, 2026-11-21) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | aecebc3 — feat(phase-4): implement app discovery and launching |
+| Latest Commit | 31aa9ce — feat(phase-5): implement real-time application search in drawer |
 
 ---
 
@@ -89,7 +89,7 @@ Rules:
 | F-002 | HUD Design System | P0 | 5 | 5 | All phases done | Build Verified | Implementation Complete — Build Verified | F-001 |
 | F-003 | HUD Home Screen | P0 | 6 | 6 | All phases done | Build Verified | Implementation Complete — Build Verified | F-002 |
 | F-004 | App Discovery & Launching | P0 | 6 | 6 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-001 |
-| F-005 | Application Search | P0 | 4 | 0 | Not Started | Not Tested | Not Started | F-004 |
+| F-005 | Application Search | P0 | 4 | 4 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-004 |
 | F-006 | Battery Telemetry | P0 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
 | F-007 | Animated Radar & HUD Graphics | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
 | F-008 | System Telemetry Dashboard | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-006, F-002 |
@@ -105,7 +105,7 @@ Rules:
 | F-018 | Extended Automation | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-013 |
 | F-019 | Open-Source Preparation | P3 | 6 | 0 | Not Started | Not Tested | Deferred | All |
 
-**Implementation Progress: 22%** (19 / 86 active planned implementation phases implemented)
+**Implementation Progress: 27%** (23 / 86 active planned implementation phases implemented)
 
 > **Denominator basis:** 86 active (non-deferred) planned phases — 31 P0 + 24 P1 + 31 P2. Deferred P3 phases (16) are excluded per the formula in Section B.2. Phase 4 counts implementation work only; its Gradle and device validation remain pending.
 
@@ -258,6 +258,35 @@ Rules:
 
 ---
 
+### PHASE-05: Application Search
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-05 |
+| Objective | Real-time application search filtering, keyboard handling, empty and no-results states |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (21s, 2026-11-21) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (16s, 19 tests passed, 2026-11-21) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (33s, 0 errors, 2026-11-21) |
+| Dependencies | PHASE-04 |
+| Started | 2026-11-21 |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (19 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+
+**Implemented:**
+
+- Pure Kotlin `AppListNormalizer.filter` case-insensitive substring search.
+- Reactive `AppDrawerViewModel` combining app discovery and query flows into `filteredApps`.
+- `HudSearchBar` composable with HUD aesthetics, 48dp clear button touch target, and IME search action.
+- App drawer integrated search, distinct "NO APPLICATIONS MATCHING" message, and query reset on dismiss.
+- Bottom navigation search placeholder wired to open drawer with search auto-focus.
+- Four new unit tests covering exact match, partial match, empty query, and no match (`UT-005-01` to `UT-005-04`).
+
+**Validation:**
+- Assemble, unit tests, and lint all completed successfully with zero errors.
+- Device testing deferred pending physical device / emulator (B-002).
+
+---
+
 ## F. Build and Test History
 
 | Date | Command | Environment | Result | Notes | Feature/Phase |
@@ -274,6 +303,9 @@ Rules:
 | 2026-11-21 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (41s) | APK: app/build/outputs/apk/debug/app-debug.apk; AAPT2 patched (DEC-013) | PHASE-04 |
 | 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (31s) | 15 tests passed (2 Example + 5 ThemeTokens + 5 ClockViewModel + 3 AppListNormalizer) | PHASE-04 |
 | 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (53s) | 0 errors | PHASE-04 |
+| 2026-11-21 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (21s) | APK: app/build/outputs/apk/debug/app-debug.apk | PHASE-05 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (16s) | 19 tests passed (2 Example + 5 ThemeTokens + 5 ClockViewModel + 7 AppListNormalizer) | PHASE-05 |
+| 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (33s) | 0 errors | PHASE-05 |
 
 ---
 
@@ -296,52 +328,46 @@ Rules:
 | 2026-10-25 | Planning review corrections applied: Gradle wrapper bootstrap defined; technical wording, testing boundaries, dependency diagram, tracker reference, and changelog alignment corrected | `reviews/` |
 | 2026-10-25 | **Phase 1 implemented:** Android project scaffold created; Gradle 8.9 wrapper bootstrapped (SHA-256 verified); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all passed; device tests pending | PHASE-01-FOUNDATION.md |
 | 2026-11-21 | **Phase 4 implemented & build verified:** app discovery, drawer, launch flow, package refresh, and JVM tests added; B-003 resolved via patchelf (DEC-013); `assembleDebug`, `testDebugUnitTest` (15 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-04-APP-DISCOVERY.md |
+| 2026-11-21 | **Phase 5 implemented & build verified:** real-time app search filtering, HudSearchBar, bottom nav wiring, IME launch action, no-results state, and 4 JVM tests added; `assembleDebug`, `testDebugUnitTest` (19 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-05-SEARCH.md |
 
 ---
 
 ## I. Session Handoff
 
-**Session:** Phase 1 — Android Launcher Foundation
-**Date:** 2026-10-25
+**Session:** Phase 5 — Application Search
+**Date:** 2026-11-21
 
-1. **Completed:** Full Phase 1 Android project scaffold. Gradle 8.9 wrapper bootstrapped from official distribution with SHA-256 verification. All source files created. Build, unit tests, and lint all pass.
-2. **Changed (new files):**
-   - `.gitignore` — resolves B-001
-   - `settings.gradle.kts` — root Gradle settings
-   - `build.gradle.kts` — root build file (plugins only)
-   - `gradle/libs.versions.toml` — version catalog per TECH_STACK.md
-   - `gradle.properties` — project-wide Gradle settings
-   - `local.properties` — machine-specific SDK path (not committed)
-   - `gradlew`, `gradlew.bat`, `gradle/wrapper/*` — Gradle 8.9 wrapper
-   - `app/build.gradle.kts` — app module with Compose
-   - `app/proguard-rules.pro` — empty ProGuard rules
-   - `app/src/main/AndroidManifest.xml` — launcher registration
-   - `app/src/main/kotlin/dev/ragnar/aegis/MainActivity.kt`
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/theme/AegisTheme.kt`
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/theme/Color.kt`
-   - `app/src/main/kotlin/dev/ragnar/aegis/ui/theme/Typography.kt`
+1. **Completed:** Full Phase 5 Application Search. Real-time search filtering in `AppDrawer` with `AppListNormalizer.filter`. `HudSearchBar` with HUD aesthetics, 48dp touch target clear button, and IME search action. Interactive bottom navigation search placeholder opening drawer with auto-focus. 4 JVM unit tests for search filter.
+2. **Changed files:**
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/apps/HudSearchBar.kt` (new)
+   - `app/src/main/kotlin/dev/ragnar/aegis/data/apps/AppListNormalizer.kt`
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/apps/AppDrawerViewModel.kt`
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/apps/AppDrawer.kt`
    - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/HomeScreen.kt`
-   - `app/src/main/res/values/strings.xml`
-   - `app/src/main/res/values/ic_launcher_colors.xml`
-   - `app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml`
-   - `app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml`
-   - `app/src/test/kotlin/dev/ragnar/aegis/ExampleUnitTest.kt`
-   - `app/src/androidTest/kotlin/dev/ragnar/aegis/ExampleInstrumentedTest.kt`
-   - `docs/PROGRESS_TRACKER.md` — updated (this file)
-   - `docs/PHASE_LOG.md` — updated
-   - `docs/NEXT_STEPS.md` — updated
+   - `app/src/main/kotlin/dev/ragnar/aegis/ui/home/BottomNavBar.kt`
+   - `app/src/test/kotlin/dev/ragnar/aegis/data/apps/AppListNormalizerTest.kt`
+   - `docs/phases/PHASE-05-SEARCH.md` (new)
+   - `docs/PROGRESS_TRACKER.md`
+   - `docs/FEATURE_PLAN.md`
+   - `docs/PHASE_LOG.md`
+   - `docs/NEXT_STEPS.md`
+   - `docs/CHANGELOG.md`
+   - `docs/TEST_PLAN.md`
+   - `docs/PROJECT_PLAN.md`
+   - `docs/README.md`
+   - `README.md`
 3. **Validated:**
-   - `./gradlew assembleDebug` — BUILD SUCCESSFUL (1m 46s)
-   - `./gradlew testDebugUnitTest` — BUILD SUCCESSFUL (36s, 2 tests passed)
-   - `./gradlew lintDebug` — BUILD SUCCESSFUL (0 errors, 34 warnings)
-   - APK produced: `app/build/outputs/apk/debug/app-debug.apk` (9.4MB)
-4. **Unverified:** DT-MANIFEST-01 through DT-MANIFEST-04 (no physical device connected).
-5. **Blockers:** B-002 — No device available for manifest tests.
-6. **Next Task:** Phase 2 — HUD Design System (after device validation of Phase 1).
-7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-01-FOUNDATION.md`.
+   - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (21s)
+   - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 19 tests passed)
+   - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (33s, 0 errors)
+   - APK produced: `app/build/outputs/apk/debug/app-debug.apk`
+4. **Unverified:** Device testing (DT-MANIFEST-01 through DT-MANIFEST-04, manual search interaction).
+5. **Blockers:** B-002 — No device available for on-device tests.
+6. **Next Task:** Phase 6 — Animated Radar & HUD Graphics (or F-006 Battery Telemetry).
+7. **Files to inspect before resuming:** `AGENTS.md`, `docs/PROGRESS_TRACKER.md`, `docs/NEXT_STEPS.md`, `docs/phases/PHASE-05-SEARCH.md`.
 8. **Commands to run when resuming:**
    ```bash
    git status
-   ./gradlew assembleDebug
+   ./gradlew --no-daemon testDebugUnitTest
    cat docs/NEXT_STEPS.md
    ```

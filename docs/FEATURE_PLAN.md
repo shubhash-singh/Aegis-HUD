@@ -157,7 +157,7 @@ Query the Android package manager for launchable applications. Display icons and
 **Priority:** P0
 **Dependencies:** F-004
 **Implementation Phase:** Phase 5
-**Status:** Not Started
+**Status:** Implementation Complete — Build Verified (Device Validation Pending)
 
 **Description:**
 Real-time search by app name. Filter as the user types. Handle empty and no-results states.
@@ -166,10 +166,10 @@ Real-time search by app name. Filter as the user types. Handle empty and no-resu
 
 | Phase | ID | Title | Status |
 |---|---|---|---|
-| 1 | F-005-P1 | Search composable (text field + clear) | Not Started |
-| 2 | F-005-P2 | Filter logic wired to app list | Not Started |
-| 3 | F-005-P3 | Empty state and no-results state | Not Started |
-| 4 | F-005-P4 | Keyboard handling and IME actions | Not Started |
+| 1 | F-005-P1 | Search composable (text field + clear) | Implemented — Build Verified |
+| 2 | F-005-P2 | Filter logic wired to app list | Implemented — Build Verified |
+| 3 | F-005-P3 | Empty state and no-results state | Implemented — Build Verified |
+| 4 | F-005-P4 | Keyboard handling and IME actions | Implemented — Build Verified |
 
 **Acceptance Criteria:**
 - Results update as each character is typed.

@@ -33,6 +33,7 @@ This directory contains all project documentation for AEGIS HUD Launcher.
 | [phases/PHASE-02-DESIGN-SYSTEM.md](phases/PHASE-02-DESIGN-SYSTEM.md) | Phase 2: HUD Design System — build verified |
 | [phases/PHASE-03-HOME-SCREEN.md](phases/PHASE-03-HOME-SCREEN.md) | Phase 3: HUD Home Screen — build verified |
 | [phases/PHASE-04-APP-DISCOVERY.md](phases/PHASE-04-APP-DISCOVERY.md) | Phase 4: App Discovery — build verified (device validation pending) |
+| [phases/PHASE-05-SEARCH.md](phases/PHASE-05-SEARCH.md) | Phase 5: Application Search — build verified (device validation pending) |
 
 ---
 
@@ -40,4 +41,4 @@ This directory contains all project documentation for AEGIS HUD Launcher.
 
 See [PROGRESS_TRACKER.md](PROGRESS_TRACKER.md) for authoritative project status.
 
-Current stage: **Phase 4 implementation and build validation complete (build verified, 15 tests passed, lint passed); device validation pending B-002.**
+Current stage: **Phase 5 implementation and build validation complete (build verified, 19 tests passed, lint passed); device validation pending B-002.**

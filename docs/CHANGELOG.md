@@ -4,6 +4,23 @@
 
 ## [Unreleased] — Development
 
+### Phase 5 — Application Search — 2026-11-21
+
+**Added:**
+- Real-time search filtering in `AppDrawer` with `AppListNormalizer.filter`.
+- `HudSearchBar` composable with HUD styling, 48dp touch target clear button, and IME search action.
+- Interactive search placeholder in bottom navigation bar that opens drawer with search focus.
+- IME search action launches top result.
+- Distinct no-results state (`NO APPLICATIONS MATCHING "<QUERY>"`).
+- Search query automatically resets on drawer dismiss.
+- 4 JVM unit tests for search filtering (`UT-005-01` through `UT-005-04`) in `AppListNormalizerTest`.
+
+**Validation:**
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (21s).
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (16s, 19 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (33s, 0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### Phase 4 — App Discovery & Launching — 2026-11-21
 
 **Added:**

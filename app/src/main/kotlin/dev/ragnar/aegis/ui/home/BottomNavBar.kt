@@ -19,10 +19,7 @@ import androidx.compose.ui.semantics.semantics
 import dev.ragnar.aegis.ui.theme.AegisTheme
 
 /**
- * Bottom navigation bar — provides access to the app drawer.
- *
- * Phase 3 renders a placeholder button.
- * Phase 4 (F-004) will wire this to the actual drawer navigation.
+ * Bottom navigation bar — provides access to search and the app drawer.
  *
  * Design from UI_UX_SPECIFICATION.md Section 5 "Bottom nav zone":
  * ```
@@ -30,11 +27,13 @@ import dev.ragnar.aegis.ui.theme.AegisTheme
  * ```
  *
  * @param onDrawerClick Callback when the drawer button is tapped.
+ * @param onSearchClick Callback when the search placeholder is tapped.
  */
 @Composable
 fun BottomNavBar(
     modifier: Modifier = Modifier,
     onDrawerClick: () -> Unit = {},
+    onSearchClick: () -> Unit = {},
 ) {
     val colors = AegisTheme.colors
     val typography = AegisTheme.typography
@@ -47,7 +46,7 @@ fun BottomNavBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Search bar placeholder
+        // Search bar launcher button
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -62,7 +61,9 @@ fun BottomNavBar(
                     color = colors.border,
                     shape = RoundedCornerShape(spacing.panelCornerRadius),
                 )
-                .padding(horizontal = spacing.md),
+                .clickable(onClick = onSearchClick)
+                .padding(horizontal = spacing.md)
+                .semantics { contentDescription = "Search applications" },
             contentAlignment = Alignment.CenterStart,
         ) {
             Text(

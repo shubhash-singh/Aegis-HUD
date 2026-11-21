@@ -6,11 +6,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -28,13 +29,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import dev.ragnar.aegis.domain.apps.AppInfo
 import dev.ragnar.aegis.ui.theme.AegisTheme
 
-/** The launcher application drawer, rendered as a modal HUD panel. */
+/** The launcher application drawer, rendered as a modal HUD panel with integrated search. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppDrawer(
     state: AppDrawerUiState,
     onDismiss: () -> Unit,
     onAppClick: (AppInfo) -> Unit,
+    onSearchQueryChange: (String) -> Unit = {},
+    onClearSearch: () -> Unit = {},
+    onSearchAction: () -> Unit = {},
+    initialSearchFocus: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val colors = AegisTheme.colors
@@ -57,6 +62,14 @@ fun AppDrawer(
                 style = typography.sectionHeader,
                 color = colors.cyanDim,
             )
+            Spacer(modifier = Modifier.height(spacing.sm))
+            HudSearchBar(
+                query = state.searchQuery,
+                onQueryChange = onSearchQueryChange,
+                onClear = onClearSearch,
+                onSearch = onSearchAction,
+                requestFocus = initialSearchFocus,
+            )
             state.errorMessage?.let { error ->
                 Text(
                     text = error,
@@ -68,6 +81,7 @@ fun AppDrawer(
             when {
                 state.isLoading -> DrawerMessage("LOADING APPLICATIONS")
                 state.apps.isEmpty() -> DrawerMessage("NO LAUNCHABLE APPLICATIONS")
+                state.isNoResults -> DrawerMessage("NO APPLICATIONS MATCHING \"${state.searchQuery.uppercase()}\"")
                 else -> LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = spacing.appIconSize + spacing.lg),
                     modifier = Modifier
@@ -77,7 +91,7 @@ fun AppDrawer(
                     horizontalArrangement = Arrangement.spacedBy(spacing.sm),
                     verticalArrangement = Arrangement.spacedBy(spacing.md),
                 ) {
-                    items(state.apps, key = AppInfo::componentName) { app ->
+                    items(state.filteredApps, key = AppInfo::componentName) { app ->
                         AppDrawerCell(app = app, onClick = { onAppClick(app) })
                     }
                 }

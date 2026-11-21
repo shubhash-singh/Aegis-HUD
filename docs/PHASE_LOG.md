@@ -324,4 +324,34 @@ NixOS environment blocker B-003 was resolved by patching the AAPT2 binary ELF in
 
 ---
 
+### PHASE-05 — Application Search
+
+| Field | Value |
+|---|---|
+| Phase | PHASE-05 |
+| Title | Application Search |
+| Date Started | 2026-11-21 |
+| Date Completed | 2026-11-21 (build verified; device validation pending) |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Result | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (21s) |
+| Test Result | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (16s, 19 tests passed) |
+| Lint Result | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (33s, 0 errors) |
+
+**Summary:**
+
+Phase 5 implemented real-time application search filtering inside the HUD application drawer:
+
+1. **AppListNormalizer.filter**: Pure Kotlin function performing case-insensitive substring matching on application labels. Returns the full list on blank/empty queries. Pure logic ensures complete JVM testability.
+2. **AppDrawerViewModel**: Introduced `searchQuery` state flow, combined with `observeLaunchableApps()` into `filteredApps`. Added `onSearchQueryChanged`, `clearSearch`, and `launchTopResult()`.
+3. **HudSearchBar**: HUD-styled `BasicTextField` with monospaced telemetry typography, dark surface background, active cyan border, clear button (`✕`) meeting the 48dp minimum touch target, and IME search action. Supports autofocus via `FocusRequester`.
+4. **AppDrawer**: Integrated search bar below header; displays `filteredApps`; renders distinct "NO APPLICATIONS MATCHING <QUERY>" state when filtered results are empty; resets search on dismiss.
+5. **BottomNavBar & HomeScreen**: Made search placeholder interactive, wired to open the drawer with search autofocus. IME search/enter action automatically launches the top matching application.
+6. **Unit Tests**: Added 4 unit tests (`UT-005-01` through `UT-005-04`) verifying exact-name matching, case-insensitive partial matching, empty/blank query behavior, and non-matching queries. All 19 project unit tests pass.
+
+All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) passed with zero errors. Device validation remains pending connection of a target device (B-002).
+
+**Next phase:** PHASE-06 — Animated Radar and Technical HUD Graphics
+
+---
+
 *(Subsequent phases will be logged as they are completed.)*

@@ -68,6 +68,7 @@ fun HomeScreen(
     )
     val appDrawerState by appDrawerViewModel.uiState.collectAsStateWithLifecycle()
     var isDrawerVisible by rememberSaveable { mutableStateOf(false) }
+    var openWithSearchFocus by rememberSaveable { mutableStateOf(false) }
     var launchError by remember { mutableStateOf<String?>(null) }
     val colors = AegisTheme.colors
     val typography = AegisTheme.typography
@@ -132,6 +133,12 @@ fun HomeScreen(
         BottomNavBar(
             onDrawerClick = {
                 launchError = null
+                openWithSearchFocus = false
+                isDrawerVisible = true
+            },
+            onSearchClick = {
+                launchError = null
+                openWithSearchFocus = true
                 isDrawerVisible = true
             },
         )
@@ -142,11 +149,32 @@ fun HomeScreen(
     if (isDrawerVisible) {
         AppDrawer(
             state = appDrawerState.copy(errorMessage = launchError ?: appDrawerState.errorMessage),
-            onDismiss = { isDrawerVisible = false },
+            onDismiss = {
+                isDrawerVisible = false
+                openWithSearchFocus = false
+                appDrawerViewModel.clearSearch()
+            },
             onAppClick = { app ->
                 launchError = appDrawerViewModel.launch(app)
-                if (launchError == null) isDrawerVisible = false
+                if (launchError == null) {
+                    isDrawerVisible = false
+                    openWithSearchFocus = false
+                    appDrawerViewModel.clearSearch()
+                }
             },
+            onSearchQueryChange = appDrawerViewModel::onSearchQueryChanged,
+            onClearSearch = appDrawerViewModel::clearSearch,
+            onSearchAction = {
+                val error = appDrawerViewModel.launchTopResult()
+                if (error != null) {
+                    launchError = error
+                } else if (appDrawerState.filteredApps.isNotEmpty()) {
+                    isDrawerVisible = false
+                    openWithSearchFocus = false
+                    appDrawerViewModel.clearSearch()
+                }
+            },
+            initialSearchFocus = openWithSearchFocus,
         )
     }
 }
