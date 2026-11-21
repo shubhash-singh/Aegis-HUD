@@ -23,7 +23,7 @@
 | Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (122 tests passed, 2026-11-22) |
 | Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | dac46d7 — feat(ui): add glassmorphism & edge glow to cards, expand neural brain to 138 nodes, remove scanline, and optimize app drawer scrolling |
+| Latest Commit | 64e13a0 — feat(ui): remove bottom emitter/cone/waveform cluster, add radial depth to app drawer cells, increase drawer transparency |
 
 ---
 
