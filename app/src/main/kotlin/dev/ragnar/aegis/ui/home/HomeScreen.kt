@@ -50,7 +50,6 @@ import dev.ragnar.aegis.ui.apps.AppDrawerViewModelFactory
 import dev.ragnar.aegis.ui.components.GestureHint
 import dev.ragnar.aegis.ui.components.GestureHintOverlay
 import dev.ragnar.aegis.ui.components.HudCornerBrackets
-import dev.ragnar.aegis.ui.components.ScanLineOverlay
 import dev.ragnar.aegis.ui.components.TacticalAlertBanner
 import dev.ragnar.aegis.ui.console.DeveloperConsoleScreen
 import dev.ragnar.aegis.ui.console.DeveloperConsoleViewModel
@@ -391,9 +390,6 @@ fun HomeScreen(
                     )
                 }
             }
-
-            // CRT Scanline Overlay
-            ScanLineOverlay(isPaused = isPowerSaveMode)
         }
 
         // =====================================================================

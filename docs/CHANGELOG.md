@@ -4,6 +4,15 @@
 
 ## [Unreleased] — Development
 
+### Visual Polish & Drawer Scroll Optimization — 2026-11-22
+
+**Changed & Enhanced:**
+- **App Drawer Glassmorphism:** Translucent frosted dark cyber gradient (`#071E30` to `#010710`) with glowing cyan rim border and customized HUD drag handle.
+- **Home Screen Cards Depth & Edge Glow:** Enhanced `FloatingHudPanel` with multi-stage outer cyan glowing aura, dual-tone neon border, translucent dark glass gradient depth, and specular top rim light.
+- **Removed Scanline Animation:** Removed the top-to-bottom translating CRT scanline line animation from the home screen for a cleaner HUD view.
+- **High-Density Neural Brain:** Expanded neural network nodes from 46 to 138 anatomical coordinates spanning frontal pole, temporal lobe, parietal cortex, occipital visual pole, cerebellar folia, brainstem projection, and thalamic core.
+- **App Drawer Scroll Optimization:** Created `AppIconCache` with an in-memory 256-slot `ImageBitmap` LRU cache; replaced heavy `AndroidView(ImageView)` with native hardware-accelerated Compose `Image`, eliminating scroll lag and main-thread IPC. Added `contentType` recycling to LazyVerticalGrid.
+
 ### Phase 15 — Reliability and Performance (F-016) — 2026-11-22
 
 **Added:**

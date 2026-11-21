@@ -28,6 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -69,15 +71,61 @@ fun AppDrawer(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         modifier = modifier.semantics { contentDescription = "Application drawer" },
-        containerColor = colors.surfaceElevated,
+        containerColor = Color.Transparent,
         contentColor = colors.textPrimary,
+        scrimColor = Color.Black.copy(alpha = 0.72f),
+        dragHandle = null,
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = spacing.md),
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xEA071E30), // Frosted cyber dark navy
+                            Color(0xF4030F1A),
+                            Color(0xF9010710),
+                        ),
+                    ),
+                    shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                )
+                .border(
+                    width = 1.dp,
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            colors.cyan.copy(alpha = 0.90f),
+                            colors.cyanDim.copy(alpha = 0.30f),
+                            Color.Transparent,
+                        ),
+                    ),
+                    shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                )
+                .padding(top = spacing.sm, bottom = spacing.lg),
         ) {
-            // Header Bar: Title + Controls (Sort, Grid Density)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = spacing.md),
+            ) {
+                // Sleek HUD drag handle
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = spacing.sm),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(36.dp)
+                            .height(3.dp)
+                            .background(
+                                color = colors.cyan.copy(alpha = 0.6f),
+                                shape = RoundedCornerShape(2.dp),
+                            ),
+                    )
+                }
+
+                // Header Bar: Title + Controls (Sort, Grid Density)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -171,7 +219,11 @@ fun AppDrawer(
                             horizontalArrangement = Arrangement.spacedBy(spacing.sm),
                             contentPadding = PaddingValues(vertical = spacing.xs),
                         ) {
-                            items(state.pinnedApps, key = { "pinned_${it.componentName}" }) { app ->
+                            items(
+                                items = state.pinnedApps,
+                                key = { "pinned_${it.componentName}" },
+                                contentType = { "pinned_cell" },
+                            ) { app ->
                                 PinnedAppCell(
                                     app = app,
                                     onClick = { onAppClick(app) },
@@ -198,7 +250,11 @@ fun AppDrawer(
                         horizontalArrangement = Arrangement.spacedBy(spacing.sm),
                         verticalArrangement = Arrangement.spacedBy(spacing.sm),
                     ) {
-                        items(state.filteredApps, key = AppInfo::componentName) { app ->
+                        items(
+                            items = state.filteredApps,
+                            key = AppInfo::componentName,
+                            contentType = { "app_cell" },
+                        ) { app ->
                             val isPinned = app.componentName in state.favoriteComponents
                             AppDrawerCell(
                                 app = app,
@@ -212,6 +268,7 @@ fun AppDrawer(
             }
         }
     }
+}
 }
 
 @Composable

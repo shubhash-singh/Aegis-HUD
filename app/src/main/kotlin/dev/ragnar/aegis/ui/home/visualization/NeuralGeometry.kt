@@ -3,23 +3,19 @@ package dev.ragnar.aegis.ui.home.visualization
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Offset
 import kotlin.math.min
-import kotlin.math.sqrt
 
 /**
  * Anatomical 3D holographic neural brain geometry.
  *
- * Models a human brain in lateral profile with:
- * - Frontal lobe (left)
- * - Parietal & superior cortex (top)
- * - Occipital lobe (right)
- * - Temporal lobe & lateral sulcus (lower-left)
- * - Cerebellum (lower-right)
- * - Brainstem (bottom projection)
- * - Holographic downward projection cone
- * - Perspective concentric elliptical emitter platform
- * - Tech HUD arc rings
- *
- * Matching the exact visual structure from the reference design.
+ * Models a detailed human brain in lateral profile with:
+ * - Frontal lobe & prefrontal pole (anterior curvature)
+ * - Motor, premotor, sensory cortex & parietal lobules (superior convexity)
+ * - Occipital lobe & visual cortex pole (posterior bulge)
+ * - Temporal lobe & lateral Sylvian fissure boundary (inferior anterior)
+ * - Cerebellum with horizontal folia striations (lower posterior mass)
+ * - Brainstem, pons, and downward projection column into emitter platform
+ * - Radiating corpus callosum arch and thalamic core
+ * - High-density 140+ node geodesic mesh matching the reference visual design
  */
 @Immutable
 data class NeuralGeometry(
@@ -40,7 +36,7 @@ data class NeuralGeometry(
 
     companion object {
         private val STATIC_NORMALIZED_NODES: List<Triple<Float, Float, Int>> by lazy { getAnatomicalBrainNodes() }
-        private val STATIC_EDGES: List<Pair<Int, Int>> by lazy { buildProximityEdges(STATIC_NORMALIZED_NODES, maxDistance = 0.32f) }
+        private val STATIC_EDGES: List<Pair<Int, Int>> by lazy { buildProximityEdges(STATIC_NORMALIZED_NODES, maxDistance = 0.26f) }
 
         @Volatile
         private var cachedWidth: Float = -1f
@@ -106,100 +102,174 @@ data class NeuralGeometry(
         }
 
         /**
-         * Normalized (nx, ny, shell) lateral profile coordinates of a human brain.
+         * Comprehensive anatomical coordinates (-1.0 to 1.0) for a human brain lateral profile.
          * nx: -1.0 (anterior/front) to 1.0 (posterior/back)
          * ny: -1.0 (superior/top) to 1.0 (inferior/stem)
-         * shell: 0 = core, 1 = inner gyri, 2 = cortical surface, 3 = cerebellum/stem
+         * shell: 0 = deep core/thalamus, 1 = mid subcortical gyri, 2 = cortical surface, 3 = cerebellum/stem
          */
         private fun getAnatomicalBrainNodes(): List<Triple<Float, Float, Int>> {
             return listOf(
-                // === 1. FRONTAL LOBE (Anterior Pole & Convexity) ===
-                Triple(-0.82f, -0.10f, 2),
-                Triple(-0.88f, -0.25f, 2),
-                Triple(-0.85f, -0.42f, 2),
-                Triple(-0.76f, -0.60f, 2),
-                Triple(-0.62f, -0.74f, 2),
-                Triple(-0.48f, -0.84f, 2),
-                Triple(-0.68f, -0.32f, 1),
-                Triple(-0.62f, -0.50f, 1),
-                Triple(-0.50f, -0.62f, 1),
-                Triple(-0.52f, -0.35f, 0),
-                Triple(-0.42f, -0.48f, 0),
-                Triple(-0.35f, -0.30f, 0),
-
-                // === 2. PARIETAL LOBE (Superior Convexity) ===
+                // === 1. FRONTAL LOBE & PREFRONTAL CONVEXITY (Anterior) ===
+                Triple(-0.84f, -0.05f, 2),
+                Triple(-0.90f, -0.18f, 2),
+                Triple(-0.93f, -0.32f, 2),
+                Triple(-0.88f, -0.46f, 2),
+                Triple(-0.82f, -0.58f, 2),
+                Triple(-0.72f, -0.70f, 2),
+                Triple(-0.60f, -0.80f, 2),
+                Triple(-0.46f, -0.88f, 2),
                 Triple(-0.32f, -0.92f, 2),
-                Triple(-0.15f, -0.96f, 2),
-                Triple(0.04f, -0.97f, 2),
-                Triple(0.24f, -0.93f, 2),
-                Triple(0.42f, -0.86f, 2),
-                Triple(-0.20f, -0.75f, 1),
-                Triple(0.02f, -0.78f, 1),
-                Triple(0.22f, -0.74f, 1),
-                Triple(-0.18f, -0.55f, 0),
-                Triple(0.02f, -0.56f, 0),
-                Triple(0.20f, -0.52f, 0),
+                Triple(-0.78f, -0.22f, 1),
+                Triple(-0.80f, -0.38f, 1),
+                Triple(-0.72f, -0.50f, 1),
+                Triple(-0.62f, -0.62f, 1),
+                Triple(-0.50f, -0.72f, 1),
+                Triple(-0.38f, -0.78f, 1),
+                Triple(-0.76f, 0.05f, 2),
+                Triple(-0.65f, 0.08f, 2),
+                Triple(-0.55f, -0.02f, 1),
+                Triple(-0.65f, -0.15f, 1),
+                Triple(-0.58f, -0.30f, 1),
+                Triple(-0.48f, -0.42f, 1),
+                Triple(-0.54f, -0.18f, 0),
+                Triple(-0.45f, -0.28f, 0),
+                Triple(-0.38f, -0.40f, 0),
+                Triple(-0.32f, -0.55f, 0),
+                Triple(-0.44f, -0.58f, 0),
+                Triple(-0.30f, -0.25f, 0),
 
-                // === 3. OCCIPITAL LOBE (Posterior Pole) ===
-                Triple(0.60f, -0.74f, 2),
-                Triple(0.76f, -0.56f, 2),
-                Triple(0.86f, -0.36f, 2),
-                Triple(0.90f, -0.15f, 2),
-                Triple(0.88f, 0.08f, 2),
-                Triple(0.78f, 0.24f, 2),
-                Triple(0.58f, -0.52f, 1),
-                Triple(0.68f, -0.34f, 1),
-                Triple(0.72f, -0.12f, 1),
-                Triple(0.68f, 0.10f, 1),
-                Triple(0.40f, -0.48f, 0),
-                Triple(0.46f, -0.28f, 0),
-                Triple(0.50f, -0.05f, 0),
+                // === 2. MOTOR, SENSORY & PARIETAL LOBE (Superior Margin) ===
+                Triple(-0.18f, -0.96f, 2),
+                Triple(-0.02f, -0.98f, 2),
+                Triple(0.14f, -0.97f, 2),
+                Triple(0.30f, -0.93f, 2),
+                Triple(0.44f, -0.86f, 2),
+                Triple(0.56f, -0.78f, 2),
+                Triple(-0.22f, -0.82f, 1),
+                Triple(-0.20f, -0.65f, 1),
+                Triple(-0.18f, -0.48f, 1),
+                Triple(-0.15f, -0.32f, 1),
+                Triple(-0.06f, -0.84f, 1),
+                Triple(-0.05f, -0.68f, 1),
+                Triple(-0.04f, -0.50f, 1),
+                Triple(-0.02f, -0.35f, 1),
+                Triple(0.10f, -0.82f, 1),
+                Triple(0.24f, -0.80f, 1),
+                Triple(0.36f, -0.72f, 1),
+                Triple(0.48f, -0.65f, 1),
+                Triple(-0.10f, -0.55f, 0),
+                Triple(0.06f, -0.62f, 0),
+                Triple(0.20f, -0.60f, 0),
+                Triple(0.32f, -0.55f, 0),
+                Triple(0.10f, -0.45f, 0),
+                Triple(0.22f, -0.42f, 0),
 
-                // === 4. TEMPORAL LOBE (Inferior & Anterior Notch) ===
-                Triple(-0.38f, 0.02f, 1), // Sylvian fissure notch
-                Triple(-0.52f, 0.08f, 1),
-                Triple(-0.68f, 0.18f, 2),
-                Triple(-0.75f, 0.32f, 2),
-                Triple(-0.68f, 0.48f, 2),
-                Triple(-0.50f, 0.58f, 2),
-                Triple(-0.32f, 0.55f, 2),
-                Triple(-0.16f, 0.46f, 2),
-                Triple(-0.54f, 0.30f, 1),
-                Triple(-0.40f, 0.38f, 1),
-                Triple(-0.25f, 0.35f, 1),
-                Triple(-0.36f, 0.18f, 0),
-                Triple(-0.20f, 0.16f, 0),
+                // === 3. OCCIPITAL LOBE & VISUAL CORTEX (Posterior Pole) ===
+                Triple(0.68f, -0.68f, 2),
+                Triple(0.80f, -0.54f, 2),
+                Triple(0.88f, -0.38f, 2),
+                Triple(0.93f, -0.20f, 2),
+                Triple(0.94f, -0.02f, 2),
+                Triple(0.90f, 0.14f, 2),
+                Triple(0.82f, 0.28f, 2),
+                Triple(0.60f, -0.55f, 1),
+                Triple(0.70f, -0.42f, 1),
+                Triple(0.78f, -0.24f, 1),
+                Triple(0.80f, -0.05f, 1),
+                Triple(0.76f, 0.12f, 1),
+                Triple(0.68f, 0.24f, 1),
+                Triple(0.50f, -0.52f, 1),
+                Triple(0.58f, -0.35f, 1),
+                Triple(0.65f, -0.18f, 1),
+                Triple(0.68f, 0.02f, 1),
+                Triple(0.58f, 0.15f, 1),
+                Triple(0.48f, -0.38f, 0),
+                Triple(0.52f, -0.18f, 0),
+                Triple(0.54f, 0.00f, 0),
 
-                // === 5. CEREBELLUM (Lower Posterior Mass) ===
-                Triple(0.38f, 0.34f, 3),
-                Triple(0.55f, 0.36f, 3),
-                Triple(0.72f, 0.42f, 3),
-                Triple(0.76f, 0.58f, 3),
-                Triple(0.65f, 0.72f, 3),
-                Triple(0.48f, 0.75f, 3),
-                Triple(0.32f, 0.68f, 3),
-                Triple(0.50f, 0.52f, 3),
-                Triple(0.60f, 0.58f, 3),
+                // === 4. TEMPORAL LOBE & LATERAL SULCUS BOUNDARY (Inferior Anterior) ===
+                Triple(-0.40f, 0.00f, 1),
+                Triple(-0.25f, 0.04f, 1),
+                Triple(-0.10f, 0.08f, 1),
+                Triple(0.05f, 0.10f, 1),
+                Triple(0.20f, 0.08f, 1),
+                Triple(0.35f, 0.04f, 1),
+                Triple(-0.55f, 0.12f, 2),
+                Triple(-0.68f, 0.22f, 2),
+                Triple(-0.76f, 0.35f, 2),
+                Triple(-0.70f, 0.48f, 2),
+                Triple(-0.56f, 0.58f, 2),
+                Triple(-0.40f, 0.60f, 2),
+                Triple(-0.24f, 0.54f, 2),
+                Triple(-0.12f, 0.45f, 2),
+                Triple(-0.58f, 0.26f, 1),
+                Triple(-0.48f, 0.36f, 1),
+                Triple(-0.35f, 0.42f, 1),
+                Triple(-0.20f, 0.38f, 1),
+                Triple(-0.06f, 0.32f, 1),
+                Triple(0.08f, 0.28f, 1),
+                Triple(-0.35f, 0.18f, 0),
+                Triple(-0.20f, 0.22f, 0),
+                Triple(-0.05f, 0.20f, 0),
+                Triple(0.12f, 0.18f, 0),
 
-                // === 6. BRAIN STEM (Inferior Projection) ===
-                Triple(0.02f, 0.42f, 3),
-                Triple(0.12f, 0.54f, 3),
-                Triple(0.16f, 0.72f, 3),
-                Triple(0.18f, 0.90f, 3),
-                Triple(0.10f, 0.95f, 3),
-                Triple(0.04f, 0.78f, 3),
-                Triple(-0.02f, 0.58f, 3),
-                Triple(0.10f, 0.72f, 3),
+                // === 5. CEREBELLUM (Lower Posterior Mass with Horizontal Folia) ===
+                Triple(0.35f, 0.32f, 3),
+                Triple(0.48f, 0.32f, 3),
+                Triple(0.62f, 0.35f, 3),
+                Triple(0.74f, 0.40f, 3),
+                Triple(0.82f, 0.50f, 3),
+                Triple(0.85f, 0.62f, 3),
+                Triple(0.78f, 0.74f, 3),
+                Triple(0.66f, 0.82f, 3),
+                Triple(0.50f, 0.84f, 3),
+                Triple(0.34f, 0.78f, 3),
+                Triple(0.42f, 0.45f, 3),
+                Triple(0.56f, 0.46f, 3),
+                Triple(0.70f, 0.50f, 3),
+                Triple(0.72f, 0.62f, 3),
+                Triple(0.60f, 0.65f, 3),
+                Triple(0.46f, 0.65f, 3),
+                Triple(0.52f, 0.74f, 3),
+                Triple(0.38f, 0.60f, 3),
+                Triple(0.50f, 0.56f, 3),
+                Triple(0.62f, 0.58f, 3),
 
-                // === 7. CENTRAL CORE & SULCAL GYRI ===
-                Triple(-0.02f, -0.32f, 0),
-                Triple(0.14f, -0.30f, 0),
-                Triple(-0.06f, -0.10f, 0),
-                Triple(0.12f, -0.08f, 0),
-                Triple(-0.04f, 0.12f, 0),
-                Triple(0.10f, 0.15f, 0),
-                Triple(0.24f, 0.05f, 0),
-                Triple(0.26f, -0.18f, 0),
+                // === 6. BRAIN STEM, PONS & PROJECTION COLUMN (Inferior Base) ===
+                Triple(0.00f, 0.28f, 3),
+                Triple(0.12f, 0.30f, 3),
+                Triple(0.22f, 0.32f, 3),
+                Triple(0.02f, 0.44f, 3),
+                Triple(0.12f, 0.46f, 3),
+                Triple(0.20f, 0.48f, 3),
+                Triple(0.05f, 0.60f, 3),
+                Triple(0.14f, 0.62f, 3),
+                Triple(0.08f, 0.76f, 3),
+                Triple(0.16f, 0.78f, 3),
+                Triple(0.10f, 0.88f, 3),
+                Triple(0.15f, 0.92f, 3),
+                Triple(0.12f, 0.96f, 3),
+                Triple(0.14f, 1.00f, 3),
+
+                // === 7. CENTRAL CORE, CORPUS CALLOSUM & THALAMUS ===
+                Triple(-0.30f, -0.42f, 0),
+                Triple(-0.16f, -0.46f, 0),
+                Triple(-0.02f, -0.48f, 0),
+                Triple(0.14f, -0.46f, 0),
+                Triple(0.28f, -0.40f, 0),
+                Triple(-0.12f, -0.32f, 0),
+                Triple(0.04f, -0.30f, 0),
+                Triple(0.18f, -0.28f, 0),
+                Triple(-0.08f, -0.18f, 0),
+                Triple(0.08f, -0.16f, 0),
+                Triple(0.22f, -0.15f, 0),
+                Triple(-0.16f, -0.06f, 0),
+                Triple(0.00f, -0.04f, 0),
+                Triple(0.14f, -0.02f, 0),
+                Triple(0.26f, -0.04f, 0),
+                Triple(-0.05f, 0.08f, 0),
+                Triple(0.08f, 0.06f, 0),
+                Triple(0.20f, 0.04f, 0),
             )
         }
 
