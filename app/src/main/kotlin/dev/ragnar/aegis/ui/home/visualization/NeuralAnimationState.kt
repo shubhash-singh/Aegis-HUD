@@ -96,7 +96,7 @@ fun rememberNeuralAnimationState(
         label = "OuterRot",
     )
 
-    val brainPulse by transition.animateFloat(
+    val brainPulse = transition.animateFloat(
         initialValue = 1f,
         targetValue = 1.05f,
         animationSpec = infiniteRepeatable(
@@ -106,7 +106,7 @@ fun rememberNeuralAnimationState(
         label = "BrainPulse",
     )
 
-    val beamAlpha by transition.animateFloat(
+    val beamAlpha = transition.animateFloat(
         initialValue = 0.3f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
@@ -160,8 +160,8 @@ fun rememberNeuralAnimationState(
         NeuralAnimationState(
             innerRotation = innerRotation,
             outerRotation = outerRotation,
-            brainPulse = mutableStateOf(brainPulse),
-            beamAlpha = mutableStateOf(beamAlpha),
+            brainPulse = brainPulse,
+            beamAlpha = beamAlpha,
             pulsePhase = pulsePhase,
             particlePhase = particlePhase,
             ringPhase = ringPhase,

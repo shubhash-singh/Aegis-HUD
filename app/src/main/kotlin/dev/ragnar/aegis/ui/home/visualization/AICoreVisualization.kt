@@ -4,12 +4,11 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -19,7 +18,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import dev.ragnar.aegis.ui.theme.AegisColorScheme
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -42,13 +40,8 @@ fun AICoreVisualization(
     colors: AegisColorScheme,
 ) {
     val anim = rememberNeuralAnimationState(isPaused = isPaused, speedMultiplier = speedMultiplier)
-
-    val innerRot by anim.innerRotation
-    val outerRot by anim.outerRotation
-    val brainPulse by anim.brainPulse
-    val pulsePhase by anim.pulsePhase
-    val particlePhase by anim.particlePhase
-    val ringPhase by anim.ringPhase
+    val mesh = remember { NeuralMesh3D.build() }
+    val frame = remember(mesh) { NeuralProjection(mesh.count) }
 
     Canvas(
         modifier = modifier
@@ -56,18 +49,14 @@ fun AICoreVisualization(
             .semantics { contentDescription = "AEGIS Neural AI Core Visualization" },
     ) {
         val geo = NeuralGeometry.build(size.width, size.height)
-
-        // 1. Surrounding tech HUD rings & outer rotating indicators
-        drawSurroundingTechRings(geo, innerRot, outerRot, colors)
-
-        // 2. Brain neural network (connection lines + data pulses + nodes)
-        drawBrainNeuralMesh(geo, brainPulse, pulsePhase, colors)
-
-        // 3. Upper glowing measurement arc indicator
-        drawUpperMeasurementArc(geo, colors)
-
-        // 4. Ambient floating particles
-        drawAmbientParticles(geo, particlePhase, colors)
+        // State is read here, in the draw phase, so animation ticks redraw without recomposing.
+        drawBrainMesh3D(
+            mesh, frame, geo,
+            brainPulse = anim.brainPulse.value,
+            pulsePhase = anim.pulsePhase.value,
+            rotationDeg = anim.outerRotation.value,
+            colors = colors,
+        )
     }
 }
 

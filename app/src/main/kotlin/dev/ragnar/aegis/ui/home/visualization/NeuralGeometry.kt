@@ -35,7 +35,7 @@ data class NeuralGeometry(
     val center: Offset get() = Offset(centerX, centerY)
 
     companion object {
-        private val STATIC_NORMALIZED_NODES: List<Triple<Float, Float, Int>> by lazy { getAnatomicalBrainNodes() }
+        internal val STATIC_NORMALIZED_NODES: List<Triple<Float, Float, Int>> by lazy { getAnatomicalBrainNodes() }
         private val STATIC_EDGES: List<Pair<Int, Int>> by lazy { buildProximityEdges(STATIC_NORMALIZED_NODES, maxDistance = 0.26f) }
 
         @Volatile
