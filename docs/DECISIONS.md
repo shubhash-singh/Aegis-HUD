@@ -298,3 +298,24 @@ The home screen should not appear as a card in the Android Overview (Recents) sc
 - Gesture detection zone must exclude the system navigation bar inset (`WindowInsets.navigationBars`).
 - Quick-launch app shortcuts and search are still accessible inside the drawer.
 - Existing `AppDrawerScreen`, search, and app-discovery code remain unchanged.
+
+---
+
+### DEC-017: Gesture Navigation Conflict Analysis
+
+**Date:** 2026-11-22
+**Phase:** PHASE-14
+**Status:** Accepted
+
+**Decision:** Implement only center-screen upward swipe, downward swipe, and long-press gestures on the AEGIS HUD home screen. Explicitly exclude swipe-from-edge gestures (back navigation reserved by Android system gesture nav, API 30+) and swipe-down from the status bar (intercepted by the system notification shade). Double-tap is excluded in Phase 14 due to gesture ambiguity with double-tap zoom/accessibility.
+
+**Alternatives Considered:**
+- Edge swipe for quick settings / app drawer: Conflicts directly with Android 10+ system back gesture navigation on left/right edges and home gesture on bottom edge.
+- Double-tap to lock screen: Requires Device Admin or Accessibility permissions, violating minimal permission design principles.
+
+**Reasoning:** Android 10+ (API 29+) reserves edge swipes for system navigation. The status bar intercepts top-edge swipes for the notification shade. As the home activity, AEGIS receives upward and downward drags on its content area safely. Launchers are exempt from some system gesture restrictions but must not conflict with system UI.
+
+**Consequences:**
+- Only 3 gesture types are implemented: Swipe Up (App Drawer), Swipe Down (Settings Sheet), Long Press (Gesture Hint Overlay).
+- All 3 are individually toggleable and persist in DataStore Preferences.
+

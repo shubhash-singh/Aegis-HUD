@@ -81,4 +81,7 @@ data class UserPreferences(
     val drawerGridColumns: Int = 4,
     val contextAwareHudEnabled: Boolean = false,
     val enabledContextRules: Set<String> = dev.ragnar.aegis.domain.context.StandardContextRules.DEFAULT_ENABLED_IDS,
+    val swipeUpEnabled: Boolean = true,
+    val swipeDownEnabled: Boolean = true,
+    val longPressEnabled: Boolean = true,
 )

@@ -42,6 +42,9 @@ class DataStorePreferencesRepository(
         val DRAWER_GRID_COLUMNS = intPreferencesKey("drawer_grid_columns")
         val CONTEXT_AWARE_HUD_ENABLED = booleanPreferencesKey("context_aware_hud_enabled")
         val ENABLED_CONTEXT_RULES = stringSetPreferencesKey("enabled_context_rules")
+        val SWIPE_UP_ENABLED = booleanPreferencesKey("swipe_up_enabled")
+        val SWIPE_DOWN_ENABLED = booleanPreferencesKey("swipe_down_enabled")
+        val LONG_PRESS_ENABLED = booleanPreferencesKey("long_press_enabled")
     }
 
     override val userPreferences: Flow<UserPreferences> = context.dataStore.data
@@ -165,6 +168,24 @@ class DataStorePreferencesRepository(
         }
     }
 
+    override suspend fun setSwipeUpEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.SWIPE_UP_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun setSwipeDownEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.SWIPE_DOWN_ENABLED] = enabled
+        }
+    }
+
+    override suspend fun setLongPressEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LONG_PRESS_ENABLED] = enabled
+        }
+    }
+
     override suspend fun resetToDefaults() {
         context.dataStore.edit { preferences ->
             preferences.clear()
@@ -193,6 +214,9 @@ class DataStorePreferencesRepository(
             drawerGridColumns = columns.coerceIn(3, 5),
             contextAwareHudEnabled = contextAwareEnabled,
             enabledContextRules = enabledRules,
+            swipeUpEnabled = preferences[PreferencesKeys.SWIPE_UP_ENABLED] ?: true,
+            swipeDownEnabled = preferences[PreferencesKeys.SWIPE_DOWN_ENABLED] ?: true,
+            longPressEnabled = preferences[PreferencesKeys.LONG_PRESS_ENABLED] ?: true,
         )
     }
 }

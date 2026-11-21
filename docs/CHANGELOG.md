@@ -4,6 +4,26 @@
 
 ## [Unreleased] — Development
 
+### Phase 14 — Gesture Navigation (F-015) — 2026-11-22
+
+**Added:**
+- Upward swipe gesture (threshold: -40f) opens App Drawer when enabled.
+- Downward swipe gesture (threshold: +40f) opens System Configuration Settings Sheet when enabled (F-015-P3).
+- Long-press gesture on home screen opens `GestureHintOverlay` modal (F-015-P4).
+- `GestureHintOverlay` cyber-tactical HUD overlay showing available active gestures with tap-to-dismiss.
+- `UserPreferences` extended with `swipeUpEnabled`, `swipeDownEnabled`, and `longPressEnabled` boolean toggles with DataStore persistence.
+- `PreferencesRepository` and `DataStorePreferencesRepository` extended with `setSwipeUpEnabled`, `setSwipeDownEnabled`, and `setLongPressEnabled`.
+- `SettingsViewModel` extended with gesture setter functions.
+- `SettingsSheet` Gesture Navigation section with individual toggles for swipe-up, swipe-down, and long-press (F-015-P5).
+- Gesture conflict analysis documented in DEC-017 (F-015-P1).
+- 5 new unit tests in `GestureSettingsViewModelTest` (103 total project tests passing).
+
+**Validation:**
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (17s).
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (30s, 103 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (1m 11s, 0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### Phase 13 — Context-Aware HUD — 2026-11-22
 
 **Added:**

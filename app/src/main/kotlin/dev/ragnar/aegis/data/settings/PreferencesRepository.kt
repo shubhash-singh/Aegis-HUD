@@ -28,5 +28,8 @@ interface PreferencesRepository {
     suspend fun setContextAwareHudEnabled(enabled: Boolean)
     suspend fun toggleContextRule(ruleId: String)
     suspend fun setEnabledContextRules(ruleIds: Set<String>)
+    suspend fun setSwipeUpEnabled(enabled: Boolean)
+    suspend fun setSwipeDownEnabled(enabled: Boolean)
+    suspend fun setLongPressEnabled(enabled: Boolean)
     suspend fun resetToDefaults()
 }

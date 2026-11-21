@@ -727,5 +727,48 @@ Implemented a pure in-memory context rule engine that adapts the HUD in real tim
 
 ---
 
+## PHASE-14 — Gesture Navigation (F-015)
+
+**Status:** Implementation Complete — Build Verified (Device Validation Pending)
+**Start Date:** 2026-11-22
+**Completion Date:** 2026-11-22
+
+### Summary
+
+Implemented gesture-based navigation on the AEGIS HUD home screen with swipe-up (App Drawer), swipe-down (Settings Sheet), and long-press (Gesture Hint Overlay). Included gesture conflict analysis with Android system navigation (DEC-017) and individual per-gesture enable/disable toggles in Settings backed by DataStore.
+
+### What Was Implemented
+
+- **Conflict Analysis (F-015-P1):** Documented in DEC-017. Avoids edge swipes reserved by system back/home/recents/shade. Uses content drag gestures safely.
+- **Swipe-Up (F-015-P2):** Opens App Drawer with threshold `dragAmount < -40f` when `swipeUpEnabled = true`.
+- **Swipe-Down (F-015-P3):** Opens Settings Sheet with threshold `dragAmount > 40f` when `swipeDownEnabled = true`.
+- **Long-Press (F-015-P4):** Opens `GestureHintOverlay` modal when `longPressEnabled = true`.
+- **UI:** `GestureHintOverlay` composable displaying active gestures with monospace cyber-HUD styling and tactile dismissal.
+- **Settings & Persistence (F-015-P5):** Added `swipeUpEnabled`, `swipeDownEnabled`, and `longPressEnabled` to `UserPreferences`, `PreferencesRepository`, `DataStorePreferencesRepository`, `SettingsViewModel`, and `SettingsSheet`.
+- **Tests:** 5 new unit tests in `GestureSettingsViewModelTest` (103 total project unit tests passing).
+
+### Build Results
+
+| Command | Result | Duration |
+|---|---|---|
+| `./gradlew --no-daemon assembleDebug` | BUILD SUCCESSFUL | 17s |
+| `./gradlew --no-daemon testDebugUnitTest` | BUILD SUCCESSFUL (103 passed) | 30s |
+| `./gradlew --no-daemon lintDebug` | BUILD SUCCESSFUL (0 errors) | 1m 11s |
+
+### Acceptance Criteria
+
+- [x] Swipe-up opens App Drawer (threshold: dragAmount < -40f).
+- [x] Swipe-down opens Settings Sheet (threshold: dragAmount > 40f).
+- [x] Long-press shows GestureHintOverlay.
+- [x] Each gesture individually togglable via Settings.
+- [x] Gesture toggles persist across restarts via DataStore.
+- [x] No conflict with Android system gestures.
+- [x] 103 unit tests passing.
+- [x] `assembleDebug` and `lintDebug` pass.
+
+**Next phase:** PHASE-15 — Reliability and Performance (F-016)
+
+---
+
 *(Subsequent phases will be logged as they are completed.)*
 

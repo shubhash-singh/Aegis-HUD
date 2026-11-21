@@ -54,6 +54,9 @@ fun SettingsSheet(
     onToggleContextAwareHud: (Boolean) -> Unit = {},
     onToggleContextRule: (String) -> Unit = {},
     activeContextRuleIds: Set<String> = emptySet(),
+    onToggleSwipeUp: (Boolean) -> Unit = {},
+    onToggleSwipeDown: (Boolean) -> Unit = {},
+    onToggleLongPress: (Boolean) -> Unit = {},
     onOpenDeveloperConsole: () -> Unit = {},
     onResetDefaults: () -> Unit,
     onDismiss: () -> Unit,
@@ -412,6 +415,29 @@ fun SettingsSheet(
                             }
                         }
                     }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(spacing.md))
+
+            // Gesture Navigation (F-015)
+            HudPanel(title = "Gesture Navigation") {
+                Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
+                    SettingsToggleRow(
+                        label = "SWIPE UP — APP DRAWER",
+                        isChecked = preferences.swipeUpEnabled,
+                        onToggle = onToggleSwipeUp,
+                    )
+                    SettingsToggleRow(
+                        label = "SWIPE DOWN — SYS CONFIG",
+                        isChecked = preferences.swipeDownEnabled,
+                        onToggle = onToggleSwipeDown,
+                    )
+                    SettingsToggleRow(
+                        label = "LONG PRESS — GESTURE HELP",
+                        isChecked = preferences.longPressEnabled,
+                        onToggle = onToggleLongPress,
+                    )
                 }
             }
 

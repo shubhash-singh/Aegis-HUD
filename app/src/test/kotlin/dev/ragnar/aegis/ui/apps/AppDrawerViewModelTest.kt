@@ -110,6 +110,18 @@ class AppDrawerViewModelTest {
             flow.value = flow.value.copy(enabledContextRules = ruleIds)
         }
 
+        override suspend fun setSwipeUpEnabled(enabled: Boolean) {
+            flow.value = flow.value.copy(swipeUpEnabled = enabled)
+        }
+
+        override suspend fun setSwipeDownEnabled(enabled: Boolean) {
+            flow.value = flow.value.copy(swipeDownEnabled = enabled)
+        }
+
+        override suspend fun setLongPressEnabled(enabled: Boolean) {
+            flow.value = flow.value.copy(longPressEnabled = enabled)
+        }
+
         override suspend fun resetToDefaults() {
             flow.value = UserPreferences()
         }

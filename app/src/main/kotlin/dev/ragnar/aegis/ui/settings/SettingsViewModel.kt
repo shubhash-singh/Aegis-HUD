@@ -100,6 +100,24 @@ class SettingsViewModel(
         }
     }
 
+    fun setSwipeUpEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setSwipeUpEnabled(enabled)
+        }
+    }
+
+    fun setSwipeDownEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setSwipeDownEnabled(enabled)
+        }
+    }
+
+    fun setLongPressEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setLongPressEnabled(enabled)
+        }
+    }
+
     fun clearFavorites() {
         viewModelScope.launch {
             preferencesRepository.clearFavorites()

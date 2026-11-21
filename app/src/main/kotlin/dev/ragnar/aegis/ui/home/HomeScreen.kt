@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.PowerManager
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,6 +47,8 @@ import dev.ragnar.aegis.domain.settings.AccentColor
 import dev.ragnar.aegis.ui.apps.AppDrawer
 import dev.ragnar.aegis.ui.apps.AppDrawerViewModel
 import dev.ragnar.aegis.ui.apps.AppDrawerViewModelFactory
+import dev.ragnar.aegis.ui.components.GestureHint
+import dev.ragnar.aegis.ui.components.GestureHintOverlay
 import dev.ragnar.aegis.ui.components.HudCornerBrackets
 import dev.ragnar.aegis.ui.components.ScanLineOverlay
 import dev.ragnar.aegis.ui.components.TacticalAlertBanner
@@ -100,11 +103,14 @@ fun HomeScreen(
     var isDrawerVisible by rememberSaveable { mutableStateOf(false) }
     var isSettingsVisible by rememberSaveable { mutableStateOf(false) }
     var isConsoleVisible by rememberSaveable { mutableStateOf(false) }
+    var isGestureHintVisible by rememberSaveable { mutableStateOf(false) }
     var launchError by remember { mutableStateOf<String?>(null) }
 
     // Launcher back press handling: closes overlays first, no-op on root home
     BackHandler {
-        if (isConsoleVisible) {
+        if (isGestureHintVisible) {
+            isGestureHintVisible = false
+        } else if (isConsoleVisible) {
             isConsoleVisible = false
         } else if (isSettingsVisible) {
             isSettingsVisible = false
@@ -231,13 +237,28 @@ fun HomeScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(Unit) {
+                .pointerInput(preferences.swipeUpEnabled, preferences.swipeDownEnabled) {
                     detectVerticalDragGestures { _, dragAmount ->
-                        // Upward swipe opens the application drawer
-                        if (dragAmount < -25f && !isDrawerVisible && !isSettingsVisible) {
-                            isDrawerVisible = true
+                        when {
+                            // Upward swipe opens the application drawer (threshold: -40f)
+                            dragAmount < -40f && preferences.swipeUpEnabled && !isDrawerVisible && !isSettingsVisible && !isConsoleVisible && !isGestureHintVisible -> {
+                                isDrawerVisible = true
+                            }
+                            // Downward swipe opens the settings sheet (threshold: 40f)
+                            dragAmount > 40f && preferences.swipeDownEnabled && !isDrawerVisible && !isSettingsVisible && !isConsoleVisible && !isGestureHintVisible -> {
+                                isSettingsVisible = true
+                            }
                         }
                     }
+                }
+                .pointerInput(preferences.longPressEnabled) {
+                    detectTapGestures(
+                        onLongPress = {
+                            if (preferences.longPressEnabled && !isDrawerVisible && !isSettingsVisible && !isConsoleVisible && !isGestureHintVisible) {
+                                isGestureHintVisible = true
+                            }
+                        },
+                    )
                 }
                 .semantics { contentDescription = "AEGIS AI Command Interface" },
         ) {
@@ -428,6 +449,9 @@ fun HomeScreen(
                 onToggleContextAwareHud = settingsViewModel::setContextAwareHudEnabled,
                 onToggleContextRule = settingsViewModel::toggleContextRule,
                 activeContextRuleIds = contextEvaluation.activeRuleIds,
+                onToggleSwipeUp = settingsViewModel::setSwipeUpEnabled,
+                onToggleSwipeDown = settingsViewModel::setSwipeDownEnabled,
+                onToggleLongPress = settingsViewModel::setLongPressEnabled,
                 onOpenDeveloperConsole = {
                     isSettingsVisible = false
                     isConsoleVisible = true
@@ -449,6 +473,21 @@ fun HomeScreen(
                 onCopyDiagnostics = developerConsoleViewModel::copyDiagnostics,
                 onSelectLogLevel = developerConsoleViewModel::setLogLevelFilter,
                 onClearLogs = developerConsoleViewModel::clearLogs,
+            )
+        }
+
+        // =====================================================================
+        // GESTURE HINT OVERLAY (F-015)
+        // =====================================================================
+        if (isGestureHintVisible) {
+            val availableHints = buildList {
+                if (preferences.swipeUpEnabled) add(GestureHint("▲▲", "SWIPE UP — APP DRAWER"))
+                if (preferences.swipeDownEnabled) add(GestureHint("▼▼", "SWIPE DOWN — SYS CONFIG"))
+                if (preferences.longPressEnabled) add(GestureHint("⊡", "LONG PRESS — GESTURE HELP"))
+            }
+            GestureHintOverlay(
+                hints = availableHints,
+                onDismiss = { isGestureHintVisible = false },
             )
         }
     }

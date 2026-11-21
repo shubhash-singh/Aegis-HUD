@@ -114,6 +114,18 @@ class SettingsViewModelTest {
             _flow.value = _flow.value.copy(enabledContextRules = ruleIds)
         }
 
+        override suspend fun setSwipeUpEnabled(enabled: Boolean) {
+            _flow.value = _flow.value.copy(swipeUpEnabled = enabled)
+        }
+
+        override suspend fun setSwipeDownEnabled(enabled: Boolean) {
+            _flow.value = _flow.value.copy(swipeDownEnabled = enabled)
+        }
+
+        override suspend fun setLongPressEnabled(enabled: Boolean) {
+            _flow.value = _flow.value.copy(longPressEnabled = enabled)
+        }
+
         override suspend fun resetToDefaults() {
             _flow.value = UserPreferences()
         }
