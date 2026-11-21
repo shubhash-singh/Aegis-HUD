@@ -683,5 +683,49 @@ All validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) pass
 
 ---
 
+## PHASE-13 — Context-Aware HUD (F-013)
+
+**Status:** Implementation Complete — Build Verified (Device Validation Pending)
+**Start Date:** 2026-11-22
+**Completion Date:** 2026-11-22
+**Commit:** `6680161`
+
+### Summary
+
+Implemented a pure in-memory context rule engine that adapts the HUD in real time based on device state (battery level, power save mode, network connectivity) and time of day. Zero background services, zero location permissions, zero fake telemetry.
+
+### What Was Implemented
+
+- **Domain:** `ContextTrigger` sealed interface (TimeWindow, BatteryLevelBelow, PowerSaveActive, NetworkDisconnected); `ContextAction` sealed interface (SetAccent, SetAnimationSpeed, ShowAlert); `ContextRule`, `ContextSnapshot`, `ContextEvaluationResult`; `StandardContextRules` with 5 predefined protocols.
+- **Engine:** `ContextRuleEvaluator` — pure evaluation, priority-sorted, midnight wrap-around for time windows.
+- **UI:** `TacticalAlertBanner` composable with pulsing tactical animation.
+- **Persistence:** `contextAwareHudEnabled` and `enabledContextRules` added to `UserPreferences`, `PreferencesRepository`, `DataStorePreferencesRepository`.
+- **Settings:** Context-Aware HUD section in `SettingsSheet` with master toggle and per-protocol ACTIVE/STANDBY rows.
+- **Home Screen:** Live `ContextSnapshot` built from real telemetry, `ContextRuleEvaluator` applied, effective accent/speed overrides applied, alert banner shown when rules fire.
+- **Tests:** 11 unit tests in `ContextRuleEvaluatorTest`; 98 total project unit tests passing.
+
+### Build Results
+
+| Command | Result | Duration |
+|---|---|---|
+| `./gradlew --no-daemon assembleDebug` | BUILD SUCCESSFUL | 2m 7s |
+| `./gradlew --no-daemon testDebugUnitTest` | BUILD SUCCESSFUL (98 passed) | 31s |
+| `./gradlew --no-daemon lintDebug` | BUILD SUCCESSFUL (0 errors) | 52s |
+
+### Acceptance Criteria
+
+- [x] `ContextRuleEvaluator` evaluates time, battery, power save, network correctly without side effects.
+- [x] Midnight wrap-around time window evaluation works.
+- [x] No rule or master toggle disabled → default HUD state unchanged.
+- [x] Context rules persist across launcher restarts via DataStore.
+- [x] Alert banner appears when an alert rule fires.
+- [x] Zero background services, zero location permissions.
+- [x] 11 new unit tests; 98 total passing.
+- [x] `assembleDebug` and `lintDebug` pass.
+
+**Next phase:** PHASE-14 — Gesture Navigation (F-015)
+
+---
+
 *(Subsequent phases will be logged as they are completed.)*
 

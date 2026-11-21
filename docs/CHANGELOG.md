@@ -4,6 +4,26 @@
 
 ## [Unreleased] — Development
 
+### Phase 13 — Context-Aware HUD — 2026-11-22
+
+**Added:**
+- `ContextModels.kt`: sealed interfaces `ContextTrigger` (TimeWindow, BatteryLevelBelow, PowerSaveActive, NetworkDisconnected) and `ContextAction` (SetAccent, SetAnimationSpeed, ShowAlert); `ContextRule`, `ContextSnapshot`, `ContextEvaluationResult` domain models.
+- `StandardContextRules` object with 5 predefined protocols: `LOW_BATTERY` (p=100, Crimson + animation off), `POWER_SAVE` (p=80, Slow), `NETWORK_OFFLINE` (p=50, alert banner), `NIGHT_OPS` (p=40, Amber), `MORNING_PROTOCOL` (p=30, Green).
+- `ContextRuleEvaluator` pure Kotlin evaluation engine: priority-ordered, deterministic, midnight wrap-around support, no background service, zero location API usage.
+- `TacticalAlertBanner` composable: pulsing cyan/warning alert overlay shown on home screen when an alert protocol is active.
+- `UserPreferences` extended with `contextAwareHudEnabled: Boolean` and `enabledContextRules: Set<String>` with DataStore persistence.
+- `PreferencesRepository` extended with `setContextAwareHudEnabled`, `toggleContextRule`, `setEnabledContextRules`.
+- `SettingsViewModel` extended with `setContextAwareHudEnabled` and `toggleContextRule`.
+- `SettingsSheet` Context-Aware HUD section: master toggle, per-protocol enable toggles showing live `ACTIVE`/`STANDBY` status.
+- `HomeScreen` wired: context snapshot built from live telemetry + clock, evaluated on every relevant state change, effective accent/speed overrides applied, alert banner displayed.
+- 11 new unit tests in `ContextRuleEvaluatorTest` covering time-based, battery, power-save, network, priority, and master-toggle scenarios (98 total project tests passing).
+
+**Validation:**
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (2m 7s).
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (31s, 98 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (52s, 0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### Phase 12 — Developer Console — 2026-11-22
 
 **Added:**

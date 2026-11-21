@@ -2,9 +2,9 @@
 
 **Feature:** F-013 (Context-Aware HUD)  
 **Dependencies:** F-002 (HUD Design System), F-006 (Battery Telemetry), F-008 (System Telemetry), F-010 (Customization & DataStore)  
-**Status:** In Progress  
+**Status:** Implementation Complete — Build Verified (Device Validation Pending)  
 **Started:** 2026-11-22  
-**Completed:** In Progress  
+**Completed:** 2026-11-22 (Build Verified)  
 
 ---
 
@@ -26,13 +26,13 @@ Automatically adapt the HUD display based on configurable, user-defined rules an
 
 | ID | Title | Scope | Status |
 |---|---|---|---|
-| **F-013-P1** | Rule Model Design | Define `ContextTrigger`, `ContextAction`, `ContextRule`, `ContextSnapshot`, and `ContextEvaluationResult`. | In Progress |
-| **F-013-P2** | Rule Evaluation Engine | Pure Kotlin `ContextRuleEvaluator` sorting by priority with deterministic resolution; no background service or leaks. | In Progress |
-| **F-013-P3** | Time-Based Rules | Time-of-day protocols (Night Ops: 22:00-06:00 Amber, Morning: 06:00-12:00 Green) with midnight hour wrap-around. | In Progress |
-| **F-013-P4** | Battery-Level Rules | Critical battery threshold (≤15% Crimson HUD + animations off) and OS power-saver mode detection. | In Progress |
-| **F-013-P5** | Network-State Rules | Network disconnected detection triggering tactical offline alert banner. | In Progress |
-| **F-013-P6** | Settings UI Configuration | `SettingsSheet` section for Context-Aware HUD with master toggle and per-protocol toggles showing live `ACTIVE`/`STANDBY` state. | In Progress |
-| **F-013-P7** | DataStore Persistence | DataStore Preferences storage for `contextAwareHudEnabled` and `enabledContextRules: Set<String>`. | In Progress |
+| **F-013-P1** | Rule Model Design | Define `ContextTrigger`, `ContextAction`, `ContextRule`, `ContextSnapshot`, and `ContextEvaluationResult`. | Implemented — Build Verified |
+| **F-013-P2** | Rule Evaluation Engine | Pure Kotlin `ContextRuleEvaluator` sorting by priority with deterministic resolution; no background service or leaks. | Implemented — Build Verified |
+| **F-013-P3** | Time-Based Rules | Time-of-day protocols (Night Ops: 22:00-06:00 Amber, Morning: 06:00-12:00 Green) with midnight hour wrap-around. | Implemented — Build Verified |
+| **F-013-P4** | Battery-Level Rules | Critical battery threshold (≤15% Crimson HUD + animations off) and OS power-saver mode detection. | Implemented — Build Verified |
+| **F-013-P5** | Network-State Rules | Network disconnected detection triggering tactical offline alert banner. | Implemented — Build Verified |
+| **F-013-P6** | Settings UI Configuration | `SettingsSheet` section for Context-Aware HUD with master toggle and per-protocol toggles showing live `ACTIVE`/`STANDBY` state. | Implemented — Build Verified |
+| **F-013-P7** | DataStore Persistence | DataStore Preferences storage for `contextAwareHudEnabled` and `enabledContextRules: Set<String>`. | Implemented — Build Verified |
 
 ---
 
@@ -96,12 +96,12 @@ Automatically adapt the HUD display based on configurable, user-defined rules an
 
 ## Acceptance Criteria
 
-- [ ] `ContextRuleEvaluator` evaluates mock time, battery, power save, and network inputs correctly without side effects.
-- [ ] Time-window evaluation correctly handles hour ranges wrapping around midnight (e.g. 22:00 to 06:00).
-- [ ] No rule configured or master toggle disabled produces default HUD state without alterations.
-- [ ] Context rules persist across launcher restarts via DataStore Preferences.
-- [ ] When an alert rule fires, a cyber-tactical alert banner appears on the home screen.
-- [ ] Zero background service, zero location permissions, zero battery drain while device is idle.
-- [ ] `./gradlew testDebugUnitTest` passes (including new unit tests `UT-013-01` through `UT-013-04`).
-- [ ] `./gradlew assembleDebug` passes.
-- [ ] `./gradlew lintDebug` passes with 0 errors.
+- [x] `ContextRuleEvaluator` evaluates mock time, battery, power save, and network inputs correctly without side effects.
+- [x] Time-window evaluation correctly handles hour ranges wrapping around midnight (e.g. 22:00 to 06:00).
+- [x] No rule configured or master toggle disabled produces default HUD state without alterations.
+- [x] Context rules persist across launcher restarts via DataStore Preferences.
+- [x] When an alert rule fires, a cyber-tactical alert banner appears on the home screen.
+- [x] Zero background service, zero location permissions, zero battery drain while device is idle.
+- [x] `./gradlew testDebugUnitTest` passes (11 new unit tests in `ContextRuleEvaluatorTest`, 98 total passing).
+- [x] `./gradlew assembleDebug` passes.
+- [x] `./gradlew lintDebug` passes with 0 errors.

@@ -604,6 +604,39 @@ Rules:
 
 ---
 
+### PHASE-13: Context-Aware HUD
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-13 |
+| Title | Context-Aware HUD |
+| Objective | In-memory adaptive HUD protocol engine responding dynamically to battery, power saver, network, and time |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (2m 7s, 2026-11-22) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (31s, 98 tests passed, 2026-11-22) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (52s, 0 errors, 2026-11-22) |
+| Dependencies | PHASE-02, PHASE-07, PHASE-09, PHASE-10 |
+| Design Docs | `docs/phases/PHASE-13-CONTEXT-AWARE-HUD.md` |
+| Started | 2026-11-22 |
+| Completed | 2026-11-22 (Build Verified) |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (98 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+
+**Implemented:**
+
+- Pure in-memory `ContextRuleEvaluator` evaluating `ContextTrigger` conditions (battery level threshold, OS power save, network connectivity loss, time-of-day window with midnight wrap-around support).
+- 5 standard protocols (`StandardContextRules`): Low Battery (Tactical Crimson + animations disabled + alert), Power Save (Slow animation + alert), Network Offline (alert banner), Night Ops (Alert Amber), and Morning Brief (Matrix Green).
+- `TacticalAlertBanner` pulsing HUD banner displayed at the top of the interface when context alerts are triggered.
+- Persistent user toggles in `SettingsSheet` with master enable switch and individual protocol mute/enable rows showing live ACTIVE/STANDBY state.
+- DataStore persistence for `contextAwareHudEnabled` and `enabledContextRules`.
+- Dynamic color theme and animation speed overrides applied reactively to `AegisTheme` and `AICoreVisualization`.
+- 11 new unit tests in `ContextRuleEvaluatorTest` (98 total project tests passing).
+
+**Validation:**
+- Assemble, unit tests, and lint all completed successfully with zero errors.
+- Device testing deferred pending physical device / emulator (B-002).
+
+---
+
 ## F. Build and Test History
 
 | Date | Command | Environment | Result | Notes | Feature/Phase |
