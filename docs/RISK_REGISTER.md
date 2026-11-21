@@ -28,7 +28,7 @@
 
 | ID | Risk | Resolution | Phase |
 |---|---|---|---|
-| (none) | — | — | — |
+| RISK-014 | Gradle-downloaded AAPT2 cannot execute on NixOS | Patched AAPT2 ELF interpreter to system glibc loader using patchelf (DEC-013) | PHASE-04 |
 
 ---
 

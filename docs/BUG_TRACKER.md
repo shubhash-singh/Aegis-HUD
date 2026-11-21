@@ -1,18 +1,20 @@
 # BUG_TRACKER.md — AEGIS HUD Launcher
 
-**Last Updated:** 2026-10-25
+**Last Updated:** 2026-11-21
 
 ---
 
 ## Active Bugs
 
-*No bugs recorded. Project is in planning phase.*
+*No active defects recorded.*
 
 ---
 
 ## Resolved Bugs
 
-*None.*
+| ID | Title | Severity | Status | Phase Discovered | Phase Resolved | Description / Resolution |
+|---|---|---|---|---|---|---|
+| B-003 | AAPT2 runtime failure on NixOS | High | Resolved | PHASE-04 | PHASE-04 | Prebuilt AAPT2 missing `/lib64/ld-linux-x86-64.so.2` on NixOS. Resolved by patching the ELF interpreter with `patchelf` pointing to NixOS glibc loader. (DEC-013) |
 
 ---
 

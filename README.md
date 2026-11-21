@@ -3,7 +3,7 @@
 **Codename:** RAGNAR HUD / AEGIS
 **Platform:** Android (Kotlin + Jetpack Compose)
 **Package:** dev.ragnar.aegis
-**Status:** Phase 0 — Planning Complete, Phase 1 Pending
+**Status:** Phase 4 — App Discovery & Launching Implementation Complete — Build Verified (Device Validation Pending)
 
 ---
 
@@ -18,7 +18,8 @@ AEGIS displays live system telemetry, provides a fully functional application dr
 ## Current Status
 
 - Phase 0 (Planning) — **Complete**
-- Phase 1 (Launcher Foundation) — **Not started**
+- Phases 1–3 — **Implemented; build verified**
+- Phase 4 (App Discovery & Launching) — **Implementation Complete — Build Verified (Device Validation Pending)**
 - Full feature list: see `docs/FEATURE_PLAN.md`
 - Progress: see `docs/PROGRESS_TRACKER.md`
 - Next step: see `docs/NEXT_STEPS.md`

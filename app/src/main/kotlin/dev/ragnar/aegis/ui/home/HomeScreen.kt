@@ -17,11 +17,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.ragnar.aegis.ui.apps.AppDrawer
+import dev.ragnar.aegis.ui.apps.AppDrawerViewModel
+import dev.ragnar.aegis.ui.apps.AppDrawerViewModelFactory
 import dev.ragnar.aegis.ui.components.HudPanel
 import dev.ragnar.aegis.ui.components.StatusIndicator
 import dev.ragnar.aegis.ui.components.StatusLevel
@@ -51,6 +60,15 @@ fun HomeScreen(
     }
 
     val clockState by clockViewModel.clockState.collectAsState()
+    val context = LocalContext.current
+    val appDrawerViewModel: AppDrawerViewModel = viewModel(
+        factory = remember(context.applicationContext) {
+            AppDrawerViewModelFactory(context.applicationContext)
+        },
+    )
+    val appDrawerState by appDrawerViewModel.uiState.collectAsStateWithLifecycle()
+    var isDrawerVisible by rememberSaveable { mutableStateOf(false) }
+    var launchError by remember { mutableStateOf<String?>(null) }
     val colors = AegisTheme.colors
     val typography = AegisTheme.typography
     val spacing = AegisTheme.spacing
@@ -101,18 +119,35 @@ fun HomeScreen(
         }
 
         // === QUICK LAUNCH ZONE ===
-        QuickLaunchRow()
+        QuickLaunchRow(
+            apps = appDrawerState.apps,
+            onAppClick = { app ->
+                launchError = appDrawerViewModel.launch(app)
+            },
+        )
 
         Spacer(modifier = Modifier.height(spacing.sm))
 
         // === BOTTOM NAV ZONE ===
         BottomNavBar(
             onDrawerClick = {
-                // Phase 4 will wire this to actual drawer navigation
+                launchError = null
+                isDrawerVisible = true
             },
         )
 
         Spacer(modifier = Modifier.height(spacing.sm))
+    }
+
+    if (isDrawerVisible) {
+        AppDrawer(
+            state = appDrawerState.copy(errorMessage = launchError ?: appDrawerState.errorMessage),
+            onDismiss = { isDrawerVisible = false },
+            onAppClick = { app ->
+                launchError = appDrawerViewModel.launch(app)
+                if (launchError == null) isDrawerVisible = false
+            },
+        )
     }
 }
 

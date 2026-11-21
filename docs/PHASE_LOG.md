@@ -301,7 +301,26 @@ Phase 3 implemented the full HUD home screen dashboard per UI_UX_SPECIFICATION.m
 | Field | Value |
 |---|---|
 | Phase | PHASE-04 |
-| Status | Not started |
+| Title | App Discovery & Launching |
+| Date Started | 2026-11-21 |
+| Date Completed | 2026-11-21 (build verified; device validation pending) |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Result | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (41s) |
+| Test Result | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (31s, 15 tests passed) |
+| Lint Result | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (53s, 0 errors) |
+
+**Summary:**
+
+Phase 4 added a platform-neutral `AppInfo` model, alphabetical/de-duplicated app-list rules,
+and an Android `PackageManager` repository. The repository queries only `MAIN` + `LAUNCHER`
+activities, skips AEGIS itself, caches activity icons, dynamically observes package changes, and
+launches activities with `FLAG_ACTIVITY_NEW_TASK` while returning failures safely. The HUD now
+shows the first five discovered apps in Quick Launch and exposes the complete responsive icon
+grid in a modal app drawer. Three JVM tests cover sorting, duplicate removal, and empty input (`AppListNormalizerTest`).
+
+NixOS environment blocker B-003 was resolved by patching the AAPT2 binary ELF interpreter to point to the system glibc dynamic loader using `patchelf` (DEC-013). Minor Compose compilation issues in `AppDrawer.kt` and `QuickLaunchRow.kt` were fixed. All three validation commands (`assembleDebug`, `testDebugUnitTest`, `lintDebug`) completed with zero errors. Device validation remains pending connection of a target device (B-002).
+
+**Next phase:** PHASE-05 — Search and Application Drawer
 
 ---
 

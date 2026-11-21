@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
-**Version:** 0.4.0
-**Last Updated:** 2026-11-01 (Phase 3 complete)
-**Current Stage:** Phase 3 — HUD Home Screen Complete
-**Overall Status:** Phase 3 build verified; full dashboard layout with live clock, status panels, quick launch, and bottom nav
+**Version:** 0.5.1
+**Last Updated:** 2026-11-21 (Phase 4 build verified; device validation pending)
+**Current Stage:** Phase 4 — App Discovery & Launching
+**Overall Status:** Phase 4 implementation complete & build verified; device validation pending (B-002)
 
 ---
 
@@ -13,17 +13,17 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 3 — HUD Home Screen |
-| Status | Implementation Complete — Build Verified |
-| Last Updated | 2026-11-01 |
-| Last Completed Phase | PHASE-03 (HUD Home Screen — build verified) |
-| Current Phase | None (awaiting Phase 4 authorization) |
-| Next Step | Phase 4 — App Discovery & Launching |
-| Latest Build | `./gradlew assembleDebug` — BUILD SUCCESSFUL (2026-11-01) |
-| Latest Test Run | `./gradlew testDebugUnitTest` — BUILD SUCCESSFUL (2026-11-01, 12 tests) |
-| Current Blockers | B-002 (Phase 1 device tests still pending) |
+| Stage | Phase 4 — App Discovery & Launching |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Last Updated | 2026-11-21 |
+| Last Completed Phase | PHASE-04 (App Discovery & Launching — build verified) |
+| Current Phase | PHASE-04 (build verified; device validation pending) |
+| Next Step | Proceed to PHASE-05 (Application Search); run device validation when connected |
+| Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (41s, 2026-11-21) |
+| Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (31s, 15 tests passed, 2026-11-21) |
+| Current Blockers | B-002 (device tests) |
 | Git Branch | main |
-| Latest Commit | 288b879 — feat(phase-3): implement HUD home screen dashboard |
+| Latest Commit | aecebc3 — feat(phase-4): implement app discovery and launching |
 
 ---
 
@@ -88,7 +88,7 @@ Rules:
 | F-001 | Launcher Foundation | P0 | 5 | 2 | F-001-P1, F-001-P2 done | Build Verified; Device Pending | Implementation Complete — Device Validation Pending | — |
 | F-002 | HUD Design System | P0 | 5 | 5 | All phases done | Build Verified | Implementation Complete — Build Verified | F-001 |
 | F-003 | HUD Home Screen | P0 | 6 | 6 | All phases done | Build Verified | Implementation Complete — Build Verified | F-002 |
-| F-004 | App Discovery & Launching | P0 | 6 | 0 | Not Started | Not Tested | Not Started | F-001 |
+| F-004 | App Discovery & Launching | P0 | 6 | 6 | All phases done | Build Verified; Device Pending | Implementation Complete — Build Verified (Device Validation Pending) | F-001 |
 | F-005 | Application Search | P0 | 4 | 0 | Not Started | Not Tested | Not Started | F-004 |
 | F-006 | Battery Telemetry | P0 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
 | F-007 | Animated Radar & HUD Graphics | P1 | 5 | 0 | Not Started | Not Tested | Not Started | F-002 |
@@ -105,9 +105,9 @@ Rules:
 | F-018 | Extended Automation | P3 | 5 | 0 | Not Started | Not Tested | Deferred | F-013 |
 | F-019 | Open-Source Preparation | P3 | 6 | 0 | Not Started | Not Tested | Deferred | All |
 
-**Implementation Progress: 15%** (13 / 86 active planned implementation phases verified complete)
+**Implementation Progress: 22%** (19 / 86 active planned implementation phases implemented)
 
-> **Denominator basis:** 86 active (non-deferred) planned phases — 31 P0 + 24 P1 + 31 P2. Deferred P3 phases (16) are excluded per the formula in Section B.2. Implementation has not started; no phase has been executed or validated.
+> **Denominator basis:** 86 active (non-deferred) planned phases — 31 P0 + 24 P1 + 31 P2. Deferred P3 phases (16) are excluded per the formula in Section B.2. Phase 4 counts implementation work only; its Gradle and device validation remain pending.
 
 **Planning Coverage: 100%** (19 / 19 features have defined phases)
 
@@ -229,6 +229,35 @@ Rules:
 
 ---
 
+### PHASE-04: Application Discovery & Launching
+
+| Field | Value |
+|---|---|
+| Phase ID | PHASE-04 |
+| Objective | Discover and display launchable activities, then launch them safely |
+| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (41s, 2026-11-21) |
+| Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (31s, 15 tests passed, 2026-11-21) |
+| Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (53s, 0 errors, 2026-11-21) |
+| Dependencies | PHASE-03 |
+| Started | 2026-11-21 |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (15 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+
+**Implemented:**
+
+- Targeted `PackageManager` discovery for `MAIN` + `LAUNCHER` activities.
+- Platform-neutral model plus deterministic alphabetical de-duplication.
+- Cached system-drawable icons, safe activity launch, and dynamic package change updates.
+- HUD app drawer with loading, empty, and launch-error states; Quick Launch populated from apps.
+- Three new unit tests for the pure app-list rules (15 total project unit tests passing).
+
+**Validation:**
+- B-003 resolved via DEC-013 (AAPT2 patched with patchelf for NixOS glibc).
+- Assemble, unit tests, and lint all completed successfully.
+- Device testing deferred pending physical device / emulator (B-002).
+
+---
+
 ## F. Build and Test History
 
 | Date | Command | Environment | Result | Notes | Feature/Phase |
@@ -242,6 +271,9 @@ Rules:
 | 2026-11-01 | `./gradlew assembleDebug` | Same | BUILD SUCCESSFUL (6s) | APK: 11MB | PHASE-03 |
 | 2026-11-01 | `./gradlew testDebugUnitTest` | Same | BUILD SUCCESSFUL (3s) | 12 tests passed (2 Example + 5 ThemeTokens + 5 ClockViewModel) | PHASE-03 |
 | 2026-11-01 | `./gradlew lintDebug` | Same | BUILD SUCCESSFUL (8s) | 0 errors | PHASE-03 |
+| 2026-11-21 | `./gradlew --no-daemon assembleDebug` | NixOS 26.11, JDK 21, AGP 8.7.3, Gradle 8.9 | BUILD SUCCESSFUL (41s) | APK: app/build/outputs/apk/debug/app-debug.apk; AAPT2 patched (DEC-013) | PHASE-04 |
+| 2026-11-21 | `./gradlew --no-daemon testDebugUnitTest` | Same | BUILD SUCCESSFUL (31s) | 15 tests passed (2 Example + 5 ThemeTokens + 5 ClockViewModel + 3 AppListNormalizer) | PHASE-04 |
+| 2026-11-21 | `./gradlew --no-daemon lintDebug` | Same | BUILD SUCCESSFUL (53s) | 0 errors | PHASE-04 |
 
 ---
 
@@ -251,6 +283,7 @@ Rules:
 |---|---|---|---|---|---|---|---|
 | B-001 | .gitignore missing from repository | Medium | All | Not created in Phase 0 | Created in Phase 1, Subtask 1 | **Resolved** | — |
 | B-002 | No physical device connected for manifest tests | Low | F-001 | No device/emulator available during session | Connect device and run DT-MANIFEST-01 through DT-MANIFEST-04 | Open | Before marking Phase 1 Complete |
+| B-003 | Gradle AAPT2 cannot execute on NixOS | High | F-004 | Generic Linux AAPT2 lacks compatible dynamic loader on NixOS | Patched AAPT2 ELF interpreter to system glibc loader via patchelf (DEC-013) | **Resolved** | Re-patch if Gradle caches are purged |
 
 ---
 
@@ -262,6 +295,7 @@ Rules:
 | 2026-10-25 | Correction task applied: F-012–F-019 expanded; toolchain corrected; progress accounting updated; AGENTS.md expanded; manifest attributes justified; consistency audit completed | Correction Task |
 | 2026-10-25 | Planning review corrections applied: Gradle wrapper bootstrap defined; technical wording, testing boundaries, dependency diagram, tracker reference, and changelog alignment corrected | `reviews/` |
 | 2026-10-25 | **Phase 1 implemented:** Android project scaffold created; Gradle 8.9 wrapper bootstrapped (SHA-256 verified); `assembleDebug`, `testDebugUnitTest`, `lintDebug` all passed; device tests pending | PHASE-01-FOUNDATION.md |
+| 2026-11-21 | **Phase 4 implemented & build verified:** app discovery, drawer, launch flow, package refresh, and JVM tests added; B-003 resolved via patchelf (DEC-013); `assembleDebug`, `testDebugUnitTest` (15 passed), `lintDebug` (0 errors) all successful; device testing pending (B-002) | PHASE-04-APP-DISCOVERY.md |
 
 ---
 

@@ -1,63 +1,49 @@
 # NEXT_STEPS.md — AEGIS HUD Launcher
 
-**Last Updated:** 2026-11-01 (Phase 3 complete)
-**Current Phase:** PHASE-03 — Implementation Complete, Build Verified
-**Next Phase:** PHASE-04 — App Discovery & Launching
+**Last Updated:** 2026-11-21 (Phase 4 build verified)
+**Current Phase:** PHASE-04 — Implementation Complete, Build Verified (Device Validation Pending)
+**Next Phase:** PHASE-05 — Search and Application Drawer (or device validation of Phase 1 & 4 when device available)
 
 ---
 
-## Immediate Next Tasks
+## Completed This Session
 
-### Task 1: Phase 1 Device Validation (still pending)
+- Resolved NixOS AAPT2 dynamic loader blocker (B-003) via `patchelf --set-interpreter` (DEC-013).
+- Fixed Compose compilation issues in `AppDrawer.kt` (removed ambiguous internal weight import) and `QuickLaunchRow.kt` (added missing items extension import).
+- Validated Phase 4 implementation:
+  - `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (41s).
+  - `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (31s, 15 tests passed with 0 failures).
+  - `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (53s, 0 errors).
+- Synchronized all project documentation (Progress Tracker, Bug Tracker, Risk Register, Decisions, Changelog, Phase 4 doc).
 
-**Phase:** PHASE-01 — B-002
+## Outstanding Blockers
 
-Connect a physical Android device and validate launcher behavior (see Phase 1 docs).
+1. **B-002:** Connect a physical Android device or emulator and run the pending Phase 1 manifest
+   tests (`DT-MANIFEST-01` through `DT-MANIFEST-04`), plus manual validation of Phase 4 app discovery,
+   icon rendering, launching, and package change observation. (Low severity; development can proceed to Phase 5).
 
-### Task 2: Begin Phase 4 — App Discovery & Launching
+## Exact Next Task
 
-**Phase:** PHASE-04 — F-004
+Begin **PHASE-05 (Application Search)**:
+1. Create `docs/phases/PHASE-05-SEARCH.md`.
+2. Implement real-time search filtering in `AppDrawerViewModel` / `AppDrawer`.
+3. Wire the search bar in `BottomNavBar` / `HomeScreen`.
+4. Add JVM unit tests for search filtering (case-insensitivity, prefix/substring matching, empty query).
+5. Run build, unit tests, and lint to verify.
 
-**Objective:**
-Query PackageManager for launchable apps, display icons and names in a grid drawer, and launch apps reliably. Wire the QuickLaunchRow and BottomNavBar drawer button.
+## Files to Inspect Before Resuming
 
-**Prerequisites:**
-- Phase 3 home screen complete (done)
-
-**Read before starting:**
-- `docs/phases/PHASE-04-APP-DISCOVERY.md` (to be created)
-- `docs/FEATURE_PLAN.md` F-004 section
-- `docs/ARCHITECTURE.md` Section 9 (background work policy — BroadcastReceiver for package changes)
-
----
-
-## Phase 3 Completion Summary
-
-**What was completed:**
-- ClockViewModel with viewModelScope coroutine, second-aligned ticking
-- HudClock composable (HH:MM bright + :SS dimmed)
-- TopBar (system label, clock, date, status)
-- QuickLaunchRow (5 placeholder slots)
-- BottomNavBar (search placeholder + drawer button)
-- Full dashboard HomeScreen assembling all four layout zones
-- 5 new ClockViewModel unit tests
-
-**What was validated:**
-- `./gradlew assembleDebug` — BUILD SUCCESSFUL (6s)
-- `./gradlew testDebugUnitTest` — BUILD SUCCESSFUL (3s, 12 tests)
-- `./gradlew lintDebug` — 0 errors
-- APK: 11MB
-
-**Blockers:**
-- B-002: Phase 1 device tests still pending
-
----
+- `docs/PROGRESS_TRACKER.md`
+- `docs/phases/PHASE-04-APP-DISCOVERY.md`
+- `docs/FEATURE_PLAN.md` (F-005: Application Search)
+- `app/src/main/kotlin/dev/ragnar/aegis/ui/apps/AppDrawerViewModel.kt`
+- `app/src/main/kotlin/dev/ragnar/aegis/ui/apps/AppDrawer.kt`
+- `app/src/main/kotlin/dev/ragnar/aegis/ui/home/BottomNavBar.kt`
 
 ## Commands to Run When Resuming
 
 ```bash
 git status
-git log --oneline -5
-./gradlew assembleDebug
-cat docs/NEXT_STEPS.md
+git log --oneline -10
+./gradlew --no-daemon testDebugUnitTest
 ```

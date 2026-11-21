@@ -4,6 +4,21 @@
 
 ## [Unreleased] — Development
 
+### Phase 4 — App Discovery & Launching — 2026-11-21
+
+**Added:**
+- Targeted launcher-activity discovery, alphabetical de-duplication, icon caching, safe app
+  launching, and package-change refresh.
+- HUD app drawer grid and real Quick Launch entries.
+- JVM coverage for app-list sorting, duplicate removal, and empty input (`AppListNormalizerTest`).
+
+**Validation:**
+- Resolved build environment blocker B-003 by patching the Gradle AAPT2 binary ELF interpreter for NixOS glibc.
+- `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (41s).
+- `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (31s, 15 tests passed across all suites).
+- `./gradlew --no-daemon lintDebug` — BUILD SUCCESSFUL (53s, 0 errors).
+- Device testing deferred pending physical device / emulator (B-002).
+
 ### [0.1.1-planning] — Planning Review Corrections — 2026-10-25
 
 **Changed:**
