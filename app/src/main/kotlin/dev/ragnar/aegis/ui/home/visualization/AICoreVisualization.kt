@@ -57,6 +57,19 @@ fun AICoreVisualization(
             )
 
         val geo = NeuralGeometry.build(size.width, size.height)
+        // Red background mesh: the flat neural node mesh, 10% smaller and 25% less opaque,
+        // drawn first so the main 3D mesh renders on top of it.
+        drawBrainNeuralMesh(
+            geo = geo,
+            brainPulse = anim.brainPulse.value,
+            pulsePhase = anim.pulsePhase.value,
+            colors = colors,
+            meshColor = Color(0xFFFF2D3A),
+            highlightColor = Color(0xFFFFB3B8),
+            sizeScale = 0.9f,
+            alphaScale = 1f,
+        )
+
         // State is read here, in the draw phase, so animation ticks redraw without recomposing.
         drawBrainMesh3D(
             mesh, frame, geo,
@@ -199,8 +212,13 @@ private fun DrawScope.drawBrainNeuralMesh(
     brainPulse: Float,
     pulsePhase: Float,
     colors: AegisColorScheme,
+    meshColor: Color = colors.cyan,
+    highlightColor: Color = Color.White,
+    sizeScale: Float = 1f,
+    alphaScale: Float = 1f,
 ) {
     val center = geo.center
+    val scale = brainPulse * sizeScale
 
     // 1. Connection lines between nodes
     val lineStroke = 0.9.dp.toPx()
@@ -209,8 +227,8 @@ private fun DrawScope.drawBrainNeuralMesh(
         val to = geo.nodes[toIdx]
 
         // Scale node positions around brain center by pulse
-        val p1 = Offset(center.x + (from.x - center.x) * brainPulse, center.y + (from.y - center.y) * brainPulse)
-        val p2 = Offset(center.x + (to.x - center.x) * brainPulse, center.y + (to.y - center.y) * brainPulse)
+        val p1 = Offset(center.x + (from.x - center.x) * scale, center.y + (from.y - center.y) * scale)
+        val p2 = Offset(center.x + (to.x - center.x) * scale, center.y + (to.y - center.y) * scale)
 
         val alpha = when {
             from.shell == 0 || to.shell == 0 -> 0.65f
@@ -219,7 +237,7 @@ private fun DrawScope.drawBrainNeuralMesh(
         }
 
         drawLine(
-            color = colors.cyan.copy(alpha = alpha),
+            color = meshColor.copy(alpha = alpha * alphaScale),
             start = p1,
             end = p2,
             strokeWidth = lineStroke,
@@ -233,8 +251,8 @@ private fun DrawScope.drawBrainNeuralMesh(
         val stagger = (idx * 0.19f) % 1f
         val t = (pulsePhase + stagger) % 1f
 
-        val p1 = Offset(center.x + (from.x - center.x) * brainPulse, center.y + (from.y - center.y) * brainPulse)
-        val p2 = Offset(center.x + (to.x - center.x) * brainPulse, center.y + (to.y - center.y) * brainPulse)
+        val p1 = Offset(center.x + (from.x - center.x) * scale, center.y + (from.y - center.y) * scale)
+        val p2 = Offset(center.x + (to.x - center.x) * scale, center.y + (to.y - center.y) * scale)
 
         val px = p1.x + (p2.x - p1.x) * t
         val py = p1.y + (p2.y - p1.y) * t
@@ -242,12 +260,12 @@ private fun DrawScope.drawBrainNeuralMesh(
 
         if (alpha > 0.1f) {
             drawCircle(
-                color = Color.White.copy(alpha = alpha),
+                color = highlightColor.copy(alpha = alpha * alphaScale),
                 radius = 1.8.dp.toPx(),
                 center = Offset(px, py),
             )
             drawCircle(
-                color = colors.cyan.copy(alpha = alpha * 0.6f),
+                color = meshColor.copy(alpha = alpha * 0.6f * alphaScale),
                 radius = 3.5.dp.toPx(),
                 center = Offset(px, py),
             )
@@ -256,7 +274,7 @@ private fun DrawScope.drawBrainNeuralMesh(
 
     // 3. Neural nodes (with outer glow, core circle, and bright center)
     geo.nodes.forEach { node ->
-        val p = Offset(center.x + (node.x - center.x) * brainPulse, center.y + (node.y - center.y) * brainPulse)
+        val p = Offset(center.x + (node.x - center.x) * scale, center.y + (node.y - center.y) * scale)
         val radius = when (node.shell) {
             0 -> 3.2.dp.toPx()
             3 -> 2.6.dp.toPx()
@@ -270,19 +288,19 @@ private fun DrawScope.drawBrainNeuralMesh(
 
         // Outer glow
         drawCircle(
-            color = colors.cyan.copy(alpha = alpha * 0.4f),
+            color = meshColor.copy(alpha = alpha * 0.4f * alphaScale),
             radius = radius * 2.4f,
             center = p,
         )
         // Core node
         drawCircle(
-            color = colors.cyan.copy(alpha = alpha),
+            color = meshColor.copy(alpha = alpha * alphaScale),
             radius = radius,
             center = p,
         )
         // Bright white specular center
         drawCircle(
-            color = Color.White.copy(alpha = alpha * 0.8f),
+            color = highlightColor.copy(alpha = alpha * 0.8f * alphaScale),
             radius = radius * 0.5f,
             center = p,
         )
