@@ -5,7 +5,7 @@
 **Dependencies:** All P0 and P1 features  
 **Start Date:** 2026-11-22  
 **Completion Date:** 2026-11-22  
-**Status:** Implementation Complete — Build Verified (Device Validation Pending)  
+**Status:** Implementation Complete — Build Verified; Device Performance Validation Failed (B-005)
 
 ---
 
@@ -20,8 +20,8 @@ Define, audit, and enforce measurable performance and reliability standards acro
 | Metric | Target | Measurement Method | Verification Result |
 |---|---|---|---|
 | **Cold Start Time** | $\le 1.0$ s | Time to initial frame (`MainActivity.onCreate` through first Compose draw) | Architectural: No blocking I/O on Main thread; asynchronous repository loading; DataStore uses background IO dispatcher |
-| **Animation Frame Rate** | Sustained 60 FPS | Android Studio Profiler / Choreographer frame drops | Memoized `NeuralGeometry` eliminates heap allocations during `DrawScope` 60 FPS sweep; battery-saver mode halts animation |
-| **Idle Memory Footprint** | $\le 45$ MB JVM heap | `Runtime.getRuntime()` in Developer Console | Circular log buffer strictly bounded at 100 entries; no retained Views; stateless pure Compose architecture |
+| **Animation Frame Rate** | Sustained 60 FPS | Android Studio Profiler / Choreographer frame drops | **Failed on device:** 36 ms median, 10.69% janky frames; B-005 |
+| **Idle Memory Footprint** | $\le 45$ MB JVM heap | `Runtime.getRuntime()` in Developer Console | **Incomplete metric:** device total PSS is 160.97 MB; JVM heap alone is not a sufficient launcher budget |
 | **Memory Leak Bound** | 0 retained callbacks after exit | Static receiver audit & `awaitClose` inspection | All 4 BroadcastReceivers & NetworkCallbacks guarded with `runCatching` in `awaitClose` / `onDispose` |
 | **Telemetry Overhead** | $\le 0.5$ ms per tick | JVM unit test benchmark (10k iterations) | 10k normalization cycles complete in $< 50$ ms ($\approx 0.005$ ms per call) |
 
@@ -46,6 +46,15 @@ Define, audit, and enforce measurable performance and reliability standards acro
   - Animations are paused (`isAnimationPaused = true`).
   - Scanline CRT overlay pauses.
   - Telemetry updates remain passive sticky-broadcast driven without wake locks.
+
+### Hardware Validation Finding — 2026-11-22
+
+- Device: OnePlus CPH2401, Android 14, 1080 × 2400, 90 Hz peak refresh rate.
+- AEGIS foreground process used roughly 2.5 CPU cores over a 30-second ADB sample. Main, RenderThread, two HWUI workers, and Mali backend were the dominant threads.
+- `dumpsys gfxinfo`: 36/57/73/85 ms at p50/p90/p95/p99 with 10.69% janky frames. GPU p50 was 7 ms, identifying CPU-side display-list/draw work rather than GPU saturation.
+- `dumpsys meminfo`: 160.97 MB PSS and 301.70 MB RSS. This is not a leak finding, but it exceeds the practical footprint expected from an idle launcher.
+- Thermal service reported skin 52.0°C (severity 3), battery 44.9°C, and CPU/GPU 64.9°C while USB-powered. Charging and system activity can contribute, so causation is not assigned exclusively to AEGIS.
+- Result: this phase remains implementation-complete, but its device-performance acceptance gate failed. P0 scope is removal/optionalization of the duplicate 2D mesh, explicit frame-rate caps, and adaptive low-power/static rendering. See B-005 and `docs/reports/2026-11-22-device-performance-diagnosis.md`.
 
 ### F-016-P5: Lifecycle Resilience
 - Launcher declared as `launchMode="singleTask"` (DEC-010).
@@ -82,3 +91,4 @@ Define, audit, and enforce measurable performance and reliability standards acro
 - [x] All receiver/callback unregister points guarded against leaks and lifecycle races (F-016-P6).
 - [x] 108 unit tests passing with zero failures (F-016-P7).
 - [x] `assembleDebug` and `lintDebug` pass with 0 errors.
+- [ ] Device performance targets accepted — failed on target hardware (B-005).

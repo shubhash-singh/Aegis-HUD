@@ -1,6 +1,6 @@
 # PHASE_LOG.md — AEGIS HUD Launcher
 
-**Last Updated:** 2026-10-25
+**Last Updated:** 2026-11-22 (hardware diagnosis recorded)
 
 ---
 
@@ -854,9 +854,26 @@ Investigated and implemented full third-party Android AppWidget hosting capabili
 - [x] 122 unit tests passing (14 new in Phase 16).
 - [x] `assembleDebug` and `lintDebug` pass with 0 errors.
 
-**Next phase:** Physical Hardware Device Validation (B-002) / P3 Open Scope Evaluation
+**Next phase:** PHASE-15 device-performance remediation (B-005), followed by remaining hardware validation.
 
 ---
 
-*(All planned P0, P1, and P2 phases are now fully implemented and build verified.)*
+## Hardware Device Diagnosis — B-005
+
+**Status:** Performance validation failed; remediation required
+**Date:** 2026-11-22
+
+### Summary
+
+ADB profiling on the connected OnePlus CPH2401 (Android 14, 90 Hz) found that the foreground AEGIS home screen consumed roughly 2.5 CPU cores. `dumpsys gfxinfo` reported a 36 ms median frame time and 10.69% janky frames, while `dumpsys meminfo` reported 160.97 MB PSS / 301.70 MB RSS. Thermal service reported 52.0°C skin temperature at severity 3. The renderer is CPU-bound: GPU p50 was 7 ms while the app main, RenderThread, HWUI, and Mali backend threads were hot.
+
+### Outcome
+
+- Created B-005 and the full evidence/remediation report at `docs/reports/2026-11-22-device-performance-diagnosis.md`.
+- Correlated the issue with display-rate rendering of both 3D and legacy 2D neural meshes, pulse/glow/ring/code-rain layers, and the absence of a frame-rate cap.
+- Phase 15 remains build verified but is **not device-performance accepted** until P0 remediation and repeat profiling pass.
+
+---
+
+*(All planned P0, P1, and P2 phases are implemented and build verified; device acceptance is blocked by B-005 and remaining B-002 validation.)*
 

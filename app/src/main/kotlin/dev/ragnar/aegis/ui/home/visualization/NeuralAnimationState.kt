@@ -1,29 +1,30 @@
 package dev.ragnar.aegis.ui.home.visualization
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameNanos
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlin.math.PI
+import kotlin.math.cos
 
 /**
  * Encapsulates all animation values for [AICoreVisualization].
  *
  * Created once inside [rememberNeuralAnimationState] and passed to the Canvas draw functions.
- * This keeps all InfiniteTransition state in one place, allowing [AICoreVisualization] to
+ * This keeps all animation state in one place, allowing [AICoreVisualization] to
  * be isolated from floating panel data updates — panel recompositions do not touch this.
  *
  * Animation specs follow UI_UX_SPECIFICATION.md Section 7.
  * Decision: DEC-014 — animation state isolated from panel data.
  *
- * When [isPaused] is true all animation values freeze at their current position.
+ * When [isPaused] is true all animation values freeze at their current position. Updates are
+ * intentionally capped at 30 FPS because this full-screen Canvas is CPU-bound on target hardware.
  */
 @Stable
 class NeuralAnimationState(
@@ -50,7 +51,7 @@ class NeuralAnimationState(
 )
 
 /**
- * Creates and remembers [NeuralAnimationState]. All transitions are started here.
+ * Creates and remembers [NeuralAnimationState]. One capped animation clock drives every value.
  *
  * @param isPaused When true, all animations freeze (battery-saver / user setting).
  * @param speedMultiplier 1f = normal, 0.5f = slow, 2f = fast.
@@ -60,142 +61,47 @@ fun rememberNeuralAnimationState(
     isPaused: Boolean = false,
     speedMultiplier: Float = 1f,
 ): NeuralAnimationState {
-    if (isPaused) {
-        return remember {
-            NeuralAnimationState(
-                innerRotation = mutableStateOf(0f),
-                outerRotation = mutableStateOf(360f),
-                brainPulse = mutableStateOf(1f),
-                beamAlpha = mutableStateOf(0.6f),
-                pulsePhase = mutableStateOf(0f),
-                particlePhase = mutableStateOf(0f),
-                ringPhase = mutableStateOf(0f),
-                wavePhase = mutableStateOf(0f),
-                meshDriftPhase = mutableStateOf(0f),
-                codeRainPhase = mutableStateOf(0f),
-            )
+    val elapsedSeconds = remember { mutableFloatStateOf(0f) }
+    val boundedSpeedMultiplier = speedMultiplier.coerceIn(0.25f, 4f)
+
+    LaunchedEffect(isPaused, boundedSpeedMultiplier) {
+        if (isPaused) return@LaunchedEffect
+
+        val phaseAtStart = elapsedSeconds.floatValue
+        val startNanos = withFrameNanos { it }
+        while (isActive) {
+            val frameNanos = withFrameNanos { it }
+            val elapsedNanos = frameNanos - startNanos
+            elapsedSeconds.floatValue = phaseAtStart +
+                (elapsedNanos / NANOS_PER_SECOND.toFloat()) * boundedSpeedMultiplier
+            delay(FRAME_INTERVAL_MILLIS)
         }
     }
 
-    // Duration helpers — scaled by speedMultiplier
-    fun ms(base: Int) = (base / speedMultiplier.coerceIn(0.25f, 4f)).toInt()
-
-    val transition = rememberInfiniteTransition(label = "NeuralCore")
-
-    val innerRotation = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(ms(6000), easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "InnerRot",
-    )
-
-    val outerRotation = transition.animateFloat(
-        initialValue = 360f,
-        targetValue = 0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(ms(10000), easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "OuterRot",
-    )
-
-    val brainPulse = transition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.018f,
-        animationSpec = infiniteRepeatable(
-            // A low-amplitude, slow pulse reads as a living hologram rather than a scaled sprite.
-            animation = tween(ms(3500), easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "BrainPulse",
-    )
-
-    val beamAlpha = transition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(ms(2000), easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "BeamAlpha",
-    )
-
-    val pulsePhase = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(ms(3000), easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "PulsePhase",
-    )
-
-    val particlePhase = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(ms(6000), easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "ParticlePhase",
-    )
-
-    val ringPhase = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(ms(4000), easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "RingPhase",
-    )
-
-    val wavePhase = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(ms(4000), easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "WavePhase",
-    )
-
-    val meshDriftPhase = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            // Keep this independent from the HUD rings: a brain should drift, not spin with an indicator.
-            animation = tween(ms(26000), easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "MeshDrift",
-    )
-
-    val codeRainPhase = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(ms(18000), easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "CodeRain",
-    )
-
-    return remember(isPaused, speedMultiplier) {
+    return remember {
         NeuralAnimationState(
-            innerRotation = innerRotation,
-            outerRotation = outerRotation,
-            brainPulse = brainPulse,
-            beamAlpha = beamAlpha,
-            pulsePhase = pulsePhase,
-            particlePhase = particlePhase,
-            ringPhase = ringPhase,
-            wavePhase = wavePhase,
-            meshDriftPhase = meshDriftPhase,
-            codeRainPhase = codeRainPhase,
+            innerRotation = derivedStateOf { positiveModulo(elapsedSeconds.floatValue * 60f, 360f) },
+            outerRotation = derivedStateOf { 360f - positiveModulo(elapsedSeconds.floatValue * 36f, 360f) },
+            brainPulse = derivedStateOf {
+                1.009f - 0.009f * cos(2f * PI.toFloat() * elapsedSeconds.floatValue / 7f)
+            },
+            beamAlpha = derivedStateOf {
+                0.65f - 0.35f * cos(PI.toFloat() * elapsedSeconds.floatValue / 2f)
+            },
+            pulsePhase = derivedStateOf { positiveModulo(elapsedSeconds.floatValue / 3f, 1f) },
+            particlePhase = derivedStateOf { positiveModulo(elapsedSeconds.floatValue / 6f, 1f) },
+            ringPhase = derivedStateOf { positiveModulo(elapsedSeconds.floatValue / 4f, 1f) },
+            wavePhase = derivedStateOf { positiveModulo(elapsedSeconds.floatValue / 4f, 1f) },
+            meshDriftPhase = derivedStateOf { positiveModulo(elapsedSeconds.floatValue / 26f, 1f) },
+            codeRainPhase = derivedStateOf { positiveModulo(elapsedSeconds.floatValue / 18f, 1f) },
         )
     }
+}
+
+private const val FRAME_INTERVAL_MILLIS = 33L
+private const val NANOS_PER_SECOND = 1_000_000_000L
+
+private fun positiveModulo(value: Float, modulus: Float): Float {
+    val remainder = value % modulus
+    return if (remainder < 0f) remainder + modulus else remainder
 }

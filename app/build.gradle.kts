@@ -4,6 +4,20 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+val releaseStoreFilePath = providers.environmentVariable("AEGIS_RELEASE_STORE_FILE").orNull
+val releaseStorePassword = providers.environmentVariable("AEGIS_RELEASE_STORE_PASSWORD").orNull
+val releaseKeyAlias = providers.environmentVariable("AEGIS_RELEASE_KEY_ALIAS").orNull
+val releaseKeyPassword = providers.environmentVariable("AEGIS_RELEASE_KEY_PASSWORD").orNull
+val hasReleaseSigning = listOf(
+    releaseStoreFilePath,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword,
+).all { !it.isNullOrBlank() }
+
+val aegisVersionCode = providers.gradleProperty("aegisVersionCode").orNull?.toIntOrNull() ?: 1
+val aegisVersionName = providers.gradleProperty("aegisVersionName").orNull ?: "0.1.0-dev"
+
 android {
     namespace = "dev.ragnar.aegis"
     compileSdk = 35
@@ -12,15 +26,27 @@ android {
         applicationId = "dev.ragnar.aegis"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0-dev"
+        versionCode = aegisVersionCode
+        versionName = aegisVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    val releaseSigningConfig = if (hasReleaseSigning) {
+        signingConfigs.create("release") {
+            storeFile = file(requireNotNull(releaseStoreFilePath))
+            storePassword = requireNotNull(releaseStorePassword)
+            keyAlias = requireNotNull(releaseKeyAlias)
+            keyPassword = requireNotNull(releaseKeyPassword)
+        }
+    } else {
+        null
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = releaseSigningConfig
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

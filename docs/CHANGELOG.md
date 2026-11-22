@@ -4,6 +4,17 @@
 
 ## [Unreleased] — Development
 
+### Production Release Automation
+
+**Added:**
+- GitHub Actions workflow releases a verified signed APK and SHA-256 checksum for every push to `production`.
+- CI/CD setup guide documents the required repository signing secrets in `docs/CI_CD.md`.
+
+### Device Performance Diagnosis — 2026-11-22
+
+**Known Issue:**
+- Target-device validation exposed B-005: the default neural HUD consumes roughly 2.5 CPU cores, has 36 ms median frame time with 10.69% jank, and materially contributes to a severe skin thermal state. No source fix is included in this diagnostic update. The remediation scope and complete ADB evidence are recorded in `docs/reports/2026-11-22-device-performance-diagnosis.md`.
+
 ### Phase 16 — Widget Hosting (F-012) — 2026-11-22
 
 **Added:**

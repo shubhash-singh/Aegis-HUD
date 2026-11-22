@@ -1,9 +1,9 @@
 # PROGRESS_TRACKER.md — AEGIS HUD Launcher
 
 **Version:** 0.19.0
-**Last Updated:** 2026-11-22 (Phase 16 build verified)
-**Current Stage:** Phase 16 Complete (Build Verified) / All Active Planned Phases 100% Implemented
-**Overall Status:** Phase 16 Complete (Build Verified)
+**Last Updated:** 2026-11-22 (hardware diagnosis recorded)
+**Current Stage:** Phase 16 Complete (Build Verified) / Phase 15 device-performance remediation required
+**Overall Status:** Build Verified; Device Performance Validation Failed (B-005)
 
 ---
 
@@ -13,17 +13,17 @@
 |---|---|
 | Project | AEGIS HUD Launcher |
 | Version | 0.1.0-dev |
-| Stage | Phase 16 Complete (Build Verified) |
-| Status | Complete (Build Verified; Device Validation Pending) |
+| Stage | Phase 16 Complete (Build Verified); hardware performance remediation pending |
+| Status | Build Verified; Device Performance Validation Failed (B-005) |
 | Last Updated | 2026-11-22 |
 | Last Completed Phase | PHASE-16 (Widget Hosting — build verified) |
-| Current Phase | PHASE-16 (Widget Hosting — F-012) (Complete) |
-| Next Step | Target Hardware Device Validation (B-002) / P3 Scope |
+| Current Phase | PHASE-15 device-performance remediation (B-005) |
+| Next Step | Implement and validate P0 neural HUD performance remediation |
 | Latest Build | `./gradlew --no-daemon assembleDebug` — BUILD SUCCESSFUL (2026-11-22) |
 | Latest Test Run | `./gradlew --no-daemon testDebugUnitTest` — BUILD SUCCESSFUL (122 tests passed, 2026-11-22) |
-| Current Blockers | B-002 (device tests) |
+| Current Blockers | B-005 (sustained CPU/jank/thermal failure); B-002 remaining functional device tests |
 | Git Branch | main |
-| Latest Commit | 64e13a0 — feat(ui): remove bottom emitter/cone/waveform cluster, add radial depth to app drawer cells, increase drawer transparency |
+| Latest Commit | 32e7e0d — Add live telemetry card metrics |
 
 ---
 
@@ -677,7 +677,7 @@ Rules:
 | Phase ID | PHASE-15 |
 | Title | Reliability and Performance |
 | Objective | Formulate performance standards, eliminate render loop allocations, harden lifecycle teardown, and add performance regression suites |
-| Status | Implementation Complete — Build Verified (Device Validation Pending) |
+| Status | Implementation Complete — Build Verified; Device Performance Validation Failed (B-005) |
 | Build Status | BUILD SUCCESSFUL — `./gradlew --no-daemon assembleDebug` (21s, 2026-11-22) |
 | Test Status | BUILD SUCCESSFUL — `./gradlew --no-daemon testDebugUnitTest` (20s, 108 tests passed, 2026-11-22) |
 | Lint Status | BUILD SUCCESSFUL — `./gradlew --no-daemon lintDebug` (1m 13s, 0 errors, 2026-11-22) |
@@ -685,7 +685,7 @@ Rules:
 | Design Docs | `docs/phases/PHASE-15-RELIABILITY-AND-PERFORMANCE.md` |
 | Started | 2026-11-22 |
 | Completed | 2026-11-22 (Build Verified) |
-| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (108 passed) ✅; Lint (0 errors) ✅; Device tests pending (B-002) |
+| Acceptance Criteria | Build ✅; APK produced ✅; Unit tests (108 passed) ✅; Lint (0 errors) ✅; Device performance ❌ (B-005) |
 
 **Implemented:**
 
@@ -694,9 +694,9 @@ Rules:
 - Hardened receiver and callback teardown: wrapped all `unregisterReceiver` and `unregisterNetworkCallback` calls in `runCatching` across `AndroidAppRepository`, `AndroidNetworkRepository`, `AndroidBatteryRepository`, and `HomeScreen`.
 - 5 new unit tests in `PerformanceReliabilityAuditTest` covering geometry memoization, high-throughput normalizer benchmarks, concurrent log buffer stress tests, and default preference footprint (108 total project tests passing).
 
-**Validation:**
-- Assemble, unit tests, and lint all completed successfully with zero errors.
-- Device testing deferred pending physical device / emulator (B-002).
+**Device Validation (2026-11-22):**
+- ADB diagnosis on OnePlus CPH2401 / Android 14 found sustained multi-core AEGIS CPU use, 36 ms median frame time, 10.69% jank, total PSS 160.97 MB, and severe 52.0°C skin thermal state.
+- The Phase 15 device-performance target is **not accepted**. See `docs/reports/2026-11-22-device-performance-diagnosis.md` and B-005.
 
 ---
 
