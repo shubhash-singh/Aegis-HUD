@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -254,6 +255,7 @@ fun HomeScreen(
 
     AegisTheme(colors = colors) {
         val isAnimationPaused = isPowerSaveMode || !effectiveSpeed.isEnabled
+        var renderedFrameRate by remember { mutableStateOf<Int?>(null) }
         val animationSpeedMultiplier = if (effectiveSpeed.isEnabled) {
             when (effectiveSpeed.durationMillis) {
                 2000 -> 2.0f
@@ -262,6 +264,30 @@ fun HomeScreen(
             }
         } else {
             0f
+        }
+
+        // Measured from the Compose frame clock, so this reports rendered HUD frames rather than a target rate.
+        LaunchedEffect(preferences.showRadar, isAnimationPaused) {
+            if (!preferences.showRadar || isAnimationPaused) {
+                renderedFrameRate = null
+                return@LaunchedEffect
+            }
+            var frameCount = 0
+            var windowStartNanos = 0L
+            while (true) {
+                withFrameNanos { frameTimeNanos ->
+                    if (windowStartNanos == 0L) {
+                        windowStartNanos = frameTimeNanos
+                    }
+                    frameCount++
+                    val elapsedNanos = frameTimeNanos - windowStartNanos
+                    if (elapsedNanos >= 1_000_000_000L) {
+                        renderedFrameRate = ((frameCount * 1_000_000_000L) / elapsedNanos).toInt()
+                        frameCount = 0
+                        windowStartNanos = frameTimeNanos
+                    }
+                }
+            }
         }
 
         Box(
@@ -393,7 +419,9 @@ fun HomeScreen(
 
                     if (preferences.showTelemetry) {
                         FloatingTelemetryPanel(
-                            batteryTemperatureLabel = telemetryState.batteryTemperatureLabel,
+                            frameRate = renderedFrameRate,
+                            wifiSignalLabel = telemetryState.wifiSignalLabel,
+                            appMemoryLabel = telemetryState.appMemoryLabel,
                             uptimeFormatted = telemetryState.uptimeFormatted,
                         )
                     }

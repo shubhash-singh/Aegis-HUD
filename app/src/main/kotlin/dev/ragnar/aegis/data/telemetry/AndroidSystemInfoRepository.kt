@@ -3,6 +3,7 @@ package dev.ragnar.aegis.data.telemetry
 import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.wifi.WifiManager
 import android.os.Environment
 import android.os.Process
 import android.os.StatFs
@@ -25,6 +26,8 @@ class AndroidSystemInfoRepository(
 ) : SystemInfoRepository {
 
     private val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+    @Suppress("DEPRECATION")
+    private val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
 
     override fun observeSystemPerformance(): Flow<SystemPerformanceState> = flow {
         var prevTotal: Long? = null
@@ -41,6 +44,26 @@ class AndroidSystemInfoRepository(
                 am.getMemoryInfo(mi)
                 ramTotal = mi.totalMem
                 ramUsed = mi.totalMem - mi.availMem
+            }
+
+            // PSS is the OS-reported memory attributable to this launcher, including shared pages.
+            val appMemoryBytes = try {
+                activityManager
+                    ?.getProcessMemoryInfo(intArrayOf(Process.myPid()))
+                    ?.firstOrNull()
+                    ?.totalPss
+                    ?.toLong()
+                    ?.times(1024L)
+                    ?: 0L
+            } catch (_: Exception) {
+                0L
+            }
+
+            // RSSI is deliberately omitted when Android redacts it or no Wi-Fi transport is active.
+            val wifiSignalDbm = try {
+                wifiManager?.connectionInfo?.rssi?.takeIf { it in -100..0 }
+            } catch (_: SecurityException) {
+                null
             }
 
             // 2. Storage
@@ -115,6 +138,8 @@ class AndroidSystemInfoRepository(
                     ramTotalBytes = ramTotal,
                     storageUsedBytes = storageUsed,
                     storageTotalBytes = storageTotal,
+                    appMemoryBytes = appMemoryBytes,
+                    wifiSignalDbm = wifiSignalDbm,
                 )
             )
 

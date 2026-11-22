@@ -40,6 +40,8 @@ data class TelemetryUiState(
     val networkStatusLevel: StatusLevel = StatusLevel.Unknown,
     val systemPerformance: SystemPerformanceState = SystemPerformanceState(),
     val storageLabel: String = "---",
+    val wifiSignalLabel: String = "---",
+    val appMemoryLabel: String = "---",
     val intelligence: IntelligenceState = IntelligenceState(),
 )
 
@@ -78,6 +80,8 @@ class TelemetryViewModel(
             networkStatusLevel = determineNetworkStatusLevel(network),
             systemPerformance = sysPerf,
             storageLabel = formatStorage(sysPerf.storageUsedBytes, sysPerf.storageTotalBytes),
+            wifiSignalLabel = formatWifiSignal(sysPerf.wifiSignalDbm),
+            appMemoryLabel = formatMemory(sysPerf.appMemoryBytes),
             intelligence = intelligence,
         )
     }.stateIn(
@@ -146,6 +150,14 @@ class TelemetryViewModel(
             val freeGb = (totalBytes - usedBytes).coerceAtLeast(0L) / (1024.0 * 1024.0 * 1024.0)
             val totalGb = totalBytes / (1024.0 * 1024.0 * 1024.0)
             return "%.1f/%.0f GB".format(freeGb, totalGb)
+        }
+
+        fun formatWifiSignal(signalDbm: Int?): String = signalDbm?.let { "$it dBm" } ?: "---"
+
+        fun formatMemory(bytes: Long): String {
+            if (bytes <= 0L) return "---"
+            val megabytes = bytes / (1024.0 * 1024.0)
+            return if (megabytes >= 1024.0) "%.1f GB".format(megabytes / 1024.0) else "%.0f MB".format(megabytes)
         }
     }
 }

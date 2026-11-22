@@ -26,6 +26,14 @@ class FloatingPanelFormatterTest {
     }
 
     @Test
+    fun telemetryFormatters_showOnlyAvailableWifiAndProcessMemory() {
+        assertEquals("-58 dBm", TelemetryViewModel.formatWifiSignal(-58))
+        assertEquals("---", TelemetryViewModel.formatWifiSignal(null))
+        assertEquals("48 MB", TelemetryViewModel.formatMemory(48L * 1024L * 1024L))
+        assertEquals("---", TelemetryViewModel.formatMemory(0L))
+    }
+
+    @Test
     fun systemPerformanceState_percentageCalculations() {
         val state = SystemPerformanceState(
             cpuUtilizationPercent = 42,

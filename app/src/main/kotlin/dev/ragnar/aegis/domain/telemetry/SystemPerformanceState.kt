@@ -14,6 +14,10 @@ data class SystemPerformanceState(
     val ramTotalBytes: Long = 0L,
     val storageUsedBytes: Long = 0L,
     val storageTotalBytes: Long = 0L,
+    /** Proportional Set Size of this launcher process, in bytes. */
+    val appMemoryBytes: Long = 0L,
+    /** Active Wi-Fi received signal strength in dBm, or null when unavailable/not on Wi-Fi. */
+    val wifiSignalDbm: Int? = null,
 ) {
     val ramPercent: Int
         get() = if (ramTotalBytes > 0) ((ramUsedBytes * 100) / ramTotalBytes).toInt().coerceIn(0, 100) else 0

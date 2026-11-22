@@ -12,8 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.ragnar.aegis.ui.components.HudBatteryIcon
 import dev.ragnar.aegis.ui.components.HudClockIcon
+import dev.ragnar.aegis.ui.components.HudCpuIcon
+import dev.ragnar.aegis.ui.components.HudRamIcon
+import dev.ragnar.aegis.ui.components.HudStackIcon
 import dev.ragnar.aegis.ui.components.HudTelemetryIcon
 import dev.ragnar.aegis.ui.theme.AegisTheme
 
@@ -22,12 +24,16 @@ import dev.ragnar.aegis.ui.theme.AegisTheme
  *
  * Visual layout matching reference:
  * [WaveIcon] TELEMETRY
- * [BattIcon]  BATT TEMP   37.0°C
+ * [CpuIcon]   DISPLAY     60 FPS
+ * [StackIcon] WIFI        -58 dBm
+ * [RamIcon]   APP MEMORY  48 MB
  * [ClockIcon] UPTIME      2H 49M
  */
 @Composable
 fun FloatingTelemetryPanel(
-    batteryTemperatureLabel: String,
+    frameRate: Int?,
+    wifiSignalLabel: String,
+    appMemoryLabel: String,
     uptimeFormatted: String,
     modifier: Modifier = Modifier,
 ) {
@@ -44,9 +50,19 @@ fun FloatingTelemetryPanel(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             TelemetryItem(
-                icon = { HudBatteryIcon(modifier = Modifier.width(12.dp)) },
-                label = "BATT TEMP",
-                value = batteryTemperatureLabel,
+                icon = { HudCpuIcon(modifier = Modifier.width(12.dp)) },
+                label = "DISPLAY",
+                value = frameRate?.let { "$it FPS" } ?: "---",
+            )
+            TelemetryItem(
+                icon = { HudStackIcon(modifier = Modifier.width(12.dp)) },
+                label = "WIFI",
+                value = wifiSignalLabel,
+            )
+            TelemetryItem(
+                icon = { HudRamIcon(modifier = Modifier.width(12.dp)) },
+                label = "APP MEMORY",
+                value = appMemoryLabel,
             )
             TelemetryItem(
                 icon = { HudClockIcon(modifier = Modifier.width(12.dp)) },
