@@ -54,15 +54,31 @@ fun AICoreVisualization(
             renderer = codeRain,
             phase = anim.codeRainPhase.value,
             colors = colors,
-        )
+            )
+
         val geo = NeuralGeometry.build(size.width, size.height)
         // State is read here, in the draw phase, so animation ticks redraw without recomposing.
         drawBrainMesh3D(
             mesh, frame, geo,
             brainPulse = anim.brainPulse.value,
             pulsePhase = anim.pulsePhase.value,
-            driftPhase = anim.meshDriftPhase.value,
+            rotationDeg = anim.outerRotation.value,
             colors = colors,
+        )
+        drawSurroundingTechRings(
+            geo = geo,
+            innerRot = anim.innerRotation.value,
+            outerRot = anim.outerRotation.value,
+            colors = colors
+        )
+        drawUpperMeasurementArc(
+            geo,colors
+        )
+        drawBrainNeuralMesh(
+            geo = geo,
+            brainPulse = anim.brainPulse.value,
+            pulsePhase = anim.pulsePhase.value,
+            colors = colors
         )
     }
 }
